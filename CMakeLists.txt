@@ -61,3 +61,4 @@ endmacro (simptestcase)
 
 simptestcase (comments-blanklines-single-file)
 simptestcase (invalid-usage-no-arguments)
+simptestcase (invalid-arguments-file-does-not-exist)

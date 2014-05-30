@@ -1,0 +1,12 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+application:file-name-resolver
+name:invalid-arguments-file-does-not-exist
+home:.
+
+test.run.cmdline:M4_FN_RESOLVER non-existing-file
+
+check.exitcode:M4_EXIT_INVALID_ARGUMENTS
+check.stdout.empty

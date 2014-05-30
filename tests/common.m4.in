@@ -8,6 +8,6 @@ m4_define(`M4_FN_RESOLVER',`M4_SRC_DIR/file-name-resolver')
 
 
 # Exit codes
-m4_define(`M4_EXIT_USAGE',1)
-m4_define(`M4_EXIT_INVALID_ARGUMENTS',2)
+m4_define(`M4_EXIT_USAGE',2)
+m4_define(`M4_EXIT_INVALID_ARGUMENTS',3)
 m4_define(`M4_EXIT_MISSING_FILE',m4_eval(8 + 0))

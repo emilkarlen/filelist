@@ -30,7 +30,7 @@ import sys
 import argparse
 
 EXIT_USAGE = 2
-
+EXIT_INVALID_ARGUMENTS = 3
 
 # Returns an open file.
 def parse_command_line():
@@ -41,8 +41,8 @@ def parse_command_line():
     args = parser.parse_args()
     try:
         return open(args.file,mode='r')
-    except e:
-        sys.exit(EXIT_USAGE)
+    except OSError:
+        sys.exit(EXIT_INVALID_ARGUMENTS)
 
 
 ###############################################################################
