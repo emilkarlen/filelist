@@ -1,4 +1,5 @@
-#!/bin/bash
+#! /usr/bin/python3
+# -*- python -*-
 
 ###############################################################################
 # Copyright 2014 Emil Karlén.
@@ -19,4 +20,8 @@
 # along with Wilde.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 
-echo testdata/existing-file.txt
+# import argparse
+# parser = argparse.ArgumentParser()
+# parser.parse_args()
+
+print("testdata/existing-file.txt")

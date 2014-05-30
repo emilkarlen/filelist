@@ -49,7 +49,7 @@ macro (simptestcase testFileNameHead)
   add_test (
     NAME ${testFileNameHead}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMAND ${SIMPTESTCASE} --m4 tests/${testFileNameHead}.m4.simptestcase
+    COMMAND ${SIMPTESTCASE} --m4 -v tests/${testFileNameHead}.m4.simptestcase
     )
 endmacro (simptestcase)
 
