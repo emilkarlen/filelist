@@ -24,3 +24,37 @@ project(file-name-resolver NONE)
 set (CMAKE_INSTALL_PREFIX /home/karlen/tmp/test-install/${CMAKE_PROJECT_NAME})
 
 install(PROGRAMS src/file-name-resolver DESTINATION bin)
+
+# Testing
+
+enable_testing()
+
+find_program(SIMPTESTCASE simptestcase)
+
+configure_file(
+  ${CMAKE_SOURCE_DIR}/tests/common.m4.in
+  ${CMAKE_SOURCE_DIR}/tests/common.m4
+) 
+
+###############################################################################
+# Macro for test using simptestcase, with a test case that uses M4.
+#
+# Argument is the name of the test case file:
+# - without the test directory name prefix ("tests/")
+# - without the file type suffix (".m4.simptestcase")
+#
+# The argument will be used as-is as the tests name.
+###############################################################################
+macro (simptestcase testFileNameHead)
+  add_test (
+    NAME ${testFileNameHead}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND ${SIMPTESTCASE} --m4 tests/${testFileNameHead}.m4.simptestcase
+    )
+endmacro (simptestcase)
+
+###############################################################################
+# Testcases
+###############################################################################
+
+simptestcase (comments-blanklines-single-file)

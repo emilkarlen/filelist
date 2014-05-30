@@ -1,0 +1,13 @@
+# All variables declared have the prefix "M4".
+
+# Aboslute name of the src directory.
+m4_define(`M4_SRC_DIR',`@CMAKE_SOURCE_DIR@/src')
+
+# Absolute name of the executable
+m4_define(`M4_FN_RESOLVER',`M4_SRC_DIR/file-name-resolver')
+
+
+# Exit codes
+m4_define(`M4_EXIT_USAGE',1)
+m4_define(`M4_EXIT_INVALID_ARGUMENTS',2)
+m4_define(`M4_EXIT_MISSING_FILE',m4_eval(8 + 0))
