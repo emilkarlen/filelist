@@ -1,3 +1,5 @@
+# -*- shell-script -*-
+
 m4_include(common.m4)
 
 application:file-name-resolver

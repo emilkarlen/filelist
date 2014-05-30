@@ -53,8 +53,11 @@ macro (simptestcase testFileNameHead)
     )
 endmacro (simptestcase)
 
+
 ###############################################################################
 # Testcases
 ###############################################################################
 
+
 simptestcase (comments-blanklines-single-file)
+simptestcase (invalid-usage-no-arguments)

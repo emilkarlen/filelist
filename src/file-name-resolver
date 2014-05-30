@@ -20,8 +20,35 @@
 # along with Wilde.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 
-# import argparse
-# parser = argparse.ArgumentParser()
-# parser.parse_args()
 
+###############################################################################
+# - parse arguments -
+###############################################################################
+
+
+import sys
+import argparse
+
+EXIT_USAGE = 2
+
+
+# Returns an open file.
+def parse_command_line():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file",
+                        metavar="FILE",
+                        help="A file that contains the resolve specification.")
+    args = parser.parse_args()
+    try:
+        return open(args.file,mode='r')
+    except e:
+        sys.exit(EXIT_USAGE)
+
+
+###############################################################################
+# - main -
+###############################################################################
+
+
+file = parse_command_line()
 print("testdata/existing-file.txt")
