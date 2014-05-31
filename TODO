@@ -1,0 +1,7 @@
+-*- org -*-
+
+* Defects
+** <2014-06-01 sun> Handling of abolute file names
+Currently, all file names are assumed to be relative.
+A prefix is added to each name, consising of the path
+from the command line current dir, to the file name.
