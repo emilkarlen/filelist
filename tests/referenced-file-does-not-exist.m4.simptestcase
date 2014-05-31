@@ -6,6 +6,8 @@ application:file-name-resolver
 name:referenced-file-does-not-exist
 home:.
 
+setup.install:testdata
+
 test.run.cmdline:M4_FN_RESOLVER testdata/referenced-file-does-not-exist.list
 
 check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST

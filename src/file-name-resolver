@@ -35,12 +35,22 @@ import re
 EXIT_USAGE = 2
 EXIT_INVALID_ARGUMENTS = 3
 EXIT_SYNTAX = 4
+EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 
 
 ###############################################################################
 # - utilities -
 ###############################################################################
 
+
+debugEnabled = False
+
+def debug(s):
+    if debugEnabled:
+        print("DEBUG: ",s)
+
+def debug_q(s):
+    debug("\"" + s + "\"")
 
 def write_lines(ostream,lines):
     """Writes a list of lines with an added trailing newline, to a stream."""
@@ -76,6 +86,12 @@ class Environment:
 
     def __init__(self,fileNamePrefix):
         self.fileNamePrefix = fileNamePrefix
+
+    def fileNameRelativeCurrentDirOfProc(self,fileName):
+        return self.fileNamePrefix + fileName
+
+    def fileNameRelativeTopLevelSourceFile(self,fileName):
+        return fileName
 
 class ResultItem:
     """
@@ -118,13 +134,25 @@ class ResultItemForFile(ResultItem):
         self.fileName = fileName
 
     def render(self,env : Environment):
-        return env.fileNamePrefix + self.fileName
+        return env.fileNameRelativeCurrentDirOfProc(self.fileName)
 
 
 ###############################################################################
 # - Instruction:s -
 ###############################################################################
 
+
+class IntructionApplicationException(Exception):
+    """
+    Indicates failure of an instruction to produce one of
+    its ResultItem:s.
+    """
+
+    def __init__(self,exitCode):
+        self.exitCode = exitCode
+
+    def render(self,ostream):
+        raise NotImplementedError
 
 class Instruction(ResultItemsConstructor):
     """
@@ -160,6 +188,23 @@ class File(ResultItemsConstructor):
 ###############################################################################
 
 
+class IntructionApplicationForMissingFileException(IntructionApplicationException):
+    """
+    Indicates that a referenced file does not exist.
+    """
+
+    def __init__(self,fileNameRelativeCurrentDirOfProc):
+        IntructionApplicationException.__init__(self,
+                                                EXIT_FILE_DOES_NOT_EXIST)
+        self.fileNameRelativeCurrentDirOfProc = fileNameRelativeCurrentDirOfProc
+
+    def render(self,ostream):
+        write_lines(ostream,
+                    [
+                        "File does not exist: " +
+                        self.fileNameRelativeCurrentDirOfProc
+                    ])
+
 class InstructionForFile(Instruction):
     """
     An instruction that resolves a single named file.
@@ -168,12 +213,17 @@ class InstructionForFile(Instruction):
         self.fileName = fileName 
 
     def resultItemIterable(self,env : Environment):
-        return [ResultItemForFile(self.fileName)]
+        filePath = env.fileNameRelativeCurrentDirOfProc(self.fileName)
+        if os.path.exists(filePath):
+            return [ResultItemForFile(self.fileName)]
+        else:
+            raise IntructionApplicationForMissingFileException(filePath)
 
 
 ###############################################################################
 # - InstructionOptionParser:s -
 ###############################################################################
+
 
 class SourceInfo:
     """Information about a part of a file source."""
@@ -359,9 +409,19 @@ def parse_command_line():
                         help="A file that contains the resolve specification.")
     args = parser.parse_args()
     try:
+        debug('a')
+        debug_q(os.getcwd())
+        debug_q(sys.argv[0])
+        debug_q(args.file)
+        e = os.path.exists(args.file)
+        debug("exists:" + str(e))
         return (args.file,
                 open(args.file,mode='r'))
     except OSError:
+        debug('b')
+        msg = "Cannot open file: \"" + args.file + "\""
+        write_lines(sys.stderr,
+                    [msg])
         sys.exit(EXIT_INVALID_ARGUMENTS)
 
 
@@ -373,11 +433,18 @@ def parse_command_line():
 
 (fileName,openFile) = parse_command_line()
 try:
+    debug('m1')
     file = FileParser.forTopLevel(fileName).apply(openFile)
+    debug('m2')
     env = Environment.forTopLevelFile(fileName)
+    debug('m3')
     for resultItem in file.resultItemIterable(env):
         print(resultItem.render(env))
 
-except InstructionSyntaxErrorException as e:
-    e.render(sys.stderr)
+except InstructionSyntaxErrorException as ex:
+    ex.render(sys.stderr)
     sys.exit(EXIT_SYNTAX)
+
+except IntructionApplicationException as ex:
+    ex.render(sys.stderr)
+    sys.exit(ex.exitCode)
