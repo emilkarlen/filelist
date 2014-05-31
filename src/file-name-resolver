@@ -55,32 +55,120 @@ def write_lines(ostream,lines):
 
 
 ###############################################################################
+# - ResultItem:s -
+###############################################################################
+
+
+class Environment:
+    """
+    Environment for executing instructions.
+    """
+
+    @staticmethod
+    def forTopLevelFile(fileName):
+        prefix = os.path.split(fileName)[0]
+        if prefix:
+            prefix = prefix + os.sep
+        return Environment(prefix)
+
+    def newForIncludedFile(self,nameOfIncludedFile):
+        raise NotImplementedError # TODO remove if not used
+
+    def __init__(self,fileNamePrefix):
+        self.fileNamePrefix = fileNamePrefix
+
+class ResultItem:
+    """
+    An item in a successful result, ready for rendering.
+
+    The rendering is not allowed to raise exceptions related to
+    the instruction that constructs this object.  I.e., all checks
+    and parses must be done.
+    """
+
+    def render(self,env : Environment):
+        """
+        Renders the item as a string).
+
+        Not allowed to raise exceptions (except for implementation issues,
+        of course).
+        """
+        raise NotImplementedError
+
+class ResultItemsConstructor:
+    """An iterable of ResultItem:s."""
+
+    def resultItemIterable(self,env : Environment):
+        """
+        Gives an iterable of all ResultItem:s that this object represents.
+
+        Can raise exceptions related to parsing and file checking.
+        """
+        raise NotImplementedError
+
+class ResultItemForFile(ResultItem):
+    """
+    An result item that is a file name.
+    """
+    def __init__(self,fileName):
+        """
+        fileName : the name of the file as specified in the source file -
+        i.e. it is relative the source file.
+        """
+        self.fileName = fileName
+
+    def render(self,env : Environment):
+        return env.fileNamePrefix + self.fileName
+
+
+###############################################################################
 # - Instruction:s -
 ###############################################################################
 
 
-class Instruction:
+class Instruction(ResultItemsConstructor):
     """
     Base class for instructions.
 
-    An instruction produces a list of file names.
+    An instruction produces an iterable of ResultItem:s.
     """
-    def execute(self):
-        """
-        Prints the file list that is specified by this instruction
-        to stdout.
-        """
+    def resultItemIterable(self,env : Environment):
         raise NotImplementedError
+
+class File(ResultItemsConstructor):
+    """A list of instructions in a single file."""
+
+    def __init__(self,
+                 directoryOfIncludingFile,
+                 fileName,
+                 instructions):
+        """
+        directoryOfIncludingFile is the empty string for top level files.
+        """
+        self.directoryOfIncludingFile = directoryOfIncludingFile
+        self.fileName = fileName
+        self.instructions = instructions
+
+    def resultItemIterable(self,env : Environment):
+        for instruction in self.instructions:
+            for resultItem in instruction.resultItemIterable(env):
+                yield resultItem
+
+
+###############################################################################
+# - concrete instructions -
+###############################################################################
+
 
 class InstructionForFile(Instruction):
     """
     An instruction that resolves a single named file.
     """
-    def __init__(self,filename):
-        self.filename = filename 
+    def __init__(self,fileName):
+        self.fileName = fileName 
 
-    def execute(self):
-        print(self.filename) # kollar inte om filen finns, ft
+    def resultItemIterable(self,env : Environment):
+        return [ResultItemForFile(self.fileName)]
 
 
 ###############################################################################
@@ -173,8 +261,13 @@ class InstructionOptionParserForFile(InstructionOptionParser):
 
 class FileParser:
     """
-    Parses a file into a list of instructions.
+    Parses a source file into a File object.
     """
+
+    @staticmethod
+    def forTopLevel(fileName):
+        return FileParser('',fileName)
+
     parsers = {
         "FILE" : InstructionOptionParserForFile()
     }
@@ -194,12 +287,18 @@ class FileParser:
     lineNumber = -1
     line = ""
 
-    def __init__(self,fileName):
+    def __init__(self,directoryOfIncludingFile,fileName):
+        """
+        directoryOfIncludingFile : empty or ends with a dir-sepa.
+        """
+
+        self.directoryOfIncludingFile = directoryOfIncludingFile
         self.fileName = fileName
+        self.outputLinePrefix = os.path.split(fileName)[0]
 
     def apply(self,openFile):
         """
-        Returns a list of Instruction:s.
+        Returns a File.
         """
         # Read all lines from the file so that we can close it before
         # opening any referenced files.
@@ -215,7 +314,9 @@ class FileParser:
             if (self.__is_ignored_line()):
                 continue
             instructions.append(self.parse_instruction_line())
-        return instructions
+        return File(self.directoryOfIncludingFile,
+                    self.fileName,
+                    instructions)
 
     def parse_instruction_line(self):
         (name,option) = self.__split_name_and_option()
@@ -223,8 +324,9 @@ class FileParser:
             parser = self.parsers[name]
             return parser.apply(option)
         except KeyError:
-            raise InstructionNameSyntaxErrorException(self.__sourceInfo(self.line),
-                                                      name)
+            raise InstructionNameSyntaxErrorException(
+                self.__sourceInfo(self.line),
+                name)
 
     def __split_name_and_option(self):
         nameAndOptionMatch = re.search(self.nameAndOptionGroupsRe,self.line)
@@ -271,9 +373,11 @@ def parse_command_line():
 
 (fileName,openFile) = parse_command_line()
 try:
-    instructions = FileParser(fileName).apply(openFile)
-    for instruction in instructions:
-        instruction.execute()
+    file = FileParser.forTopLevel(fileName).apply(openFile)
+    env = Environment.forTopLevelFile(fileName)
+    for resultItem in file.resultItemIterable(env):
+        print(resultItem.render(env))
+
 except InstructionSyntaxErrorException as e:
     e.render(sys.stderr)
     sys.exit(EXIT_SYNTAX)
