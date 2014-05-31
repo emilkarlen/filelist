@@ -230,10 +230,13 @@ class SourceInfo:
     def __init__(self,
                  fileName,
                  lineNumber,
-                 snippet):
+                 lineContents):
         self.fileName = fileName
         self.lineNumber = lineNumber
-        self.snippet = snippet
+        self.lineContents = lineContents
+
+    def errMsgFileRef(self):
+        return "File \"" + self.fileName + "\", line " + str(self.lineNumber)
 
 class InstructionSyntaxErrorException(Exception):
     """A syntactic error in an instruction of a source file."""
@@ -242,19 +245,19 @@ class InstructionSyntaxErrorException(Exception):
         self.description = description
     
     def render(self,ostream):
-        sourcePosition = "File \"" + self.sourceInfo.fileName + "\", line " + str(self.sourceInfo.lineNumber)
+        sourcePosition = self.sourceInfo.errMsgFileRef()
         write_lines(ostream,
                     [
                         sourcePosition,
                         "  " + self.description + ":",
-                        "    " + self.sourceInfo.snippet
+                        "    " + self.sourceInfo.lineContents
                     ])
 
 class InstructionLineSyntaxErrorException(InstructionSyntaxErrorException):
     """Invalid syntax of a line that should contain an instruction."""
     def __init__(self,
                  sourceInfo):
-        description = "The line contains no instruction."
+        description = "Invalid input line, cannot find instruction:"
         InstructionSyntaxErrorException.__init__(self,
                                                  sourceInfo,
                                                  description)
@@ -375,23 +378,23 @@ class FileParser:
             return parser.apply(option)
         except KeyError:
             raise InstructionNameSyntaxErrorException(
-                self.__sourceInfo(self.line),
+                self.__sourceInfo(),
                 name)
 
     def __split_name_and_option(self):
         nameAndOptionMatch = re.search(self.nameAndOptionGroupsRe,self.line)
         if (not nameAndOptionMatch):
-            raise InstructionLineSyntaxErrorException()
+            raise InstructionLineSyntaxErrorException(self.__sourceInfo())
         return (nameAndOptionMatch.group(1),
                 nameAndOptionMatch.group(2))
 
     def __is_ignored_line(self):
         return (self.ignoredLineRe.match(self.line) != None)
 
-    def __sourceInfo(self,sourceSnippet):
+    def __sourceInfo(self):
         return SourceInfo(self.fileName,
                           self.lineNumber,
-                          sourceSnippet)
+                          self.line)
 
 
 ###############################################################################

@@ -68,6 +68,7 @@ simptestcase (invalid-usage-no-arguments)
 simptestcase (invalid-arguments-file-does-not-exist)
 
 simptestcase (parse/invalid-instruction-name)
+simptestcase (parse/invalid-line-syntax)
 
 simptestcase (comments-blanklines-single-file)
 simptestcase (referenced-file-does-not-exist)

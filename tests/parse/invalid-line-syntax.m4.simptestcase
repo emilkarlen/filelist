@@ -1,0 +1,14 @@
+# -*- shell-script -*-
+
+m4_include(../common.m4)
+
+application:file-name-resolver
+name:invalid-line-syntax
+home:..
+
+setup.install:testdata
+
+test.run.cmdline:M4_FN_RESOLVER testdata/invalid-line-syntax.list
+
+check.exitcode:M4_EXIT_SYNTAX
+check.stdout.empty
