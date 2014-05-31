@@ -1,0 +1,12 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+application:file-name-resolver
+name:referenced-file-does-not-exist
+home:.
+
+test.run.cmdline:M4_FN_RESOLVER testdata/referenced-file-does-not-exist.list
+
+check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
+check.stdout.empty

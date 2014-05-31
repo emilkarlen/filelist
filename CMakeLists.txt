@@ -25,7 +25,11 @@ set (CMAKE_INSTALL_PREFIX /home/karlen/tmp/test-install/${CMAKE_PROJECT_NAME})
 
 install(PROGRAMS src/file-name-resolver DESTINATION bin)
 
-# Testing
+
+###############################################################################
+# - test -
+###############################################################################
+
 
 enable_testing()
 
@@ -59,6 +63,11 @@ endmacro (simptestcase)
 ###############################################################################
 
 
-simptestcase (comments-blanklines-single-file)
+# Usage
 simptestcase (invalid-usage-no-arguments)
 simptestcase (invalid-arguments-file-does-not-exist)
+
+simptestcase (parse/invalid-instruction-name)
+
+simptestcase (comments-blanklines-single-file)
+simptestcase (referenced-file-does-not-exist)

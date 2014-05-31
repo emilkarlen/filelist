@@ -1,4 +1,9 @@
+# Configuration and values common to all tests.
+
 # All variables declared have the prefix "M4".
+
+# Aboslute name of the test directory.
+m4_define(`M4_TEST_DIR',`@CMAKE_SOURCE_DIR@/tests')
 
 # Aboslute name of the src directory.
 m4_define(`M4_SRC_DIR',`@CMAKE_SOURCE_DIR@/src')
@@ -6,8 +11,10 @@ m4_define(`M4_SRC_DIR',`@CMAKE_SOURCE_DIR@/src')
 # Absolute name of the executable
 m4_define(`M4_FN_RESOLVER',`M4_SRC_DIR/file-name-resolver')
 
+m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
 
 # Exit codes
 m4_define(`M4_EXIT_USAGE',2)
 m4_define(`M4_EXIT_INVALID_ARGUMENTS',3)
-m4_define(`M4_EXIT_MISSING_FILE',m4_eval(8 + 0))
+m4_define(`M4_EXIT_FILE_DOES_NOT_EXIST',m4_eval(8 + 0))
+m4_define(`M4_EXIT_SYNTAX',4)

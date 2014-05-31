@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+# -*- coding: utf-8 -*-
 # -*- python -*-
 
 ###############################################################################
@@ -27,22 +28,240 @@
 
 
 import sys
+import os
 import argparse
+import re
 
 EXIT_USAGE = 2
 EXIT_INVALID_ARGUMENTS = 3
+EXIT_SYNTAX = 4
 
-# Returns an open file.
+
+###############################################################################
+# - utilities -
+###############################################################################
+
+
+def write_lines(ostream,lines):
+    """Writes a list of lines with an added trailing newline, to a stream."""
+    for line in lines:
+        ostream.write(line)
+        ostream.write(os.linesep)
+
+
+###############################################################################
+# - classes -
+###############################################################################
+
+
+###############################################################################
+# - Instruction:s -
+###############################################################################
+
+
+class Instruction:
+    """
+    Base class for instructions.
+
+    An instruction produces a list of file names.
+    """
+    def execute(self):
+        """
+        Prints the file list that is specified by this instruction
+        to stdout.
+        """
+        raise NotImplementedError
+
+class InstructionForFile(Instruction):
+    """
+    An instruction that resolves a single named file.
+    """
+    def __init__(self,filename):
+        self.filename = filename 
+
+    def execute(self):
+        print(self.filename) # kollar inte om filen finns, ft
+
+
+###############################################################################
+# - InstructionOptionParser:s -
+###############################################################################
+
+class SourceInfo:
+    """Information about a part of a file source."""
+    def __init__(self,
+                 fileName,
+                 lineNumber,
+                 snippet):
+        self.fileName = fileName
+        self.lineNumber = lineNumber
+        self.snippet = snippet
+
+class InstructionSyntaxErrorException(Exception):
+    """A syntactic error in an instruction of a source file."""
+    def __init__(self,sourceInfo,description):
+        self.sourceInfo = sourceInfo
+        self.description = description
+    
+    def render(self,ostream):
+        sourcePosition = "File \"" + self.sourceInfo.fileName + "\", line " + str(self.sourceInfo.lineNumber)
+        write_lines(ostream,
+                    [
+                        sourcePosition,
+                        "  " + self.description + ":",
+                        "    " + self.sourceInfo.snippet
+                    ])
+
+class InstructionLineSyntaxErrorException(InstructionSyntaxErrorException):
+    """Invalid syntax of a line that should contain an instruction."""
+    def __init__(self,
+                 sourceInfo):
+        description = "The line contains no instruction."
+        InstructionSyntaxErrorException.__init__(self,
+                                                 sourceInfo,
+                                                 description)
+
+class InstructionNameSyntaxErrorException(InstructionSyntaxErrorException):
+    """Invalid name of an instruction of a source file."""
+    def __init__(self,
+                 sourceInfo,
+                 instructionName):
+        description = "Invalid instruction name `" + instructionName + "'"
+        InstructionSyntaxErrorException.__init__(self,
+                                                 sourceInfo,
+                                                 description)
+
+class InstructionOptionSyntaxErrorException(Exception):
+    """
+    A syntactic error in an Instruction Option of a source file.
+
+    This exception is internal to the File Parser and
+    Option Parsers.
+    
+    This exception is raised by Option Parsers, and handled by
+    the parser, which re-rases it in the form of a
+    InstructionSyntaxErrorException.
+    """
+    def __init__(self,messageLines):
+        self._messageLines = messageLines
+
+    def messageLines(self):
+            return self._messageLines
+
+class InstructionOptionParser:
+    """
+    Parses the options-part of a line in a source file.
+    """
+
+    def apply(self,instructionOptions):
+        """Returns an Instruction."""
+        raise NotImplementedError
+
+class InstructionOptionParserForFile(InstructionOptionParser):
+    """Parser for a single file."""
+
+    def apply(self,instructionOptions):
+        # TODO check syntax of instructionOptions - should be single
+        # file name
+        return InstructionForFile(instructionOptions)
+
+
+###############################################################################
+# - FileParser -
+###############################################################################
+
+
+class FileParser:
+    """
+    Parses a file into a list of instructions.
+    """
+    parsers = {
+        "FILE" : InstructionOptionParserForFile()
+    }
+
+    ignoredLineReString = "^\s*(#.*)?$"
+    ignoredLineRe = re.compile(ignoredLineReString)
+
+    nameAndOptionGroupsReString = "\s*(\w+)\s*(.*)"
+    nameAndOptionGroupsRe = re.compile(nameAndOptionGroupsReString)
+
+    # Mutable state.
+    # Having these here avoids having to pass them around to almost every
+    # method.
+    # The values are set by the top level method (apply), so that
+    # can access them.
+    # Only the apply method is allowed to modify this state.
+    lineNumber = -1
+    line = ""
+
+    def __init__(self,fileName):
+        self.fileName = fileName
+
+    def apply(self,openFile):
+        """
+        Returns a list of Instruction:s.
+        """
+        # Read all lines from the file so that we can close it before
+        # opening any referenced files.
+        # This prevents exhausting the number of open files.
+        lines = openFile.readlines()
+        openFile.close()
+
+        self.lineNumber = 0
+        instructions = []
+        for lineWithPossibleNewLine in lines:
+            self.line = lineWithPossibleNewLine.strip('\n')
+            self.lineNumber += 1
+            if (self.__is_ignored_line()):
+                continue
+            instructions.append(self.parse_instruction_line())
+        return instructions
+
+    def parse_instruction_line(self):
+        (name,option) = self.__split_name_and_option()
+        try:
+            parser = self.parsers[name]
+            return parser.apply(option)
+        except KeyError:
+            raise InstructionNameSyntaxErrorException(self.__sourceInfo(self.line),
+                                                      name)
+
+    def __split_name_and_option(self):
+        nameAndOptionMatch = re.search(self.nameAndOptionGroupsRe,self.line)
+        if (not nameAndOptionMatch):
+            raise InstructionLineSyntaxErrorException()
+        return (nameAndOptionMatch.group(1),
+                nameAndOptionMatch.group(2))
+
+    def __is_ignored_line(self):
+        return (self.ignoredLineRe.match(self.line) != None)
+
+    def __sourceInfo(self,sourceSnippet):
+        return SourceInfo(self.fileName,
+                          self.lineNumber,
+                          sourceSnippet)
+
+
+###############################################################################
+# - parse_command_line -
+###############################################################################
+
+
 def parse_command_line():
+    """
+    Returns an (file name,open file).
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("file",
                         metavar="FILE",
                         help="A file that contains the resolve specification.")
     args = parser.parse_args()
     try:
-        return open(args.file,mode='r')
+        return (args.file,
+                open(args.file,mode='r'))
     except OSError:
         sys.exit(EXIT_INVALID_ARGUMENTS)
+
 
 
 ###############################################################################
@@ -50,5 +269,11 @@ def parse_command_line():
 ###############################################################################
 
 
-file = parse_command_line()
-print("testdata/existing-file.txt")
+(fileName,openFile) = parse_command_line()
+try:
+    instructions = FileParser(fileName).apply(openFile)
+    for instruction in instructions:
+        instruction.execute()
+except InstructionSyntaxErrorException as e:
+    e.render(sys.stderr)
+    sys.exit(EXIT_SYNTAX)
