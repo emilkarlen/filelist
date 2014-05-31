@@ -5,3 +5,40 @@
 Currently, all file names are assumed to be relative.
 A prefix is added to each name, consising of the path
 from the command line current dir, to the file name.
+
+* New features
+** Switches for turning on/off checking the existence of files
+** Flatten file
+Generate an input file that is equivalent to the given argument
+(regarding output from running the program in normal mode, on it)
+but that consists of a single "flat" file - a file that contains
+no INCLUDE instructions.
+
+This could be usefull for getting an overview of file references,
+or for debugging.
+
+A variant of this is to print only INCLUDE instructions, to get
+an overview of all references.
+
+** Associating tags with each file
+Consists of two parts:
+1. New instruction that produces no output:
+   TAG <list of tags>
+2. Switch to turn on output of tags
+
+The first part sets a number of "tags" that will be associated with each file
+up until a new TAG instruction.
+
+In the output: each file will be preceded by the tags associated with it.
+
+This feature could be usefull for combining information about different
+categories of files using a single file list.
+E.g. in which "phase" a file should be executed - "pre-install", "install",
+"post-install".
+Without this feature, categorizing files in this way requires a single
+file list for each category.  And maintaining several files has some
+drawbacks:
+1. Difficulty to get an overview of all involved categories.
+2. If a similair sub-directory structure is used for all categories,
+   then this structure has to be repeated in each file
+   (the INCLUDEs will be identical, except for concrete file-name).
