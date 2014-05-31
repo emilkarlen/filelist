@@ -74,13 +74,6 @@ class Environment:
     Environment for executing instructions.
     """
 
-    @staticmethod
-    def forTopLevelFile(fileName):
-        prefix = os.path.split(fileName)[0]
-        if prefix:
-            prefix = prefix + os.sep
-        return Environment(prefix)
-
     def newForIncludedFile(self,nameOfIncludedFile):
         raise NotImplementedError # TODO remove if not used
 
@@ -93,6 +86,40 @@ class Environment:
     def fileNameRelativeTopLevelSourceFile(self,fileName):
         return fileName
 
+class RenditionSettings:
+    """
+    Settings for rendering the output.
+    """
+    def __init__(self,
+                 fileNamesAreRelativeFileArgumentLocation : bool):
+        self.fileNamesAreRelativeFileArgumentLocation = fileNamesAreRelativeFileArgumentLocation
+
+class RenditionEnvironment(Environment):
+    """
+    Environment used during the rendition of a ResultItem.
+    """
+
+    @staticmethod
+    def forTopLevelFile(fileName,
+                        settings : RenditionSettings):
+        prefix = os.path.split(fileName)[0]
+        if prefix:
+            prefix = prefix + os.sep
+        return RenditionEnvironment(prefix,
+                                    settings)
+
+    def __init__(self,
+                 fileNamePrefix,
+                 renditionSettings):
+        Environment.__init__(self,fileNamePrefix)
+        self.renditionSettings = renditionSettings
+
+    def renderFileNameAccordingToSettings(self,fileName):
+        if renditionSettings.fileNamesAreRelativeFileArgumentLocation:
+            return self.fileNameRelativeTopLevelSourceFile(fileName)
+        else:
+            return self.fileNameRelativeCurrentDirOfProc(fileName)
+
 class ResultItem:
     """
     An item in a successful result, ready for rendering.
@@ -102,7 +129,7 @@ class ResultItem:
     and parses must be done.
     """
 
-    def render(self,env : Environment):
+    def render(self,env : RenditionEnvironment):
         """
         Renders the item as a string).
 
@@ -133,8 +160,8 @@ class ResultItemForFile(ResultItem):
         """
         self.fileName = fileName
 
-    def render(self,env : Environment):
-        return env.fileNameRelativeCurrentDirOfProc(self.fileName)
+    def render(self,env : RenditionEnvironment):
+        return env.renderFileNameAccordingToSettings(self.fileName)
 
 
 ###############################################################################
@@ -404,13 +431,19 @@ class FileParser:
 
 def parse_command_line():
     """
-    Returns an (file name,open file).
+    Returns an (file name,RenditionSettings,open file).
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("file",
                         metavar="FILE",
                         help="A file that contains the resolve specification.")
+    parser.add_argument("--relative-file-argument-location","-f",
+                        default=False,
+                        action='store_true',
+                        help="File paths are relative the location of the FILE argument. Without this option, file names are relative the location of the invocation of the program.")
     args = parser.parse_args()
+    renditionSettings = RenditionSettings(args.relative_file_argument_location)
+    debug(args)
     try:
         debug('a')
         debug_q(os.getcwd())
@@ -419,6 +452,7 @@ def parse_command_line():
         e = os.path.exists(args.file)
         debug("exists:" + str(e))
         return (args.file,
+                renditionSettings,
                 open(args.file,mode='r'))
     except OSError:
         debug('b')
@@ -434,12 +468,12 @@ def parse_command_line():
 ###############################################################################
 
 
-(fileName,openFile) = parse_command_line()
+(fileName,renditionSettings,openFile) = parse_command_line()
 try:
     debug('m1')
     file = FileParser.forTopLevel(fileName).apply(openFile)
     debug('m2')
-    env = Environment.forTopLevelFile(fileName)
+    env = RenditionEnvironment.forTopLevelFile(fileName,renditionSettings)
     debug('m3')
     for resultItem in file.resultItemIterable(env):
         print(resultItem.render(env))
