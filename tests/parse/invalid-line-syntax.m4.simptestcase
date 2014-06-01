@@ -4,9 +4,9 @@ m4_include(../common.m4)
 
 application:file-name-resolver
 name:invalid-line-syntax
-home:..
+home:.
 
-setup.install:testdata
+setup.install:M4_TEST_DIR/testdata
 
 test.run.cmdline:M4_EXECUTABLE testdata/invalid-line-syntax.list
 

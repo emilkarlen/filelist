@@ -4,9 +4,9 @@ m4_include(../common.m4)
 
 application:file-name-resolver
 name:invalid-instruction-name
-home:..
+home:.
 
-setup.install:M4_COMMON_TESTDATA_DIR
+setup.install:M4_TEST_DIR/testdata
 
 test.run.cmdline:M4_EXECUTABLE testdata/invalid-instruction-name.list
 
