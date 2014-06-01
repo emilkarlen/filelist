@@ -1,0 +1,2 @@
+dir/existing-file-2.txt
+dir/existing-file.txt

@@ -1,0 +1,2 @@
+testdata/dir/existing-file-2.txt
+testdata/dir/existing-file.txt

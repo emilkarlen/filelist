@@ -43,14 +43,21 @@ EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 ###############################################################################
 
 
-debugEnabled = False
+debugEnabled = True
 
 def debug(s):
     if debugEnabled:
-        print("DEBUG: ",s)
+        sys.stderr.write("DEBUG: " + s)
+        sys.stderr.write(os.linesep)
 
 def debug_q(s):
     debug("\"" + s + "\"")
+
+def debug_begin(s):
+    debug(s + " BEGIN")
+
+def debug_end(s):
+    debug(s + " END")
 
 def write_lines(ostream,lines):
     """Writes a list of lines with an added trailing newline, to a stream."""
@@ -74,17 +81,31 @@ class Environment:
     Environment for executing instructions.
     """
 
+    def newForDirectory(self,nameOfDirectory):
+        fromCurrDir = os.path.join(self.fromCurrDir,
+                              nameOfDirectory)
+        fromTopLevelFile = os.path.join(self.fromTopLevelFile,
+                              nameOfDirectory)
+        if fromCurrDir[-1] != os.path.sep:
+            fromCurrDir += os.path.sep
+            fromTopLevelFile += os.path.sep
+        return Environment(fromCurrDir,
+                           fromTopLevelFile)
+
     def newForIncludedFile(self,nameOfIncludedFile):
         raise NotImplementedError # TODO remove if not used
 
-    def __init__(self,fileNamePrefix):
-        self.fileNamePrefix = fileNamePrefix
+    def __init__(self,
+                 fromCurrDir : str,
+                 fromTopLevelFile : str):
+        self.fromCurrDir = fromCurrDir
+        self.fromTopLevelFile = fromTopLevelFile
 
     def fileNameRelativeCurrentDirOfProc(self,fileName):
-        return self.fileNamePrefix + fileName
+        return self.fromCurrDir + fileName
 
     def fileNameRelativeTopLevelSourceFile(self,fileName):
-        return fileName
+        return self.fromTopLevelFile + fileName
 
 class RenditionSettings:
     """
@@ -102,16 +123,18 @@ class RenditionEnvironment(Environment):
     @staticmethod
     def forTopLevelFile(fileName,
                         settings : RenditionSettings):
-        prefix = os.path.split(fileName)[0]
+        prefix = os.path.dirname(fileName)
         if prefix:
             prefix = prefix + os.sep
         return RenditionEnvironment(prefix,
+                                    '',
                                     settings)
 
     def __init__(self,
-                 fileNamePrefix,
+                 fromCurrDir : str,
+                 fromTopLevelFile : str,
                  renditionSettings):
-        Environment.__init__(self,fileNamePrefix)
+        Environment.__init__(self,fromCurrDir,fromTopLevelFile)
         self.renditionSettings = renditionSettings
 
     def renderFileNameAccordingToSettings(self,fileName):
@@ -241,10 +264,30 @@ class InstructionForFile(Instruction):
 
     def resultItemIterable(self,env : Environment):
         filePath = env.fileNameRelativeCurrentDirOfProc(self.fileName)
-        if os.path.exists(filePath):
-            return [ResultItemForFile(self.fileName)]
-        else:
+        if not os.path.exists(filePath):
             raise IntructionApplicationForMissingFileException(filePath)
+        return [ResultItemForFile(self.fileName)]
+
+class InstructionForDirectoryListing(Instruction):
+    """
+    An instruction that resolves the contents of a directory.
+    """
+    def __init__(self,directoryName):
+        self.directoryName = directoryName 
+
+    def resultItemIterable(self,env : Environment):
+        dirPath = env.fileNameRelativeCurrentDirOfProc(self.directoryName)
+        if not os.path.isdir(dirPath):
+            raise IntructionApplicationForMissingFileException(dirPath)
+        envForDir = env.newForDirectory(self.directoryName)
+        debug("list: " + self.directoryName)
+        for fileInDir in os.listdir(dirPath):
+            fileNameRelCurrDir = envForDir.fileNameRelativeCurrentDirOfProc(fileInDir)
+            debug("list   " + fileInDir)
+            debug("list   " + fileNameRelCurrDir)
+            if os.path.exists(fileNameRelCurrDir):
+                yield ResultItemForFile(
+                    envForDir.fileNameRelativeTopLevelSourceFile(fileInDir))
 
 
 ###############################################################################
@@ -333,6 +376,14 @@ class InstructionOptionParserForFile(InstructionOptionParser):
         # file name
         return InstructionForFile(instructionOptions)
 
+class InstructionOptionParserForDirectoryListing(InstructionOptionParser):
+    """Parser for the contents of a directory."""
+
+    def apply(self,instructionOptions):
+        # TODO check syntax of instructionOptions - should be single
+        # file name
+        return InstructionForDirectoryListing(instructionOptions)
+
 
 ###############################################################################
 # - FileParser -
@@ -349,7 +400,8 @@ class FileParser:
         return FileParser('',fileName)
 
     parsers = {
-        "FILE" : InstructionOptionParserForFile()
+        "FILE" : InstructionOptionParserForFile(),
+        "LIST" : InstructionOptionParserForDirectoryListing()
     }
 
     ignoredLineReString = "^\s*(#.*)?$"
@@ -374,7 +426,7 @@ class FileParser:
 
         self.directoryOfIncludingFile = directoryOfIncludingFile
         self.fileName = fileName
-        self.outputLinePrefix = os.path.split(fileName)[0]
+        self.outputLinePrefix = os.path.dirname(fileName)
 
     def apply(self,openFile):
         """
@@ -443,19 +495,12 @@ def parse_command_line():
                         help="File paths are relative the location of the FILE argument. Without this option, file names are relative the location of the invocation of the program.")
     args = parser.parse_args()
     renditionSettings = RenditionSettings(args.relative_file_argument_location)
-    debug(args)
     try:
-        debug('a')
-        debug_q(os.getcwd())
-        debug_q(sys.argv[0])
-        debug_q(args.file)
         e = os.path.exists(args.file)
-        debug("exists:" + str(e))
         return (args.file,
                 renditionSettings,
                 open(args.file,mode='r'))
     except OSError:
-        debug('b')
         msg = "Cannot open file: \"" + args.file + "\""
         write_lines(sys.stderr,
                     [msg])
@@ -468,20 +513,23 @@ def parse_command_line():
 ###############################################################################
 
 
+debug_begin('parse')
 (fileName,renditionSettings,openFile) = parse_command_line()
+debug_end('parse')
 try:
-    debug('m1')
     file = FileParser.forTopLevel(fileName).apply(openFile)
-    debug('m2')
     env = RenditionEnvironment.forTopLevelFile(fileName,renditionSettings)
-    debug('m3')
+    debug_begin('iter')
     for resultItem in file.resultItemIterable(env):
         print(resultItem.render(env))
+    debug_end('iter')
 
 except InstructionSyntaxErrorException as ex:
+    debug('InstructionSyntaxErrorException')
     ex.render(sys.stderr)
     sys.exit(EXIT_SYNTAX)
 
 except IntructionApplicationException as ex:
+    debug('IntructionApplicationException')
     ex.render(sys.stderr)
     sys.exit(ex.exitCode)

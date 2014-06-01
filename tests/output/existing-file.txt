@@ -1,1 +1,2 @@
 testdata/existing-file.txt
+testdata/dir
