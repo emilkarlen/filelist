@@ -62,6 +62,11 @@ drawbacks:
    then this structure has to be repeated in each file
    (the INCLUDEs will be identical, except for concrete file-name).
 
+** PRINT-instruction
+   Prints the arguments to the output
+   Would provide a way to group the files (an alternative to the
+   tag-feature).
+   Possible: switch to supress output from all PRINT instruction
 * Build system
 ** Support parallell builds
    Current, only one build is supported, since the file
