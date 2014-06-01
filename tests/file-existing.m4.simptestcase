@@ -3,12 +3,12 @@
 m4_include(common.m4)
 
 application:file-name-resolver
-name:existing-file
+name:file-existing
 home:.
 
 setup.install:testdata
 
-test.run.cmdline:M4_FN_RESOLVER testdata/existing-file.list
+test.run.cmdline:M4_FN_RESOLVER testdata/file-existing.list
 
 check.exitcode:0
-check.stdout.file.eq:output/existing-file.txt
+check.stdout.file.eq:output/file-existing.txt

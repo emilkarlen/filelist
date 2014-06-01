@@ -8,7 +8,7 @@ home:.
 
 setup.install:testdata
 
-test.run.cmdline:M4_FN_RESOLVER testdata/referenced-file-does-not-exist.list
+test.run.cmdline:M4_FN_RESOLVER testdata/file-non-existing.list
 
 check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
 check.stdout.empty
