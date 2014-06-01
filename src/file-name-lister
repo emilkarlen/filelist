@@ -32,6 +32,8 @@ import os
 import argparse
 import re
 import textwrap
+import fnmatch
+from types import FunctionType
 
 EXIT_USAGE = 2
 EXIT_INVALID_ARGUMENTS = 3
@@ -64,6 +66,8 @@ def debug_begin(s):
 def debug_end(s):
     debug(s + " END")
 
+def cq(s):
+    return " : \"" + s + "\""
 
 def write_lines(o_stream,lines):
     """Writes a list of lines with an added trailing newline, to a stream."""
@@ -346,13 +350,15 @@ class InstructionForFile(Instruction):
         result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name))
         return iter([result_item])
 
-
 class InstructionForDirectoryListing(Instruction):
     """
     An instruction that resolves the contents of a directory.
     """
-    def __init__(self, directory_name: str):
-        self.directory_name = directory_name 
+    def __init__(self,
+                 directory_name: str,
+                 matcher: FunctionType):
+        self.directory_name = directory_name
+        self.matcher = matcher
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
@@ -363,6 +369,8 @@ class InstructionForDirectoryListing(Instruction):
         env_for_dir = env.new_for_directory(self.directory_name)
         debug("list: " + self.directory_name)
         for fileInDir in os.listdir(dir_path):
+            if not self.matcher(fileInDir):
+                continue
             file_name_rel_curr_dir = env_for_dir.file_name_relative_current_dir_of_process(fileInDir)
             debug("list   " + fileInDir)
             debug("list   " + file_name_rel_curr_dir)
@@ -457,24 +465,34 @@ class InstructionNameSyntaxErrorException(InstructionSyntaxErrorException):
                                                  source_info,
                                                  description)
 
+class InstructionArgumentSyntaxErrorException(InstructionSyntaxErrorException):
+    """The arguments of an instruction are invalid."""
+    def __init__(self,
+                 source_info: SourceInfo,
+                 lines: list):
+        description = "\n".join(lines)
+        InstructionSyntaxErrorException.__init__(self,
+                                                 source_info,
+                                                 description)
 
-class InstructionArgumentSyntaxErrorException(Exception):
+
+class InstructionArgumentParserSyntaxErrorException(Exception):
     """
-    A syntactic error in an Instruction Option of a source file.
+    A syntactic error in an Instruction Argument of a source file.
 
     This exception is internal to the File Parser and
     Option Parsers.
     
-    This exception is raised by Option Parsers, and handled by
+    This exception is raised by Argument Parsers, and handled by
     the parser, which re-raises it in the form of a
     InstructionSyntaxErrorException.
     """
     def __init__(self,
                  message_lines: list):
-        self._message_lines = message_lines
+        self.message_lines = message_lines
 
     def message_lines(self):
-            return self._message_lines
+            return self.message_lines
 
 
 class InstructionArgumentParser:
@@ -500,15 +518,59 @@ class InstructionArgumentParserForFile(InstructionArgumentParser):
         return InstructionForFile(instruction_argument)
 
 
+def wildcard_matcher(wildcard: str):
+    """A mather that matches on Unix-style wildcards."""
+    debug("           wc: " + str(type(wildcard)) + cq(wildcard))
+    try:
+        regex_string = fnmatch.translate(wildcard)
+        regex = re.compile(regex_string)
+    except:
+        raise InstructionArgumentParserSyntaxErrorException(["Invalid wildcard: `" + wildcard + "'"])
+    def f(file_name: str) -> bool:
+        return regex.match(file_name)
+    return f
+
+def or_matcher(matchers):
+    """
+    A matcher that must match one of a given list of matchers.
+    """
+    def f(file_name: str) -> bool:
+        for matcher in matchers:
+            if matcher(file_name):
+                return True
+        return False
+    return f
+
+def constantly_true_matcher():
+    def f(file_name: str) -> bool:
+        return True
+    return f
+
 class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
     """Parser for the contents of a directory."""
 
     def apply(self,
               parsing_settings: ParsingSettings,
               instruction_argument: str):
-        # TODO check syntax of instruction_argument - should be single
-        # file name
-        return InstructionForDirectoryListing(instruction_argument)
+        (directory,matcher) = self._parse_arguments(parsing_settings,instruction_argument)
+        return InstructionForDirectoryListing(directory,matcher)
+
+    def _parse_arguments(self,
+                         parsing_settings: ParsingSettings,
+                         instruction_argument: str) -> (str,list):
+        arguments = instruction_argument.split()
+        if not arguments:
+            raise InstructionArgumentParserSyntaxErrorException(["A directory must be given."])
+        directory = arguments[0]
+        matcher = self._parse_matcher(arguments[1:])
+        return directory, matcher
+
+    def _parse_matcher(self, wildcards: list):
+        if not wildcards:
+            return constantly_true_matcher()
+        for wc in wildcards:
+            debug(str(type(wc)) + cq(wc))
+        return or_matcher([wildcard_matcher(wildcard) for wildcard in wildcards])
 
 
 class InstructionArgumentParserForInclude(InstructionArgumentParser):
@@ -588,6 +650,9 @@ class FileParser:
             raise InstructionNameSyntaxErrorException(
                 self._source_info(),
                 name)
+        except InstructionArgumentParserSyntaxErrorException as ex:
+            raise InstructionArgumentSyntaxErrorException(self._source_info(),
+                                                          ex.message_lines)
 
     def _split_name_and_argument(self) -> (str, str):
         name_and_argument_match = re.search(self.name_and_argument_groups_re, self.line)
@@ -702,15 +767,26 @@ description_of_file = InstructionDescription(
 )
 
 description_of_directory = InstructionDescription(
-    "Outputs the pats of the files inside a directory.",
-    "DIRECTORY",
+    "Prints paths of the files inside a directory.",
+    "DIRECTORY [PATTERN...]",
     [("DIRECTORY",
      """\
      A name relative to the location of the list file.
      The directory must exist and be readable.
+     """),
+    ("PATTERN",
+     """\
+     A Unix like shell-style wildcard.
+     (E.g. the constructs "*, ?, [abc],[!abc]".)
      """)
     ],
-    None
+    """\
+    If no PATTERN is given, then all files will be printed.
+    If one or more PATTERN are given, then every path that
+    match at least one pattern is printed.
+    Each PATTERN is applied to the base-name of the files in the
+    directory.
+    """
 )
 
 description_of_include = InstructionDescription(

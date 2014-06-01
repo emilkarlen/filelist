@@ -1,0 +1,14 @@
+# -*- shell-script -*-
+
+m4_include(../common.m4)
+
+application:file-name-resolver
+name:wildecards
+home:.
+
+setup.install:pattern-test-data
+
+test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-test-data/wildcards.list | sort
+
+check.exitcode:0
+check.stdout.file.eq:output/wildcards.txt

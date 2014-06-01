@@ -11,6 +11,10 @@ m4_define(`M4_SRC_DIR',`@CMAKE_SOURCE_DIR@/src')
 # Absolute name of the executable
 m4_define(`M4_EXECUTABLE',`M4_SRC_DIR/file-name-lister')
 
+# The executable invoked for printing paths relative the
+# list file.
+m4_define(`M4_EXECUTABLE_REL_LIST',`M4_EXECUTABLE --relative-file-argument-location')
+
 m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
 
 # Exit codes
