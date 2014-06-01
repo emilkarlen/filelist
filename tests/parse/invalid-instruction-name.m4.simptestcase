@@ -8,7 +8,7 @@ home:..
 
 setup.install:M4_COMMON_TESTDATA_DIR
 
-test.run.cmdline:M4_FN_RESOLVER testdata/invalid-instruction-name.list
+test.run.cmdline:M4_EXECUTABLE testdata/invalid-instruction-name.list
 
 check.exitcode:M4_EXIT_SYNTAX
 check.stdout.empty

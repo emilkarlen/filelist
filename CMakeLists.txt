@@ -19,11 +19,11 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(file-name-resolver NONE)
+project(file-name-lister NONE)
 
 set (CMAKE_INSTALL_PREFIX /home/karlen/tmp/test-install/${CMAKE_PROJECT_NAME})
 
-install(PROGRAMS src/file-name-resolver DESTINATION bin)
+install(PROGRAMS src/file-name-lister DESTINATION bin)
 
 
 ###############################################################################

@@ -8,7 +8,7 @@ home:.
 
 setup.install:testdata
 
-test.run.cmdline:M4_FN_RESOLVER --relative-file-argument-location testdata/file-existing.list
+test.run.cmdline:M4_EXECUTABLE --relative-file-argument-location testdata/file-existing.list
 
 check.exitcode:0
 check.stdout.file.eq:output/file-existing-relative-file-argument.txt

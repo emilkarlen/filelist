@@ -6,7 +6,7 @@ application:file-name-resolver
 name:invalid-usage-no-arguments
 home:.
 
-test.run.cmdline:M4_FN_RESOLVER
+test.run.cmdline:M4_EXECUTABLE
 
 check.exitcode:M4_EXIT_USAGE
 check.stdout.empty

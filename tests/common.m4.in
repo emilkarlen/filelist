@@ -9,7 +9,7 @@ m4_define(`M4_TEST_DIR',`@CMAKE_SOURCE_DIR@/tests')
 m4_define(`M4_SRC_DIR',`@CMAKE_SOURCE_DIR@/src')
 
 # Absolute name of the executable
-m4_define(`M4_FN_RESOLVER',`M4_SRC_DIR/file-name-resolver')
+m4_define(`M4_EXECUTABLE',`M4_SRC_DIR/file-name-lister')
 
 m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
 

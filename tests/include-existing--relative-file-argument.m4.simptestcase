@@ -8,7 +8,7 @@ home:.
 
 setup.install:testdata
 
-test.run.cmdline:M4_FN_RESOLVER --relative-file-argument-location testdata/include-existing-in-subdir.list
+test.run.cmdline:M4_EXECUTABLE --relative-file-argument-location testdata/include-existing-in-subdir.list
 
 check.exitcode:0
 check.stdout.file.eq:output/include-existing--relative-file-argument.txt

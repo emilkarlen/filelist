@@ -8,7 +8,7 @@ home:.
 
 setup.install:testdata
 
-test.run.cmdline:M4_FN_RESOLVER testdata/list-existing-directory.list | sort
+test.run.cmdline:M4_EXECUTABLE testdata/list-existing-directory.list | sort
 
 check.exitcode:0
 check.stdout.file.eq:output/list-existing-directory.txt
