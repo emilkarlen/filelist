@@ -21,6 +21,7 @@ i : include
 ** Better error messages
 Should display hierarchy of included file.
 * New features
+** Command to print program version
 ** Conditions on individual files in directory listings
 E.g.
 - on filename (glob , shell filename patterns, regex)
