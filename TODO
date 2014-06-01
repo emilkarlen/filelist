@@ -10,15 +10,9 @@ from the command line current dir, to the file name.
 ** Switch to print absolute file names
 ** Case insensitive instruction-names
 ** Strip ws at both ends of paths
-** Ignore case in instruction identifiers
-** Aliases for instructions
-f : file
-l : list
-i : include
-
 ** Better error messages
 Should display hierarchy of included file.
-* New features
+* Features
 ** Command to print program version
 ** Conditions on individual files in directory listings
 E.g.
