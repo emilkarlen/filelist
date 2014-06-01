@@ -78,5 +78,6 @@ simptestcase (file-non-existing)
 simptestcase (list-existing-directory)
 simptestcase (list-existing-directory-relative-file-argument)
 
+simptestcase (include-existing--relative-file-argument)
 simptestcase (include-existing)
 simptestcase (include-non-existing)
