@@ -370,7 +370,7 @@ class InstructionForForInclude(Instruction):
 
 
 ###############################################################################
-# - InstructionOptionParser:s -
+# - InstructionArgumentParser:s -
 ###############################################################################
 
 
@@ -427,7 +427,7 @@ class InstructionNameSyntaxErrorException(InstructionSyntaxErrorException):
                                                  description)
 
 
-class InstructionOptionSyntaxErrorException(Exception):
+class InstructionArgumentSyntaxErrorException(Exception):
     """
     A syntactic error in an Instruction Option of a source file.
 
@@ -446,45 +446,45 @@ class InstructionOptionSyntaxErrorException(Exception):
             return self._message_lines
 
 
-class InstructionOptionParser:
+class InstructionArgumentParser:
     """
-    Parses the options-part of a line in a source file.
+    Parses the argument-part of a line in a source file.
     """
 
     def apply(self,
-              instruction_options: str):
+              instruction_argument: str):
         """Returns an Instruction."""
         raise NotImplementedError
 
 
-class InstructionOptionParserForFile(InstructionOptionParser):
+class InstructionArgumentParserForFile(InstructionArgumentParser):
     """Parser for a single file."""
 
     def apply(self,
-              instruction_options: str):
-        # TODO check syntax of instruction_options - should be single
+              instruction_argument: str):
+        # TODO check syntax of instruction_argument - should be single
         # file name
-        return InstructionForFile(instruction_options)
+        return InstructionForFile(instruction_argument)
 
 
-class InstructionOptionParserForDirectoryListing(InstructionOptionParser):
+class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
     """Parser for the contents of a directory."""
 
     def apply(self,
-              instruction_options: str):
-        # TODO check syntax of instruction_options - should be single
+              instruction_argument: str):
+        # TODO check syntax of instruction_argument - should be single
         # file name
-        return InstructionForDirectoryListing(instruction_options)
+        return InstructionForDirectoryListing(instruction_argument)
 
 
-class InstructionOptionParserForInclude(InstructionOptionParser):
+class InstructionArgumentParserForInclude(InstructionArgumentParser):
     """Parser for including a file list."""
 
     def apply(self,
-              instruction_options: str):
-        # TODO check syntax of instruction_options - should be single
+              instruction_argument: str):
+        # TODO check syntax of instruction_argument - should be single
         # file name
-        return InstructionForForInclude(instruction_options)
+        return InstructionForForInclude(instruction_argument)
 
 
 ###############################################################################
@@ -502,16 +502,16 @@ class FileParser:
         return FileParser(file_name)
 
     parsers = {
-        "FILE"    : InstructionOptionParserForFile(),
-        "LIST"    : InstructionOptionParserForDirectoryListing(),
-        "INCLUDE" : InstructionOptionParserForInclude()
+        "FILE"    : InstructionArgumentParserForFile(),
+        "LIST"    : InstructionArgumentParserForDirectoryListing(),
+        "INCLUDE" : InstructionArgumentParserForInclude()
     }
 
-    ignoredLineReString = "^\s*(#.*)?$"
-    ignoredLineRe = re.compile(ignoredLineReString)
+    ignored_line_re_string = "^\s*(#.*)?$"
+    ignored_line_re = re.compile(ignored_line_re_string)
 
-    nameAndOptionGroupsReString = "\s*(\w+)\s*(.*)"
-    nameAndOptionGroupsRe = re.compile(nameAndOptionGroupsReString)
+    name_and_argument_groups_re_string = "\s*(\w+)\s*(.*)"
+    name_and_argument_groups_re = re.compile(name_and_argument_groups_re_string)
 
     # Mutable state.
     # Having these here avoids having to pass them around to almost every
@@ -546,24 +546,24 @@ class FileParser:
         return File(instructions)
 
     def parse_instruction_line(self):
-        (name, option) = self._split_name_and_option()
+        (name, argument) = self._split_name_and_argument()
         try:
             parser = self.parsers[name]
-            return parser.apply(option)
+            return parser.apply(argument)
         except KeyError:
             raise InstructionNameSyntaxErrorException(
                 self._source_info(),
                 name)
 
-    def _split_name_and_option(self):
-        name_and_option_match = re.search(self.nameAndOptionGroupsRe, self.line)
-        if not name_and_option_match:
+    def _split_name_and_argument(self):
+        name_and_argument_match = re.search(self.name_and_argument_groups_re, self.line)
+        if not name_and_argument_match:
             raise InstructionLineSyntaxErrorException(self._source_info())
-        return (name_and_option_match.group(1),
-                name_and_option_match.group(2))
+        return (name_and_argument_match.group(1),
+                name_and_argument_match.group(2))
 
     def _is_ignored_line(self):
-        return self.ignoredLineRe.match(self.line) is not None
+        return self.ignored_line_re.match(self.line) is not None
 
     def _source_info(self):
         return SourceInfo(self.file_name,
