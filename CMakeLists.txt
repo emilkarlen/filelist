@@ -76,8 +76,8 @@ simptestcase (file-existing)
 simptestcase (file-existing-relative-file-argument)
 simptestcase (file-non-existing)
 
-simptestcase (list-existing-directory)
-simptestcase (list-existing-directory-relative-file-argument)
+simptestcase (list/existing-directory)
+simptestcase (list/existing-directory-relative-file-argument)
 simptestcase (list/wildcards)
 simptestcase (list/invalid-wildcard)
 

@@ -1,14 +1,14 @@
 # -*- shell-script -*-
 
-m4_include(common.m4)
+m4_include(../common.m4)
 
 application:file-name-resolver
 name:directory-existing-relative-file-argument
 home:.
 
-setup.install:testdata
+setup.install:M4_COMMON_TESTDATA_DIR
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST testdata/list-existing-directory.list | sort
 
 check.exitcode:0
-check.stdout.file.eq:output/list-existing-directory-relative-file-argument.txt
+check.stdout.file.eq:output/existing-directory-relative-file-argument.txt
