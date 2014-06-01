@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# It should be an error to try to include a directory.
+#
+
+m4_include(common.m4)
+
+application:file-name-resolver
+name:include-existing-dir
+home:.
+
+setup.install:testdata
+
+test.run.cmdline:M4_FN_RESOLVER testdata/include-existing-dir.list
+
+# TODO is there a better exit code?
+check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
+check.stdout.empty
