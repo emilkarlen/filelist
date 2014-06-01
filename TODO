@@ -17,12 +17,22 @@ f : file
 l : list
 i : include
 
+** Better error messages
+Should display hierarchy of included file.
 * New features
 ** Conditions on individual files in directory listings
 E.g.
 - on filename (glob , shell filename patterns, regex)
 - on file type (d, f)
 ** Switches for turning on/off checking the existence of files
+** Command for displaying the inclusion-hierarchy
+** Multiple command line FILE-arguments
+   Names should be relative the location of each file.
+   The option to print names relative the FILE argument causes trouble with
+   this functionality, since these locations can be different among FILE
+   arguments, causing the produced list to use different "anchor points".
+** stdin as FILE argument
+File
 ** Flatten file
 Generate an input file that is equivalent to the given argument
 (regarding output from running the program in normal mode, on it)
@@ -57,3 +67,12 @@ drawbacks:
 2. If a similair sub-directory structure is used for all categories,
    then this structure has to be repeated in each file
    (the INCLUDEs will be identical, except for concrete file-name).
+
+* Build system
+** Support parallell builds
+   Current, only one build is supported, since the file
+   tests/common.m4.in
+   is configured into
+   tests/common.m4
+   inside the source directory, and it contains a reference to the
+   executable, which ideally should be put in the build directory.
