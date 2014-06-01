@@ -31,6 +31,7 @@ import sys
 import os
 import argparse
 import re
+import textwrap
 
 EXIT_USAGE = 2
 EXIT_INVALID_ARGUMENTS = 3
@@ -76,11 +77,6 @@ def write_lines(o_stream,lines):
 ###############################################################################
 
 
-###############################################################################
-# - ResultItem:s -
-###############################################################################
-
-
 class Environment:
     """
     Environment for executing instructions.
@@ -117,6 +113,11 @@ class Environment:
                          dir_delta))
 
 
+###############################################################################
+# - ResultItem:s -
+###############################################################################
+
+
 class RenditionSettings:
     """
     Settings for rendering the output.
@@ -124,7 +125,6 @@ class RenditionSettings:
     def __init__(self,
                  file_names_are_relative_file_argument_location: bool):
         """
-
         :rtype : RenditionSettings
         """
         self.file_names_are_relative_file_argument_location = file_names_are_relative_file_argument_location
@@ -181,10 +181,25 @@ class ResultItem:
         raise NotImplementedError()
 
 
+class ParsingSettings:
+    def __init__(self,
+                 instruction_parsers_dict: dict):
+        """
+        :param instruction_parsers_dict: Maps instruction identifiers to
+         parsers: str -> InstructionArgumentParser.
+        """
+        self.instruction_parsers_dict = instruction_parsers_dict
+
+    def parserForInstruction(self,
+                             identifier: str):
+        return self.instruction_parsers_dict[identifier]
+
+
 class ResultItemsConstructor:
     """An iterable of ResultItem:s."""
 
     def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
                              env: Environment):
         """
         Gives an iterable of all ResultItem:s that this object represents.
@@ -192,6 +207,11 @@ class ResultItemsConstructor:
         Can raise exceptions related to parsing and file checking.
         """
         raise NotImplementedError()
+
+
+###############################################################################
+# - concrete ResultItem:s -
+###############################################################################
 
 
 class ResultItemForFile(ResultItem):
@@ -244,19 +264,24 @@ class File(ResultItemsConstructor):
     """A list of instructions in a single file."""
 
     def __init__(self,
-                 instructions):
+                 instructions: list):
         self.instructions = instructions
 
     def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
                              env: Environment):
-        return ResultItemIterableForFile(self.instructions, env)
+        return ResultItemIterableForFile(parsing_settings,
+                                         self.instructions,
+                                         env)
 
 
 class ResultItemIterableForFile:
     def __init__(self,
-                 instructions,
+                 parsing_settings: ParsingSettings,
+                 instructions: list,
                  env: Environment):
         self.instructions = instructions
+        self.parsing_settings = parsing_settings
         self.env = env
         self.curr_result_item_iterable = None
 
@@ -270,7 +295,8 @@ class ResultItemIterableForFile:
                 if not self.instructions:
                     debug('   iter stop')
                     raise StopIteration
-                self.curr_result_item_iterable = self.instructions[0].result_item_iterable(self.env)
+                self.curr_result_item_iterable = self.instructions[0].result_item_iterable(self.parsing_settings,
+                                                                                           self.env)
                 del self.instructions[0]
             try:
                 debug('       returning')
@@ -312,6 +338,7 @@ class InstructionForFile(Instruction):
         self.file_name = file_name 
 
     def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
                              env: Environment):
         file_path = env.file_name_relative_current_dir_of_process(self.file_name)
         if not os.path.exists(file_path):
@@ -328,6 +355,7 @@ class InstructionForDirectoryListing(Instruction):
         self.directory_name = directory_name 
 
     def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
                              env: Environment):
         dir_path = env.file_name_relative_current_dir_of_process(self.directory_name)
         if not os.path.isdir(dir_path):
@@ -343,30 +371,33 @@ class InstructionForDirectoryListing(Instruction):
                     env_for_dir.file_name_relative_top_level_source_file(fileInDir))
 
 
-class InstructionForForInclude(Instruction):
+class InstructionForInclude(Instruction):
     """
     An instruction that resolves the contents of a list file.
     """
     def __init__(self,
                  file_name_relative_include_file: str):
-        self.file_name_relative_include_file = file_name_relative_include_file
+        self._file_name_relative_include_file= file_name_relative_include_file
 
     def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
                              env: Environment):
-        file_path = env.file_name_relative_current_dir_of_process(self.file_name_relative_include_file)
+        file_path = env.file_name_relative_current_dir_of_process(self._file_name_relative_include_file)
         if not os.path.isfile(file_path):
             raise InstructionApplicationForMissingFileException(file_path)
-        env_for_file = env.new_for_included_file(self.file_name_relative_include_file)
-        debug("incl: " + self.file_name_relative_include_file)
+        env_for_file = env.new_for_included_file(self._file_name_relative_include_file)
+        debug("incl: " + self._file_name_relative_include_file)
         debug("         env/fromTopLvl : " + env_for_file.fromTopLevelFile)
         debug("         env/fromCurrDir: " + env_for_file.fromCurrDir)
-        file_parser = FileParser(file_path)
+        file_parser = FileParser(parsing_settings,
+                                 file_path)
         try:
             file = file_parser.apply(open(file_path,
                                           mode='r'))
         except OSError:
             raise InstructionApplicationForMissingFileException(file_path)
-        return file.result_item_iterable(env_for_file)
+        return file.result_item_iterable(parsing_settings,
+                                         env_for_file)
 
 
 ###############################################################################
@@ -452,6 +483,7 @@ class InstructionArgumentParser:
     """
 
     def apply(self,
+              parsing_settings: ParsingSettings,
               instruction_argument: str):
         """Returns an Instruction."""
         raise NotImplementedError
@@ -461,6 +493,7 @@ class InstructionArgumentParserForFile(InstructionArgumentParser):
     """Parser for a single file."""
 
     def apply(self,
+              parsing_settings: ParsingSettings,
               instruction_argument: str):
         # TODO check syntax of instruction_argument - should be single
         # file name
@@ -471,6 +504,7 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
     """Parser for the contents of a directory."""
 
     def apply(self,
+              parsing_settings: ParsingSettings,
               instruction_argument: str):
         # TODO check syntax of instruction_argument - should be single
         # file name
@@ -481,10 +515,11 @@ class InstructionArgumentParserForInclude(InstructionArgumentParser):
     """Parser for including a file list."""
 
     def apply(self,
+              parsing_settings: ParsingSettings,
               instruction_argument: str):
         # TODO check syntax of instruction_argument - should be single
         # file name
-        return InstructionForForInclude(instruction_argument)
+        return InstructionForInclude(instruction_argument)
 
 
 ###############################################################################
@@ -498,14 +533,10 @@ class FileParser:
     """
 
     @staticmethod
-    def for_top_level(file_name: str):
-        return FileParser(file_name)
-
-    parsers = {
-        "FILE"    : InstructionArgumentParserForFile(),
-        "LIST"    : InstructionArgumentParserForDirectoryListing(),
-        "INCLUDE" : InstructionArgumentParserForInclude()
-    }
+    def for_top_level(parsing_settings: ParsingSettings,
+                      file_name: str):
+        return FileParser(parsing_settings,
+                          file_name)
 
     ignored_line_re_string = "^\s*(#.*)?$"
     ignored_line_re = re.compile(ignored_line_re_string)
@@ -522,7 +553,10 @@ class FileParser:
     line_number = -1
     line = ""
 
-    def __init__(self, file_name):
+    def __init__(self,
+                 parsing_settings: ParsingSettings,
+                 file_name: str):
+        self._parsing_settings = parsing_settings
         self.file_name = file_name
 
     def apply(self, open_file):
@@ -548,8 +582,8 @@ class FileParser:
     def parse_instruction_line(self):
         (name, argument) = self._split_name_and_argument()
         try:
-            parser = self.parsers[name]
-            return parser.apply(argument)
+            parser = self._parsing_settings.parserForInstruction(name)
+            return parser.apply(self._parsing_settings,argument)
         except KeyError:
             raise InstructionNameSyntaxErrorException(
                 self._source_info(),
@@ -572,6 +606,232 @@ class FileParser:
 
 
 ###############################################################################
+# - configuration of instructions -
+###############################################################################
+
+
+class InstructionDescription:
+    """Detailed description of an instruction."""
+    def __init__(self,
+                 one_line_description: str,
+                 arguments_syntax: str,
+                 arguments: list,
+                 long_description: str):
+        """
+        :param one_line_description:
+        :param arguments_syntax: One-line description of arguments, à la -h
+        :param arguments: List of (argument-name,argument-description)
+        """
+        self.one_line_description = one_line_description
+        self.arguments_syntax = arguments_syntax
+        self.arguments = arguments
+        self.long_description = long_description
+
+    def render_as_lines(self,
+                        wrapper: textwrap.TextWrapper) -> list:
+        """Renders the description as a list of lines."""
+        ret_val = []
+        ret_val += self._render_arguments_syntax(wrapper)
+        ret_val += self._render_one_line_description(wrapper)
+        ret_val += self._render_arguments(wrapper)
+        ret_val += self._render_long_description(wrapper)
+        return ret_val
+
+    def _render_arguments_syntax(self,
+                                 wrapper: textwrap.TextWrapper) -> list:
+        syntax = self.arguments_syntax
+        if not syntax:
+            syntax = "<none>"
+        return wrapper.wrap("Arguments: " + syntax)
+
+    def _render_one_line_description(self, wrapper):
+        return wrapper.wrap(self.one_line_description)
+
+    def _render_arguments(self, wrapper):
+        ret_val = []
+        for (identifier,description) in self.arguments:
+            ret_val += wrapper.wrap(identifier + " - " + textwrap.dedent(description))
+        return ret_val
+
+    def _render_long_description(self, wrapper):
+        if self.long_description:
+            return wrapper.wrap(textwrap.dedent(self.long_description))
+        else:
+            return []
+
+
+class InstructionConfiguration:
+    """Complete information about an instruction."""
+
+    def __init__(self,
+                 long_name: str,
+                 name_aliases: list,
+                 description: InstructionDescription,
+                 argument_parser: InstructionArgumentParser):
+        self.long_name = long_name
+        self.name_aliases = name_aliases
+        self.description = description
+        self.argument_parser = argument_parser
+
+    def render_as_lines(self,
+                        wrapper: textwrap.TextWrapper) -> list:
+        """Renders the description as a list of lines."""
+        saved_initial_indent = wrapper.initial_indent
+        ret_val = []
+        ret_val += self._render_name_line(wrapper)
+        wrapper.initial_indent = wrapper.subsequent_indent
+        ret_val += self.description.render_as_lines(wrapper)
+        wrapper.initial_indent = saved_initial_indent
+        ret_val += ['']
+        return ret_val
+
+    def _render_name_line(self, wrapper):
+        return wrapper.wrap(self.long_name + " " + str(self.name_aliases))
+
+
+description_of_file = InstructionDescription(
+    "Outputs the path of a file.",
+    "FILE",
+    [("FILE",
+     """\
+     A name relative to the location of the list file.
+     The file must exist. It can be any type of file (regular, directory ...).
+     """)
+    ],
+     None
+)
+
+description_of_directory = InstructionDescription(
+    "Outputs the pats of the files inside a directory.",
+    "DIRECTORY",
+    [("DIRECTORY",
+     """\
+     A name relative to the location of the list file.
+     The directory must exist and be readable.
+     """)
+    ],
+    None
+)
+
+description_of_include = InstructionDescription(
+    "Includes instructions from a file.",
+    "FILE",
+    [("FIE",
+     """\
+     A readable file, who's name is relative the including file.
+     """)
+     ],
+     """\
+     File paths inside the included file are relative the
+     location of that file.
+     """
+)
+
+blank_line = ""
+
+description_header_of_program_paragraphs = [
+    "Prints a list of file paths given a list of file path instructions.",
+    "",
+    """\
+    This is a tool for maintaining a distributed list of files
+    that can be accessed via a top level list-file.
+    """,
+    """\
+    The printed paths are all relative the same location - the
+    current working directory,
+    so that they can be easily accessed by a program.
+    """,
+    blank_line,
+    """\
+    The file path instructions can be distributed across several files,
+    via an inclusion instruction. The specified file paths in each
+    included file is relative the location of the file itself.
+    """,
+    blank_line,
+    """\
+    Each line in the input is an instruction that either resolves to one
+    or more file paths, or it includes.
+    """,
+    blank_line,
+    """\
+    Note: Designed to only work with file names
+    that does not contain new-lines.
+    """,
+    blank_line,
+    """\
+    Input files consist of white-space lines (ignored),
+    comment lines (ignored) and instruction lines.
+    Comments begin with a #.
+    Instruction lines may not contain comments.
+    """,
+    blank_line,
+    """\
+    An instruction line has the form INSTRUCTION-NAME ARGUMENTS.
+    """,
+    """\
+    An INSTRUCTION-NAME is case insensitive, and may have one or more aliases.
+    """,
+    """\
+    The syntax and meaning of ARGUMENTS depend on the instruction, of course.
+    """,
+    blank_line,
+    """\
+    List of instructions:
+    """
+]
+
+instruction_configurations = [
+    InstructionConfiguration("FILE",
+                             ["F"],
+                             description_of_file,
+                             InstructionArgumentParserForFile()),
+    InstructionConfiguration("LIST",
+                             ["L"],
+                             description_of_directory,
+                             InstructionArgumentParserForDirectoryListing()),
+    InstructionConfiguration("INCLUDE",
+                             ["I"],
+                             description_of_include,
+                             InstructionArgumentParserForInclude()),
+]
+
+def instruction_configurations_lines(wrapper: textwrap.TextWrapper) -> list:
+    lines = []
+    for i_config in instruction_configurations:
+        lines += i_config.render_as_lines(wrapper)
+    return lines
+
+def program_description():
+    top_level_wrapper = textwrap.TextWrapper(initial_indent="",
+                                             subsequent_indent="")
+
+    instruction_wrapper = textwrap.TextWrapper(initial_indent="  ",
+                                             subsequent_indent="    ")
+
+    lines = []
+    for paragraph in description_header_of_program_paragraphs:
+        if paragraph:
+            lines += top_level_wrapper.wrap(textwrap.dedent(paragraph))
+        else:
+            lines.append("\n")
+    lines += instruction_configurations_lines(instruction_wrapper)
+    return "\n".join(lines)
+
+def instruction_identifier_to_parser_dict() -> dict:
+    """
+    Gives a dictionary with mappings for all valid instruction identifiers.
+
+    Returns a dict : INSTRUCTION-IDENTIFIER -> InstructionArgumentParser
+    """
+    ret_val = {}
+    for i_conf in instruction_configurations:
+        ret_val[i_conf.long_name] = i_conf.argument_parser
+        for alias in i_conf.name_aliases:
+           ret_val[alias] = i_conf.argument_parser
+    return ret_val
+
+
+###############################################################################
 # - parse_command_line -
 ###############################################################################
 
@@ -580,14 +840,18 @@ def parse_command_line():
     """
     Returns an (file name,RenditionSettings,open file).
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description=program_description())
     parser.add_argument("file",
                         metavar="FILE",
                         help="A file that contains the resolve specification.")
-    parser.add_argument("--relative-file-argument-location", "-f",
+    parser.add_argument( "-f", "--relative-file-argument-location",
                         default=False,
                         action='store_true',
-                        help="File paths are relative the location of the FILE argument. Without this option, file names are relative the location of the invocation of the program.")
+                        help="""\
+                        File paths are relative the location of the FILE argument.
+                        Without this option, file names are relative
+                        the location of the invocation of the program.""")
     args = parser.parse_args()
     rendition_settings = RenditionSettings(args.relative_file_argument_location)
     try:
@@ -613,10 +877,14 @@ debug_begin('parse')
 (file_name, rendition_settings, open_file) = parse_command_line()
 debug_end('parse')
 try:
-    file = FileParser.for_top_level(file_name).apply(open_file)
-    env = RenditionEnvironment.for_top_level_file(file_name, rendition_settings)
+    parsing_settings = ParsingSettings(instruction_identifier_to_parser_dict())
+    file_parser = FileParser.for_top_level(parsing_settings,
+                                           file_name)
+    file = file_parser.apply(open_file)
+    env = RenditionEnvironment.for_top_level_file(file_name,
+                                                  rendition_settings)
     debug_begin('iter')
-    for resultItem in file.result_item_iterable(env):
+    for resultItem in file.result_item_iterable(parsing_settings,env):
         print(resultItem.render(env))
     debug_end('iter')
 
