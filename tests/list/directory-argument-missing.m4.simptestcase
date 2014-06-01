@@ -1,0 +1,14 @@
+# -*- shell-script -*-
+
+m4_include(../common.m4)
+
+application:file-name-resolver
+name:directory-argument-missing
+home:.
+
+setup.install:pattern-test-data
+
+test.run.cmdline:M4_EXECUTABLE pattern-test-data/directory-argument-missing.list
+
+check.exitcode:M4_EXIT_SYNTAX
+check.stdout.empty

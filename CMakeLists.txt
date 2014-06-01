@@ -80,6 +80,7 @@ simptestcase (list/existing-directory)
 simptestcase (list/existing-directory-relative-file-argument)
 simptestcase (list/wildcards)
 simptestcase (list/invalid-wildcard)
+simptestcase (list/directory-argument-missing)
 
 simptestcase (include-existing--relative-file-argument)
 simptestcase (include-existing-in-same-dir)
