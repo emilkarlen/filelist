@@ -1,0 +1,14 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+application:file-name-resolver
+name:include-non-existing
+home:.
+
+setup.install:testdata
+
+test.run.cmdline:M4_FN_RESOLVER testdata/include-non-existing.list
+
+check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
+check.stdout.empty

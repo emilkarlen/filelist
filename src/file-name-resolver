@@ -43,7 +43,7 @@ EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 ###############################################################################
 
 
-debugEnabled = True
+debugEnabled = False
 
 def debug(s):
     if debugEnabled:
@@ -81,31 +81,35 @@ class Environment:
     Environment for executing instructions.
     """
 
-    def newForDirectory(self,nameOfDirectory):
-        fromCurrDir = os.path.join(self.fromCurrDir,
-                              nameOfDirectory)
-        fromTopLevelFile = os.path.join(self.fromTopLevelFile,
-                              nameOfDirectory)
-        if fromCurrDir[-1] != os.path.sep:
-            fromCurrDir += os.path.sep
-            fromTopLevelFile += os.path.sep
-        return Environment(fromCurrDir,
-                           fromTopLevelFile)
-
-    def newForIncludedFile(self,nameOfIncludedFile):
-        raise NotImplementedError # TODO remove if not used
-
     def __init__(self,
                  fromCurrDir : str,
                  fromTopLevelFile : str):
         self.fromCurrDir = fromCurrDir
         self.fromTopLevelFile = fromTopLevelFile
 
+    def newForDirectory(self,nameOfDirectory):
+        return self._appendDir(nameOfDirectory)
+
+    def newForIncludedFile(self,fileNameRelativeIncludeFile):
+        dirDelta = os.path.dirname(fileNameRelativeIncludeFile)
+        if not dirDelta: # file is in same directory
+            return self
+        return self._appendDir(dirDelta)
+
     def fileNameRelativeCurrentDirOfProc(self,fileName):
         return self.fromCurrDir + fileName
 
     def fileNameRelativeTopLevelSourceFile(self,fileName):
         return self.fromTopLevelFile + fileName
+
+    def _appendDir(self,dirDelta):
+        if dirDelta[-1] != os.path.sep:
+            dirDelta += os.path.sep
+        return Environment(
+            os.path.join(self.fromCurrDir,
+                         dirDelta),
+            os.path.join(self.fromTopLevelFile,
+                         dirDelta))
 
 class RenditionSettings:
     """
@@ -184,6 +188,9 @@ class ResultItemForFile(ResultItem):
         self.fileName = fileName
 
     def render(self,env : RenditionEnvironment):
+        debug('  ResultItemForFile : ' + self.fileName)
+        debug("           env/fromTopLvl : " + env.fromTopLevelFile)
+        debug("           env/fromCurrDir: " + env.fromCurrDir)
         return env.renderFileNameAccordingToSettings(self.fileName)
 
 
@@ -217,20 +224,37 @@ class File(ResultItemsConstructor):
     """A list of instructions in a single file."""
 
     def __init__(self,
-                 directoryOfIncludingFile,
-                 fileName,
                  instructions):
-        """
-        directoryOfIncludingFile is the empty string for top level files.
-        """
-        self.directoryOfIncludingFile = directoryOfIncludingFile
-        self.fileName = fileName
         self.instructions = instructions
 
     def resultItemIterable(self,env : Environment):
-        for instruction in self.instructions:
-            for resultItem in instruction.resultItemIterable(env):
-                yield resultItem
+        return ResultItemIterableForFile(self.instructions,env)
+
+class ResultItemIterableForFile:
+    def __init__(self,
+                 instructions,
+                 env : Environment):
+        self.instructions = instructions
+        self.env = env
+        self.currResultItemIterable = None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            debug('    iter loop  : instructions.length = ' + str(len(self.instructions)))
+            if self.currResultItemIterable == None:
+                if self.instructions == []:
+                    debug('   iter stop')
+                    raise StopIteration
+                self.currResultItemIterable = self.instructions[0].resultItemIterable(self.env)
+                del self.instructions[0]
+            try:
+                debug('       returning')
+                return self.currResultItemIterable.__next__()
+            except StopIteration:
+                self.currResultItemIterable = None
 
 
 ###############################################################################
@@ -266,7 +290,8 @@ class InstructionForFile(Instruction):
         filePath = env.fileNameRelativeCurrentDirOfProc(self.fileName)
         if not os.path.exists(filePath):
             raise IntructionApplicationForMissingFileException(filePath)
-        return [ResultItemForFile(self.fileName)]
+        resultItem = ResultItemForFile(env.fileNameRelativeTopLevelSourceFile(self.fileName))
+        return iter([resultItem])
 
 class InstructionForDirectoryListing(Instruction):
     """
@@ -288,6 +313,28 @@ class InstructionForDirectoryListing(Instruction):
             if os.path.exists(fileNameRelCurrDir):
                 yield ResultItemForFile(
                     envForDir.fileNameRelativeTopLevelSourceFile(fileInDir))
+
+class InstructionForForInclude(Instruction):
+    """
+    An instruction that resolves the contents of a list file.
+    """
+    def __init__(self,fileNameRelativeIncludeFile):
+        self.fileNameRelativeIncludeFile = fileNameRelativeIncludeFile
+
+    def resultItemIterable(self,env : Environment):
+        filePath = env.fileNameRelativeCurrentDirOfProc(self.fileNameRelativeIncludeFile)
+        if not os.path.isfile(filePath):
+            raise IntructionApplicationForMissingFileException(filePath)
+        envForFile = env.newForIncludedFile(self.fileNameRelativeIncludeFile)
+        debug("incl: " + self.fileNameRelativeIncludeFile)
+        debug("         env/fromTopLvl : " + envForFile.fromTopLevelFile)
+        debug("         env/fromCurrDir: " + envForFile.fromCurrDir)
+        fileParser = FileParser(filePath)
+        try:
+            file = fileParser.apply(open(filePath,mode='r'))
+        except OSError:
+            raise IntructionApplicationForMissingFileException(filePath)
+        return file.resultItemIterable(envForFile)
 
 
 ###############################################################################
@@ -384,6 +431,14 @@ class InstructionOptionParserForDirectoryListing(InstructionOptionParser):
         # file name
         return InstructionForDirectoryListing(instructionOptions)
 
+class InstructionOptionParserForInclude(InstructionOptionParser):
+    """Parser for including a file list."""
+
+    def apply(self,instructionOptions):
+        # TODO check syntax of instructionOptions - should be single
+        # file name
+        return InstructionForForInclude(instructionOptions)
+
 
 ###############################################################################
 # - FileParser -
@@ -397,11 +452,12 @@ class FileParser:
 
     @staticmethod
     def forTopLevel(fileName):
-        return FileParser('',fileName)
+        return FileParser(fileName)
 
     parsers = {
-        "FILE" : InstructionOptionParserForFile(),
-        "LIST" : InstructionOptionParserForDirectoryListing()
+        "FILE"    : InstructionOptionParserForFile(),
+        "LIST"    : InstructionOptionParserForDirectoryListing(),
+        "INCLUDE" : InstructionOptionParserForInclude()
     }
 
     ignoredLineReString = "^\s*(#.*)?$"
@@ -419,14 +475,8 @@ class FileParser:
     lineNumber = -1
     line = ""
 
-    def __init__(self,directoryOfIncludingFile,fileName):
-        """
-        directoryOfIncludingFile : empty or ends with a dir-sepa.
-        """
-
-        self.directoryOfIncludingFile = directoryOfIncludingFile
+    def __init__(self,fileName):
         self.fileName = fileName
-        self.outputLinePrefix = os.path.dirname(fileName)
 
     def apply(self,openFile):
         """
@@ -443,34 +493,32 @@ class FileParser:
         for lineWithPossibleNewLine in lines:
             self.line = lineWithPossibleNewLine.strip('\n')
             self.lineNumber += 1
-            if (self.__is_ignored_line()):
+            if (self._is_ignored_line()):
                 continue
             instructions.append(self.parse_instruction_line())
-        return File(self.directoryOfIncludingFile,
-                    self.fileName,
-                    instructions)
+        return File(instructions)
 
     def parse_instruction_line(self):
-        (name,option) = self.__split_name_and_option()
+        (name,option) = self._split_name_and_option()
         try:
             parser = self.parsers[name]
             return parser.apply(option)
         except KeyError:
             raise InstructionNameSyntaxErrorException(
-                self.__sourceInfo(),
+                self._sourceInfo(),
                 name)
 
-    def __split_name_and_option(self):
+    def _split_name_and_option(self):
         nameAndOptionMatch = re.search(self.nameAndOptionGroupsRe,self.line)
         if (not nameAndOptionMatch):
-            raise InstructionLineSyntaxErrorException(self.__sourceInfo())
+            raise InstructionLineSyntaxErrorException(self._sourceInfo())
         return (nameAndOptionMatch.group(1),
                 nameAndOptionMatch.group(2))
 
-    def __is_ignored_line(self):
+    def _is_ignored_line(self):
         return (self.ignoredLineRe.match(self.line) != None)
 
-    def __sourceInfo(self):
+    def _sourceInfo(self):
         return SourceInfo(self.fileName,
                           self.lineNumber,
                           self.line)

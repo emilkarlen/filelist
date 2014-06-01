@@ -63,7 +63,6 @@ endmacro (simptestcase)
 ###############################################################################
 
 
-# Usage
 simptestcase (invalid-usage-no-arguments)
 simptestcase (invalid-arguments-file-does-not-exist)
 
@@ -78,3 +77,6 @@ simptestcase (file-non-existing)
 
 simptestcase (list-existing-directory)
 simptestcase (list-existing-directory-relative-file-argument)
+
+simptestcase (include-existing)
+simptestcase (include-non-existing)

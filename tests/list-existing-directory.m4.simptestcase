@@ -3,7 +3,7 @@
 m4_include(common.m4)
 
 application:file-name-resolver
-name:directory-existing
+name:list-existing-directory
 home:.
 
 setup.install:testdata

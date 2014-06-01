@@ -6,7 +6,20 @@ Currently, all file names are assumed to be relative.
 A prefix is added to each name, consising of the path
 from the command line current dir, to the file name.
 
+* Improvements
+** Helpt text should describe each instruction
+The setup of each instruction should
+contain a help text which is printed by --help.
+** Aliases for instructions
+f : file
+l : list
+i : include
+
 * New features
+** Conditions on individual files in directory listings
+E.g.
+- on filename (glob , shell filename patterns, regex)
+- on file type (d, f)
 ** Switches for turning on/off checking the existence of files
 ** Flatten file
 Generate an input file that is equivalent to the given argument

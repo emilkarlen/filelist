@@ -1,0 +1,3 @@
+testdata/existing-file.txt
+testdata/dir-with-listfile/include-existing-file.txt
+testdata/existing-file.txt
