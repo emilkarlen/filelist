@@ -1,0 +1,5 @@
+FILE existing-file.txt
+File existing-file.txt
+file existing-file.txt
+F    dir/existing-file.txt
+f    dir/existing-file.txt

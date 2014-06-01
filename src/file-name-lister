@@ -582,14 +582,14 @@ class FileParser:
     def parse_instruction_line(self):
         (name, argument) = self._split_name_and_argument()
         try:
-            parser = self._parsing_settings.parserForInstruction(name)
+            parser = self._parsing_settings.parserForInstruction(name.upper())
             return parser.apply(self._parsing_settings,argument)
         except KeyError:
             raise InstructionNameSyntaxErrorException(
                 self._source_info(),
                 name)
 
-    def _split_name_and_argument(self):
+    def _split_name_and_argument(self) -> (str, str):
         name_and_argument_match = re.search(self.name_and_argument_groups_re, self.line)
         if not name_and_argument_match:
             raise InstructionLineSyntaxErrorException(self._source_info())
@@ -865,7 +865,6 @@ def parse_command_line():
         write_lines(sys.stderr,
                     [msg])
         sys.exit(EXIT_INVALID_ARGUMENTS)
-
 
 
 ###############################################################################
