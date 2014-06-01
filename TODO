@@ -7,6 +7,8 @@ A prefix is added to each name, consising of the path
 from the command line current dir, to the file name.
 
 * Improvements
+** Case insensitive instruction-names
+** Strip ws at both ends of paths
 ** Helpt text should describe each instruction
 The setup of each instruction should
 contain a help text which is printed by --help.
