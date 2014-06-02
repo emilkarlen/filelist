@@ -207,7 +207,7 @@ class RenditionEnvironment(Environment):
                              from_top_level_file)
         self.rendition_settings = rendition_settings
 
-    def render_file_name_according_to_settings(self, file_name):
+    def render_file_name_according_to_settings(self, file_name) -> str:
         if self.rendition_settings.file_names_are_relative_file_argument_location:
             return self.file_name_relative_top_level_source_file(file_name)
         else:
@@ -267,6 +267,20 @@ class ResultItemsConstructor:
 ###############################################################################
 
 
+class ResultItemForPrint(ResultItem):
+    """
+    An result item that prints a constant string.
+    """
+    def __init__(self,
+                 string: str):
+        self._string = string
+
+    def render(self,
+               env: RenditionEnvironment) -> str:
+
+        return self._string
+
+
 class ResultItemForFile(ResultItem):
     """
     An result item that is a file name.
@@ -280,7 +294,7 @@ class ResultItemForFile(ResultItem):
         self.file_name = file_name
 
     def render(self,
-               env: RenditionEnvironment):
+               env: RenditionEnvironment) -> str:
         debug('  ResultItemForFile : ' + self.file_name)
         debug("           env/fromTopLvl : " + env.fromTopLevelFile)
         debug("           env/fromCurrDir: " + env.fromCurrDir)
@@ -381,6 +395,25 @@ class InstructionApplicationForMissingFileException(InstructionApplicationExcept
                         "File does not exist: " +
                         self.file_name_relative_current_dir_of_process
                     ])
+
+
+###############################################################################
+# - InstructionForPrint -
+###############################################################################
+
+
+class InstructionForPrint(Instruction):
+    """
+    An instruction that resolves a single named file.
+    """
+    def __init__(self,
+                 string: str):
+        self._string = string
+
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: Environment):
+        return iter([ResultItemForPrint(self._string)])
 
 
 ###############################################################################
@@ -640,6 +673,15 @@ class InstructionArgumentParserForFile(InstructionArgumentParser):
         # TODO check syntax of instruction_argument - should be single
         # file name
         return InstructionForFile(instruction_argument)
+
+
+class InstructionArgumentParserForPrint(InstructionArgumentParser):
+    """Parser for printing a string."""
+
+    def apply(self,
+              parsing_settings: ParsingSettings,
+              instruction_argument: str):
+        return InstructionForPrint(instruction_argument)
 
 
 ###############################################################################
@@ -927,6 +969,22 @@ class InstructionConfiguration:
         return wrapper.wrap(self.long_name + " " + str(self.name_aliases))
 
 
+description_of_print = InstructionDescription(
+    "Outputs the argument.",
+    "[STRING]",
+    [("STRING",
+     """\
+     String to be printed.
+     Extends to the end of line.
+     Comment characters are not treated as comments, but is
+     included in the printed string.
+     """)
+     ],
+    """\
+    If STRING is not given, then an empty line is printed.
+    """
+)
+
 description_of_file = InstructionDescription(
     "Outputs the path of a file.",
     "FILE",
@@ -1034,11 +1092,15 @@ description_header_of_program_paragraphs = [
     """,
     blank_line,
     """\
-    List of instructions:
+    instructions:
     """
 ]
 
 instruction_configurations = [
+    InstructionConfiguration("PRINT",
+                             ["P"],
+                             description_of_print,
+                             InstructionArgumentParserForPrint()),
     InstructionConfiguration("FILE",
                              ["F"],
                              description_of_file,

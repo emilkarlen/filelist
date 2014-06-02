@@ -82,6 +82,8 @@ simptestcase (parse/instruction-name-variants)
 
 simptestcase (comments-blanklines-single-file)
 
+simptestcase2 (print simple-print)
+
 simptestcase (file-existing)
 simptestcase (file-existing-relative-file-argument)
 simptestcase (file-non-existing)

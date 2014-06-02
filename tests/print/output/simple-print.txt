@@ -1,0 +1,4 @@
+first-line
+
+third line * # comments-like parts are not removed
+white-space indent is removed
