@@ -1,5 +1,11 @@
 -*- org -*-
 
+
+* HOWTO implement a TODO
+  1. Checkout new branch
+  2. TDD impl functionality
+  3. Write program help
+  4. Remove item from this file.
 * Defects
 ** <2014-06-01 sun> Handling of abolute file names
 Currently, all file names are assumed to be relative.
