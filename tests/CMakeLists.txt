@@ -87,6 +87,7 @@ simptestcase2 (print suppress-print-output)
 
 simptestcase (file-existing)
 simptestcase (file-existing-relative-file-argument)
+simptestcase (file-existing-with-suppress-non-path-output)
 simptestcase (file-non-existing)
 
 simptestcase2 (list existing-directory)
