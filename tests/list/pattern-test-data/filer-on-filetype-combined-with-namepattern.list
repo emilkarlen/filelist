@@ -1,0 +1,12 @@
+# Match
+# A file with a pattern that matches only "a-file.a".
+LIST dir --type f *.a
+
+# Match
+# A file with a pattern that matches both a single file "b-file.b" and
+# a subdirectory "b-subdir".
+LIST dir --type f b*
+
+# No match
+# A file with a pattern that matches no file but several directories.
+LIST dir --type f *subdir

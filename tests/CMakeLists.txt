@@ -91,6 +91,8 @@ simptestcase2 (list existing-directory-relative-file-argument)
 simptestcase2 (list wildcards)
 simptestcase2 (list invalid-wildcard)
 simptestcase2 (list directory-argument-missing)
+simptestcase2 (list filer-on-filetype-file)
+simptestcase2 (list filer-on-filetype-combined-with-namepattern)
 
 simptestcase (include-existing--relative-file-argument)
 simptestcase (include-existing-in-same-dir)
