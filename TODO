@@ -14,7 +14,6 @@ from the command line current dir, to the file name.
 Should display hierarchy of included file.
 ** List
 *** match file-nameusing reg-ex
-*** sort output
 * Features
 ** Command to print program version
 ** Switches for turning on/off checking the existence of files

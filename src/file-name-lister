@@ -48,7 +48,7 @@ EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 ###############################################################################
 
 
-debugEnabled = False
+debugEnabled = True
 
 
 def debug(s):
@@ -71,6 +71,13 @@ def debug_end(s):
 
 def cq(s):
     return " : \"" + s + "\""
+
+
+def debug_cq(header, content):
+    c = content
+    if type(c) != str:
+        c = str(c)
+    debug(header + ":  `" + c + "'")
 
 
 def write_lines(o_stream,lines):
@@ -376,6 +383,11 @@ class InstructionApplicationForMissingFileException(InstructionApplicationExcept
                     ])
 
 
+###############################################################################
+# - InstructionForFile -
+###############################################################################
+
+
 class InstructionForFile(Instruction):
     """
     An instruction that resolves a single named file.
@@ -394,30 +406,100 @@ class InstructionForFile(Instruction):
         return iter([result_item])
 
 
+###############################################################################
+# - InstructionForDirectoryListing -
+###############################################################################
+
+
+class ListSettings:
+    """
+    Settings relevant to directory listing.
+
+    The settings are on a "high level" - ready for use
+    without further parsing.
+    """
+    def __init__(self,
+                 relative_directory_name: str,
+                 file_matcher,
+                 sort: bool):
+        self.relative_directory_name = relative_directory_name
+        self.file_matcher = file_matcher
+        self.sort = sort
+
+
+class FileMatchInfo:
+    """Mutable info about a file to match for inclusion in the result of the program.
+    The info is mutable so that matchers can set information they need,
+    which may also be needed by later matchers.
+    """
+    def __init__(self,
+                 path: str,
+                 base_name: str):
+        self._path = path
+        self._base_name = base_name
+        self._stat_result = None
+
+    def path(self):
+        return self._path
+
+    def base_name(self):
+        return self._base_name
+
+    def stat_result(self) -> os.stat_result:
+        """Return not-None: reads info if not present."""
+        if not self._stat_result:
+            self._stat_result = os.stat(self.path())
+        return self._stat_result
+
+
 class InstructionForDirectoryListing(Instruction):
     """
     An instruction that resolves the contents of a directory.
     """
     def __init__(self,
-                 directory_name: str,
-                 matcher: FunctionType):
-        self.directory_name = directory_name
-        self.matcher = matcher
+                 settings: ListSettings):
+        self.settings = settings
+        self.env_for_dir = None
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
                              env: Environment):
-        dir_path = env.file_name_relative_current_dir_of_process(self.directory_name)
+        dir_path = env.file_name_relative_current_dir_of_process(self.settings.relative_directory_name)
         if not os.path.isdir(dir_path):
             raise InstructionApplicationForMissingFileException(dir_path)
-        env_for_dir = env.new_for_directory(self.directory_name)
+        self.env_for_dir = env.new_for_directory(self.settings.relative_directory_name)
+        if self.settings.sort:
+            return self._sorted_iterable(dir_path)
+        else:
+            return self._unsorted_iterable(dir_path)
+
+    def _sorted_iterable(self,
+                         dir_path: str) -> iter:
+        all_files = [self._new_file_match_info(file_name) for file_name in os.listdir(dir_path)]
+        matching_base_names = list(map(FileMatchInfo.base_name,
+                                   filter(self.settings.file_matcher,
+                                          all_files)))
+        # sort
+        # Sorting here lets us sort on base_name, which is faster than sorting on
+        # the complete result file name.
+        matching_base_names.sort()
+        file_paths = [self._new_file_result(base_name) for base_name in matching_base_names]
+        return iter(file_paths)
+
+    def _unsorted_iterable(self,
+                           dir_path: str) -> iter:
         for file_base_name in os.listdir(dir_path):
-            file_to_match = FileMatchInfo(env_for_dir.file_name_relative_current_dir_of_process(file_base_name),
-                                          file_base_name)
-            if not self.matcher(file_to_match):
+            if not self.settings.file_matcher(self._new_file_match_info(file_base_name)):
                 continue
-            yield ResultItemForFile(
-                env_for_dir.file_name_relative_top_level_source_file(file_base_name))
+            yield self._new_file_result(file_base_name)
+
+    def _new_file_match_info(self, base_name: str) -> FileMatchInfo:
+        return FileMatchInfo(self.env_for_dir.file_name_relative_current_dir_of_process(base_name),
+                             base_name)
+
+    def _new_file_result(self, base_name: str) -> ResultItemForFile:
+        return ResultItemForFile(
+            self.env_for_dir.file_name_relative_top_level_source_file(base_name))
 
 
 class InstructionForInclude(Instruction):
@@ -565,25 +647,6 @@ class InstructionArgumentParserForFile(InstructionArgumentParser):
 ###############################################################################
 
 
-class FileMatchInfo:
-    """Mutable info about a file to match for inclusion in the result of the program.
-    The info is mutable so that matchers can set information they need,
-    which may also be needed by later matchers.
-    """
-    def __init__(self,
-                 path: str,
-                 base_name: str):
-        self.path = path
-        self.base_name = base_name
-        self._stat_result = None
-
-    def stat_result(self) -> os.stat_result:
-        """Return not-None: reads info if not present."""
-        if not self._stat_result:
-            self._stat_result = os.stat(self.path)
-        return self._stat_result
-
-
 def wildcard_matcher(wildcard: str):
     """A mather that matches on Unix-style wildcards."""
     debug("           wc: " + str(type(wildcard)) + cq(wildcard))
@@ -594,7 +657,7 @@ def wildcard_matcher(wildcard: str):
         raise InstructionArgumentParserSyntaxErrorException(["Invalid wildcard: `" + wildcard + "'"])
 
     def f(file: FileMatchInfo) -> bool:
-        return regex.match(file.base_name)
+        return regex.match(file.base_name())
     return f
 
 
@@ -630,11 +693,11 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
     def apply(self,
               parsing_settings: ParsingSettings,
               instruction_argument: str):
-        (directory, matcher) = self._parse_arguments(instruction_argument)
-        return InstructionForDirectoryListing(directory, matcher)
+        list_settings = self._parse_arguments(instruction_argument)
+        return InstructionForDirectoryListing(list_settings)
 
     def _parse_arguments(self,
-                         instruction_argument: str) -> (str, list):
+                         instruction_argument: str) -> ListSettings:
         parser = argparse.ArgumentParser(add_help=False,
                                          description="Lists files in a directory")
         parser.add_argument("patterns",
@@ -648,15 +711,22 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
                             Condition on the file type.
                             "f" for regular file.
                             "d" for directory.""")
+        parser.add_argument('-s', '--sort',
+                            action='store_const',
+                            const=True,
+                            default=False,
+                            help='Sort names alphabetically')
         arguments = instruction_argument.split()
         if not arguments:
             raise InstructionArgumentParserSyntaxErrorException(["A directory must be given."])
         directory = arguments[0]
         args = parser.parse_args(arguments[1:])
-        debug(str(args))
+        debug_cq("Args", args)
         matcher = self._parse_matcher(args.type,
                                       args.patterns)
-        return directory, matcher
+        return ListSettings(directory,
+                            matcher,
+                            args.sort)
 
     @staticmethod
     def _parse_matcher(file_type: list,
