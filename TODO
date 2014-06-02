@@ -18,6 +18,7 @@ A prefix is added to each name, consising of the path
 from the command line current dir, to the file name.
 
 * Improvements
+** Output: supress all non-file output, e.g. PRINT
 ** Switch to print absolute file names
 ** Case insensitive instruction-names
 ** Strip ws at both ends of paths
