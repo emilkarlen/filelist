@@ -14,7 +14,6 @@ from the command line current dir, to the file name.
 Should display hierarchy of included file.
 ** List
 *** match file-nameusing reg-ex
-*** possibility to list the dir that contains current file
 *** sort output
 * Features
 ** Command to print program version
