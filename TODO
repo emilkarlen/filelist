@@ -13,9 +13,6 @@ from the command line current dir, to the file name.
 ** Better error messages
 Should display hierarchy of included file.
 ** List: match using reg-ex
-** List: match on file type
-   on file type (d, f)
-
 * Features
 ** Command to print program version
 ** Switches for turning on/off checking the existence of files
