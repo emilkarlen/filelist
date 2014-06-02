@@ -81,6 +81,41 @@ def write_lines(o_stream,lines):
 
 
 ###############################################################################
+# - matcher utils -
+###############################################################################
+
+
+def or_matcher(matchers: list):
+    """
+    A matcher that must match one of a given list of matchers.
+    """
+    def f(x) -> bool:
+        for matcher in matchers:
+            if matcher(x):
+                return True
+        return False
+    return f
+
+
+def and_matcher(matchers: list):
+    """
+    A matcher that must match every one of a given list of matchers.
+    """
+    def f(x) -> bool:
+        for matcher in matchers:
+            if not matcher(x):
+                return False
+        return True
+    return f
+
+
+def constantly_true_matcher():
+    def f(x) -> bool:
+        return True
+    return f
+
+
+###############################################################################
 # - classes -
 ###############################################################################
 
@@ -376,7 +411,7 @@ class InstructionForDirectoryListing(Instruction):
         debug("list: " + self.directory_name)
         for file_base_name in os.listdir(dir_path):
             file_name_rel_curr_dir = env_for_dir.file_name_relative_current_dir_of_process(file_base_name)
-            file_to_match = FileToMatch(file_name_rel_curr_dir, file_base_name)
+            file_to_match = FileMatchInfo(file_name_rel_curr_dir, file_base_name)
             if not self.matcher(file_to_match):
                 continue
             debug("list   " + file_base_name)
@@ -515,8 +550,24 @@ class InstructionArgumentParser:
         raise NotImplementedError
 
 
-class FileToMatch:
-    """Mutable info about a file to match.
+class InstructionArgumentParserForFile(InstructionArgumentParser):
+    """Parser for a single file."""
+
+    def apply(self,
+              parsing_settings: ParsingSettings,
+              instruction_argument: str):
+        # TODO check syntax of instruction_argument - should be single
+        # file name
+        return InstructionForFile(instruction_argument)
+
+
+###############################################################################
+# - InstructionArgumentParserForDirectoryListing -
+###############################################################################
+
+
+class FileMatchInfo:
+    """Mutable info about a file to match for inclusion in the result of the program.
     The info is mutable so that matchers can set information they need,
     which may also be needed by later matchers.
     """
@@ -534,17 +585,6 @@ class FileToMatch:
         return self._stat_result
 
 
-class InstructionArgumentParserForFile(InstructionArgumentParser):
-    """Parser for a single file."""
-
-    def apply(self,
-              parsing_settings: ParsingSettings,
-              instruction_argument: str):
-        # TODO check syntax of instruction_argument - should be single
-        # file name
-        return InstructionForFile(instruction_argument)
-
-
 def wildcard_matcher(wildcard: str):
     """A mather that matches on Unix-style wildcards."""
     debug("           wc: " + str(type(wildcard)) + cq(wildcard))
@@ -554,50 +594,8 @@ def wildcard_matcher(wildcard: str):
     except:
         raise InstructionArgumentParserSyntaxErrorException(["Invalid wildcard: `" + wildcard + "'"])
 
-    def f(file: FileToMatch) -> bool:
+    def f(file: FileMatchInfo) -> bool:
         return regex.match(file.base_name)
-    return f
-
-
-def or_matcher(matchers: list):
-    """
-    A matcher that must match one of a given list of matchers.
-    """
-    def f(x) -> bool:
-        for matcher in matchers:
-            if matcher(x):
-                return True
-        return False
-    return f
-
-
-def and_matcher(matchers: list):
-    """
-    A matcher that must match every one of a given list of matchers.
-    """
-    def f(x) -> bool:
-        for matcher in matchers:
-            if not matcher(x):
-                return False
-        return True
-    return f
-
-
-def constantly_true_matcher():
-    def f(x) -> bool:
-        return True
-    return f
-
-
-def file_type_regular_file_matcher():
-    def f(file: FileToMatch) -> bool:
-        return stat.S_ISREG(file.stat_result()[stat.ST_MODE])
-    return f
-
-
-def file_type_directory_matcher():
-    def f(file: FileToMatch) -> bool:
-        return stat.S_ISDIR(file.stat_result()[stat.ST_MODE])
     return f
 
 
@@ -607,23 +605,24 @@ class FileType:
     The condition is parsed from a string, making the class
     suitable for us by an ArgumentParser.
     """
-    FILE = 1
-    DIR = 2
 
     def __init__(self, s: str):
         if s in ["f", "F"]:
-            self.t = self.FILE
+            self.mode_predicate = stat.S_ISREG
         elif s in ["d", "D"]:
-            self.t = self.DIR
+            self.mode_predicate = stat.S_ISDIR
         else:
             raise InstructionArgumentParserSyntaxErrorException(["Invalid file type `" + s + "'",
                                                                  "Valid types are f,d."])
 
     def new_matcher(self):
-        if self.t == self.FILE:
-            return file_type_regular_file_matcher()
-        else:
-            return file_type_directory_matcher()
+        return file_type_matcher(self)
+
+
+def file_type_matcher(expected_type: FileType):
+    def f(file: FileMatchInfo) -> bool:
+        return expected_type.mode_predicate(file.stat_result()[stat.ST_MODE])
+    return f
 
 
 class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
@@ -871,7 +870,7 @@ description_of_file = InstructionDescription(
     None
 )
 
-description_of_directory = InstructionDescription(
+description_of_directory_list = InstructionDescription(
     "Prints paths of the files inside a directory.",
     "DIRECTORY [PATTERN...]",
     [("DIRECTORY",
@@ -968,7 +967,7 @@ instruction_configurations = [
                              InstructionArgumentParserForFile()),
     InstructionConfiguration("LIST",
                              ["L"],
-                             description_of_directory,
+                             description_of_directory_list,
                              InstructionArgumentParserForDirectoryListing()),
     InstructionConfiguration("INCLUDE",
                              ["I"],
