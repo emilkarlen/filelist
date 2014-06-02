@@ -941,7 +941,7 @@ description_of_file = InstructionDescription(
 
 description_of_directory_list = InstructionDescription(
     "Prints paths of the files inside a directory.",
-    "DIRECTORY [-t | --type TYPE] [PATTERN...]",
+    "DIRECTORY [-t | --type TYPE] [-s | --sort] [PATTERN...]",
     [("DIRECTORY",
      """\
      A name relative to the location of the list file.
@@ -951,6 +951,10 @@ description_of_directory_list = InstructionDescription(
      """\
      A condition on the file type that must be satisfied.
      f: regular file; d: directory.
+     """),
+    ("--sort",
+     """\
+     Makes the output being sorted in alphabetical order.
      """),
     ("PATTERN",
      """\
