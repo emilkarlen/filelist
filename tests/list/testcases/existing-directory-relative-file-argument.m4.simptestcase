@@ -1,10 +1,10 @@
 # -*- shell-script -*-
 
-m4_include(../common.m4)
+m4_include(common.m4)
 
 application:file-name-resolver
 name:directory-existing-relative-file-argument
-home:.
+home:..
 
 setup.install:M4_COMMON_TESTDATA_DIR
 

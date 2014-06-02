@@ -1,10 +1,10 @@
 # -*- shell-script -*-
 
-m4_include(../common.m4)
+m4_include(common.m4)
 
 application:file-name-resolver
 name:wildecards
-home:.
+home:..
 
 setup.install:pattern-test-data
 

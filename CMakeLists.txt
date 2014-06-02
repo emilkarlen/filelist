@@ -57,6 +57,14 @@ macro (simptestcase testFileNameHead)
     )
 endmacro (simptestcase)
 
+macro (simptestcase2 testPkgDir testFileNameHead)
+  add_test (
+    NAME ${testPkgDir}/${testFileNameHead}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND ${SIMPTESTCASE} --m4 -v tests/${testPkgDir}/testcases/${testFileNameHead}.m4.simptestcase
+    )
+endmacro (simptestcase)
+
 
 ###############################################################################
 # Testcases
@@ -76,11 +84,11 @@ simptestcase (file-existing)
 simptestcase (file-existing-relative-file-argument)
 simptestcase (file-non-existing)
 
-simptestcase (list/existing-directory)
-simptestcase (list/existing-directory-relative-file-argument)
-simptestcase (list/wildcards)
-simptestcase (list/invalid-wildcard)
-simptestcase (list/directory-argument-missing)
+simptestcase2 (list existing-directory)
+simptestcase2 (list existing-directory-relative-file-argument)
+simptestcase2 (list wildcards)
+simptestcase2 (list invalid-wildcard)
+simptestcase2 (list directory-argument-missing)
 
 simptestcase (include-existing--relative-file-argument)
 simptestcase (include-existing-in-same-dir)
