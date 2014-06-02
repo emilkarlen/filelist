@@ -607,9 +607,9 @@ class FileType:
     """
 
     def __init__(self, s: str):
-        if s in ["f", "F"]:
+        if s == "f":
             self.mode_predicate = stat.S_ISREG
-        elif s in ["d", "D"]:
+        elif s == "d":
             self.mode_predicate = stat.S_ISDIR
         else:
             raise InstructionArgumentParserSyntaxErrorException(["Invalid file type `" + s + "'",
@@ -872,25 +872,30 @@ description_of_file = InstructionDescription(
 
 description_of_directory_list = InstructionDescription(
     "Prints paths of the files inside a directory.",
-    "DIRECTORY [PATTERN...]",
+    "DIRECTORY [-t | --type TYPE] [PATTERN...]",
     [("DIRECTORY",
      """\
      A name relative to the location of the list file.
      The directory must exist and be readable.
      """),
+    ("TYPE",
+     """\
+     A condition on the file type that must be satisfied.
+     f: regular file; d: directory.
+     """),
     ("PATTERN",
      """\
      A Unix like shell-style wildcard.
      (E.g. the constructs "*, ?, [abc],[!abc]".)
+     Each PATTERN is applied to the base-name of the files in the
+     directory.
+     If no PATTERN is given, then there is no condition on the
+     file name.
+     If PATTERNs are given, then the condition on the file name
+     is to match at least one of these.
      """)
      ],
-    """\
-    If no PATTERN is given, then all files will be printed.
-    If one or more PATTERN are given, then every path that
-    match at least one pattern is printed.
-    Each PATTERN is applied to the base-name of the files in the
-    directory.
-    """
+    None
 )
 
 description_of_include = InstructionDescription(
