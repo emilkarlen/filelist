@@ -4,6 +4,11 @@
 * HOWTO implement a TODO
   1. Checkout new branch
   2. TDD impl functionality
+     1. Setup new simptestcase test
+     2. Add test to CMakeLists.txt
+     3. Watch test fail
+     4. Implement
+     5. Refactor
   3. Write program help
   4. Remove item from this file.
 * Defects
