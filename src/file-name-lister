@@ -11,7 +11,7 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Wilde is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -159,7 +159,7 @@ class RenditionEnvironment(Environment):
         self.rendition_settings = rendition_settings
 
     def render_file_name_according_to_settings(self, file_name):
-        if rendition_settings.file_names_are_relative_file_argument_location:
+        if self.rendition_settings.file_names_are_relative_file_argument_location:
             return self.file_name_relative_top_level_source_file(file_name)
         else:
             return self.file_name_relative_current_dir_of_process(file_name)
@@ -264,6 +264,7 @@ class Instruction(ResultItemsConstructor):
     An instruction produces an iterable of ResultItem:s.
     """
 
+
 class File(ResultItemsConstructor):
     """A list of instructions in a single file."""
 
@@ -350,6 +351,7 @@ class InstructionForFile(Instruction):
         result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name))
         return iter([result_item])
 
+
 class InstructionForDirectoryListing(Instruction):
     """
     An instruction that resolves the contents of a directory.
@@ -385,7 +387,7 @@ class InstructionForInclude(Instruction):
     """
     def __init__(self,
                  file_name_relative_include_file: str):
-        self._file_name_relative_include_file= file_name_relative_include_file
+        self._file_name_relative_include_file = file_name_relative_include_file
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
@@ -465,6 +467,7 @@ class InstructionNameSyntaxErrorException(InstructionSyntaxErrorException):
                                                  source_info,
                                                  description)
 
+
 class InstructionArgumentSyntaxErrorException(InstructionSyntaxErrorException):
     """The arguments of an instruction are invalid."""
     def __init__(self,
@@ -526,11 +529,13 @@ def wildcard_matcher(wildcard: str):
         regex = re.compile(regex_string)
     except:
         raise InstructionArgumentParserSyntaxErrorException(["Invalid wildcard: `" + wildcard + "'"])
+
     def f(file_name: str) -> bool:
         return regex.match(file_name)
     return f
 
-def or_matcher(matchers):
+
+def or_matcher(matchers: list):
     """
     A matcher that must match one of a given list of matchers.
     """
@@ -541,10 +546,12 @@ def or_matcher(matchers):
         return False
     return f
 
+
 def constantly_true_matcher():
     def f(file_name: str) -> bool:
         return True
     return f
+
 
 class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
     """Parser for the contents of a directory."""
@@ -552,12 +559,11 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
     def apply(self,
               parsing_settings: ParsingSettings,
               instruction_argument: str):
-        (directory,matcher) = self._parse_arguments(parsing_settings,instruction_argument)
-        return InstructionForDirectoryListing(directory,matcher)
+        (directory, matcher) = self._parse_arguments(instruction_argument)
+        return InstructionForDirectoryListing(directory, matcher)
 
     def _parse_arguments(self,
-                         parsing_settings: ParsingSettings,
-                         instruction_argument: str) -> (str,list):
+                         instruction_argument: str) -> (str, list):
         arguments = instruction_argument.split()
         if not arguments:
             raise InstructionArgumentParserSyntaxErrorException(["A directory must be given."])
@@ -565,7 +571,8 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
         matcher = self._parse_matcher(arguments[1:])
         return directory, matcher
 
-    def _parse_matcher(self, wildcards: list):
+    @staticmethod
+    def _parse_matcher(wildcards: list):
         if not wildcards:
             return constantly_true_matcher()
         for wc in wildcards:
@@ -645,7 +652,7 @@ class FileParser:
         (name, argument) = self._split_name_and_argument()
         try:
             parser = self._parsing_settings.parserForInstruction(name.upper())
-            return parser.apply(self._parsing_settings,argument)
+            return parser.apply(self._parsing_settings, argument)
         except KeyError:
             raise InstructionNameSyntaxErrorException(
                 self._source_info(),
@@ -762,8 +769,8 @@ description_of_file = InstructionDescription(
      A name relative to the location of the list file.
      The file must exist. It can be any type of file (regular, directory ...).
      """)
-    ],
-     None
+     ],
+    None
 )
 
 description_of_directory = InstructionDescription(
@@ -779,7 +786,7 @@ description_of_directory = InstructionDescription(
      A Unix like shell-style wildcard.
      (E.g. the constructs "*, ?, [abc],[!abc]".)
      """)
-    ],
+     ],
     """\
     If no PATTERN is given, then all files will be printed.
     If one or more PATTERN are given, then every path that
@@ -797,10 +804,10 @@ description_of_include = InstructionDescription(
      A readable file, who's name is relative the including file.
      """)
      ],
-     """\
-     File paths inside the included file are relative the
-     location of that file.
-     """
+    """\
+    File paths inside the included file are relative the
+    location of that file.
+    """
 )
 
 blank_line = ""
@@ -871,18 +878,20 @@ instruction_configurations = [
                              InstructionArgumentParserForInclude()),
 ]
 
+
 def instruction_configurations_lines(wrapper: textwrap.TextWrapper) -> list:
     lines = []
     for i_config in instruction_configurations:
         lines += i_config.render_as_lines(wrapper)
     return lines
 
+
 def program_description():
     top_level_wrapper = textwrap.TextWrapper(initial_indent="",
                                              subsequent_indent="")
 
     instruction_wrapper = textwrap.TextWrapper(initial_indent="  ",
-                                             subsequent_indent="    ")
+                                               subsequent_indent="    ")
 
     lines = []
     for paragraph in description_header_of_program_paragraphs:
@@ -892,6 +901,7 @@ def program_description():
             lines.append("\n")
     lines += instruction_configurations_lines(instruction_wrapper)
     return "\n".join(lines)
+
 
 def instruction_identifier_to_parser_dict() -> dict:
     """
@@ -903,12 +913,12 @@ def instruction_identifier_to_parser_dict() -> dict:
     for i_conf in instruction_configurations:
         ret_val[i_conf.long_name] = i_conf.argument_parser
         for alias in i_conf.name_aliases:
-           ret_val[alias] = i_conf.argument_parser
+            ret_val[alias] = i_conf.argument_parser
     return ret_val
 
 
 ###############################################################################
-# - parse_command_line -
+# - main -
 ###############################################################################
 
 
@@ -921,7 +931,7 @@ def parse_command_line():
     parser.add_argument("file",
                         metavar="FILE",
                         help="A file that contains the resolve specification.")
-    parser.add_argument( "-f", "--relative-file-argument-location",
+    parser.add_argument("-f", "--relative-file-argument-location",
                         default=False,
                         action='store_true',
                         help="""\
@@ -943,32 +953,39 @@ def parse_command_line():
         sys.exit(EXIT_INVALID_ARGUMENTS)
 
 
-###############################################################################
-# - main -
-###############################################################################
-
-
-debug_begin('parse')
-(file_name, rendition_settings, open_file) = parse_command_line()
-debug_end('parse')
-try:
-    parsing_settings = ParsingSettings(instruction_identifier_to_parser_dict())
+def process_file(file_name: str,
+                 open_file,
+                 rendition_settings: RenditionSettings,
+                 parsing_settings: ParsingSettings):
     file_parser = FileParser.for_top_level(parsing_settings,
                                            file_name)
     file = file_parser.apply(open_file)
     env = RenditionEnvironment.for_top_level_file(file_name,
                                                   rendition_settings)
     debug_begin('iter')
-    for resultItem in file.result_item_iterable(parsing_settings,env):
+    for resultItem in file.result_item_iterable(parsing_settings, env):
         print(resultItem.render(env))
     debug_end('iter')
 
-except InstructionSyntaxErrorException as ex:
-    debug('InstructionSyntaxErrorException')
-    ex.render(sys.stderr)
-    sys.exit(EXIT_SYNTAX)
 
-except InstructionApplicationException as ex:
-    debug('InstructionApplicationException')
-    ex.render(sys.stderr)
-    sys.exit(ex.exitCode)
+def main():
+    debug_begin('parse')
+    (file_name, rendition_settings, open_file) = parse_command_line()
+    debug_end('parse')
+    try:
+        process_file(file_name,
+                     open_file,
+                     rendition_settings,
+                     ParsingSettings(instruction_identifier_to_parser_dict()))
+    except InstructionSyntaxErrorException as ex:
+        debug('InstructionSyntaxErrorException')
+        ex.render(sys.stderr)
+        sys.exit(EXIT_SYNTAX)
+
+    except InstructionApplicationException as ex:
+        debug('InstructionApplicationException')
+        ex.render(sys.stderr)
+        sys.exit(ex.exitCode)
+
+
+main()
