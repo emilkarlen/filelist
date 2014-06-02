@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# Ability to list the contents of the home directory -
+# the directory where the source file is located.
+#
+
+m4_include(common.m4)
+
+application:file-name-resolver
+name:list-home-dir
+home:..
+
+setup.install:testdata/home-dir
+
+test.run.cmdline:M4_EXECUTABLE_REL_LIST home-dir/list-home-dir.list | sort
+
+check.exitcode:0
+check.stdout.file.eq:output/list-home-dir.txt

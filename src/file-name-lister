@@ -132,7 +132,10 @@ class Environment:
         self.fromTopLevelFile = from_top_level_file
 
     def new_for_directory(self, name_of_directory):
-        return self._append_dir(name_of_directory)
+        if name_of_directory == ".":
+            return self
+        else:
+            return self._append_dir(name_of_directory)
 
     def new_for_included_file(self, file_name_relative_include_file):
         dir_delta = os.path.dirname(file_name_relative_include_file)
@@ -408,17 +411,13 @@ class InstructionForDirectoryListing(Instruction):
         if not os.path.isdir(dir_path):
             raise InstructionApplicationForMissingFileException(dir_path)
         env_for_dir = env.new_for_directory(self.directory_name)
-        debug("list: " + self.directory_name)
         for file_base_name in os.listdir(dir_path):
-            file_name_rel_curr_dir = env_for_dir.file_name_relative_current_dir_of_process(file_base_name)
-            file_to_match = FileMatchInfo(file_name_rel_curr_dir, file_base_name)
+            file_to_match = FileMatchInfo(env_for_dir.file_name_relative_current_dir_of_process(file_base_name),
+                                          file_base_name)
             if not self.matcher(file_to_match):
                 continue
-            debug("list   " + file_base_name)
-            debug("list   " + file_name_rel_curr_dir)
-            if os.path.exists(file_name_rel_curr_dir):
-                yield ResultItemForFile(
-                    env_for_dir.file_name_relative_top_level_source_file(file_base_name))
+            yield ResultItemForFile(
+                env_for_dir.file_name_relative_top_level_source_file(file_base_name))
 
 
 class InstructionForInclude(Instruction):
