@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# Tests the option to suppress all non-file output,
+# used with the PRINT instruction.
+#
+
+m4_include(common.m4)
+
+application:file-name-resolver
+name:suppress-print-output
+home:..
+
+setup.install:testdata
+
+test.run.cmdline:M4_EXECUTABLE --suppress-non-path-output testdata/simple-print.list
+
+check.exitcode:0
+check.stdout.empty
