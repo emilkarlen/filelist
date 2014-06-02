@@ -48,7 +48,7 @@ EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 ###############################################################################
 
 
-debugEnabled = True
+debugEnabled = False
 
 
 def debug(s):
@@ -176,11 +176,13 @@ class RenditionSettings:
     Settings for rendering the output.
     """
     def __init__(self,
-                 file_names_are_relative_file_argument_location: bool):
+                 file_names_are_relative_file_argument_location: bool,
+                 suppress_non_path_output: bool):
         """
         :rtype : RenditionSettings
         """
         self.file_names_are_relative_file_argument_location = file_names_are_relative_file_argument_location
+        self.suppress_non_path_output = suppress_non_path_output
 
 
 class RenditionEnvironment(Environment):
@@ -277,8 +279,10 @@ class ResultItemForPrint(ResultItem):
 
     def render(self,
                env: RenditionEnvironment) -> str:
-
-        return self._string
+        if env.rendition_settings.suppress_non_path_output:
+            return None
+        else:
+            return self._string
 
 
 class ResultItemForFile(ResultItem):
@@ -1175,10 +1179,18 @@ def parse_command_line():
                         File paths are relative the location of the FILE argument.
                         Without this option, file names are relative
                         the location of the invocation of the program.""")
+    parser.add_argument("-S", "--suppress-non-path-output",
+                        default=False,
+                        action='store_true',
+                        help="""\
+                        Suppresses all output other than file paths.
+                        E.g., PRINT instructions will have no effect.
+                        """)
     args = parser.parse_args()
-    rendition_settings = RenditionSettings(args.relative_file_argument_location)
+    rendition_settings = RenditionSettings(args.relative_file_argument_location,
+                                           args.suppress_non_path_output)
     try:
-        e = os.path.exists(args.file)
+        os.path.exists(args.file)  # Must be a regular file
         return (args.file,
                 rendition_settings,
                 open(args.file,
@@ -1199,10 +1211,12 @@ def process_file(file_name: str,
     file = file_parser.apply(open_file)
     env = RenditionEnvironment.for_top_level_file(file_name,
                                                   rendition_settings)
-    debug_begin('iter')
+    debug_begin('print result')
     for resultItem in file.result_item_iterable(parsing_settings, env):
-        print(resultItem.render(env))
-    debug_end('iter')
+        s = resultItem.render(env)
+        if s is not None:
+            print(s)
+    debug_end('print result')
 
 
 def main():
