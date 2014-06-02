@@ -3,7 +3,7 @@
 # All variables declared have the prefix "M4".
 
 # Aboslute name of the test directory.
-m4_define(`M4_TEST_DIR',`@CMAKE_SOURCE_DIR@/tests')
+m4_define(`M4_TEST_DIR',`@CMAKE_CURRENT_SOURCE_DIR@')
 
 # Aboslute name of the src directory.
 m4_define(`M4_SRC_DIR',`@CMAKE_SOURCE_DIR@/src')
