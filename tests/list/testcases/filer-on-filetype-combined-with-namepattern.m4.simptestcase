@@ -6,9 +6,9 @@ application:file-name-resolver
 name:filer-on-filetype-combined-with-namepattern
 home:..
 
-setup.install:pattern-test-data
+setup.install:testdata/pattern-and-types
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-test-data/filer-on-filetype-combined-with-namepattern.list | sort
+test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-and-types/filer-on-filetype-combined-with-namepattern.list | sort
 
 check.exitcode:0
 check.stdout.file.eq:output/filer-on-filetype-combined-with-namepattern.txt

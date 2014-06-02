@@ -6,9 +6,9 @@ application:file-name-resolver
 name:directory-argument-missing
 home:..
 
-setup.install:pattern-test-data
+setup.install:testdata/pattern-and-types
 
-test.run.cmdline:M4_EXECUTABLE pattern-test-data/directory-argument-missing.list
+test.run.cmdline:M4_EXECUTABLE pattern-and-types/directory-argument-missing.list
 
 check.exitcode:M4_EXIT_SYNTAX
 check.stdout.empty

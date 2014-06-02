@@ -6,9 +6,9 @@ application:file-name-resolver
 name:invalid-wildcard
 home:..
 
-setup.install:pattern-test-data
+setup.install:testdata/pattern-and-types
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-test-data/invalid-wildcard.list
+test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-and-types/invalid-wildcard.list
 
 check.exitcode:M4_EXIT_SYNTAX
 check.stdout.empty
