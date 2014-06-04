@@ -1,4 +1,4 @@
 #
 # Lists all files in the home directory.
 #
-LIST .
+@LIST .

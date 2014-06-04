@@ -1,1 +1,1 @@
-LIST dir  *.c  [a]*.a
+@LIST dir  *.c  [a]*.a

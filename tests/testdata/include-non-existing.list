@@ -1,1 +1,1 @@
-INCLUDE non-existing-list.list
+@INCLUDE non-existing-list.list

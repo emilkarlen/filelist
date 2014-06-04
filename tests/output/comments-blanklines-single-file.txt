@@ -1,1 +1,1 @@
-testdata/existing-file.txt
+the-only-output

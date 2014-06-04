@@ -82,7 +82,7 @@ def debug_cq(header, content):
     debug(header + ":  `" + c + "'")
 
 
-def write_lines(o_stream,lines):
+def write_lines(o_stream, lines):
     """Writes a list of lines with an added trailing newline, to a stream."""
     for line in lines:
         o_stream.write(line)
@@ -821,10 +821,10 @@ class FileParser:
         return FileParser(parsing_settings,
                           file_name)
 
-    ignored_line_re_string = "^\s*(#.*)?$"
+    ignored_line_re_string = "\s*(#.*)?$"
     ignored_line_re = re.compile(ignored_line_re_string)
 
-    name_and_argument_groups_re_string = "\s*(\w+)\s*(.*)"
+    name_and_argument_groups_re_string = "\s*@(\w+)\s*(.*)"
     name_and_argument_groups_re = re.compile(name_and_argument_groups_re_string)
 
     # Mutable state.

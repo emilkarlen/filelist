@@ -1,7 +1,7 @@
 # This comment is output, and neither is the following empty line.
 
-PRINT first-line
-PRINT
-PRINT third line * # comments-like parts are not removed
-PRINT       white-space indent is removed
+@PRINT first-line
+@PRINT
+@PRINT third line * # comments-like parts are not removed
+@PRINT       white-space indent is removed
 # This comment is output, and neither is the previous empty line.

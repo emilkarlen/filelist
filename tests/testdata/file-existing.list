@@ -1,2 +1,2 @@
-FILE existing-file.txt
-FILE dir
+@FILE existing-file.txt
+@FILE dir

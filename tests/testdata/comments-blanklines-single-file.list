@@ -3,7 +3,7 @@
        #
 
 
-FILE existing-file.txt
+@PRINT the-only-output
       
      
    # Comment

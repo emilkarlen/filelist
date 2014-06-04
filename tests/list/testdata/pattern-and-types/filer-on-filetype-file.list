@@ -1,2 +1,2 @@
 # Lists all files in dir/.
-LIST dir --type f
+@LIST dir --type f

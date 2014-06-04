@@ -1,1 +1,1 @@
-LIST dir  *.c  [a]*.a   [no-match].no-match
+@LIST dir  *.c  [a]*.a   [no-match].no-match
