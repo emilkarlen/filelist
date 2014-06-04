@@ -878,7 +878,7 @@ class FileParser:
                                                           ex.message_lines)
 
     def _split_name_and_argument(self) -> (str, str):
-        name_and_argument_match = re.search(self.name_and_argument_groups_re, self.line)
+        name_and_argument_match = re.match(self.name_and_argument_groups_re, self.line)
         if not name_and_argument_match:
             raise InstructionLineSyntaxErrorException(self._source_info())
         return (name_and_argument_match.group(1),

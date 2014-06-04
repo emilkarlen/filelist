@@ -11,4 +11,3 @@ setup.install:input/invalid-instruction-line.list
 test.run.cmdline:M4_EXECUTABLE --relative-file-argument-location invalid-instruction-line.list
 
 check.exitcode:M4_EXIT_SYNTAX
-check.stdout.empty
