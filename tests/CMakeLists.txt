@@ -76,6 +76,7 @@ endmacro (simptestcase2)
 simptestcase (invalid-usage-no-arguments)
 simptestcase (invalid-arguments-file-does-not-exist)
 
+simptestcase (parse/ignored-lines)
 simptestcase (parse/invalid-instruction-name)
 simptestcase (parse/invalid-line-syntax)
 simptestcase (parse/instruction-name-variants)
