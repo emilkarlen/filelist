@@ -12,19 +12,26 @@
   3. Write program help
   4. Remove item from this file.
 * Defects
-** <2014-06-01 sun> Handling of abolute file names
-Currently, all file names are assumed to be relative.
-A prefix is added to each name, consising of the path
-from the command line current dir, to the file name.
+** Handling of abolute file names
+   Currently, all file names are assumed to be relative.
+   A prefix is added to each name, consising of the path
+   from the command line current dir, to the file name.
 
 * Improvements
+** Allow comments at end of line for lines with file
+Reason it has not been done is,
+1. lack of time
+2. it could be useful to allow all form of names of files.
+   Especially if file-existence is not check.  In that case,
+   the comment character could be interpreted later down
+   the pipe.
 ** Switch to print absolute file names
 ** Case insensitive instruction-names
 ** Strip ws at both ends of paths
 ** Better error messages
 Should display hierarchy of included file.
 ** List
-*** match file-nameusing reg-ex
+*** match file-name using reg-ex
 * Features
 ** Command to print program version
 ** Switches for turning on/off checking the existence of files
