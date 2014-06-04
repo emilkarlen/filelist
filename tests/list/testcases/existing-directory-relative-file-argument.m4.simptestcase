@@ -2,7 +2,7 @@
 
 m4_include(common.m4)
 
-application:file-name-resolver
+application:file-name-lister
 name:directory-existing-relative-file-argument
 home:..
 

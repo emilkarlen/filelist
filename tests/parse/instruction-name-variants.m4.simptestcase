@@ -7,7 +7,7 @@ m4_include(../common.m4)
 # (Note: this test could be split into several tests.)
 #
 
-application:file-name-resolver
+application:file-name-lister
 name:instruction-name-variants
 home:.
 
