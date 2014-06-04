@@ -80,6 +80,7 @@ simptestcase (parse/ignored-lines)
 simptestcase (parse/invalid-instruction-name)
 simptestcase (parse/invalid-line-syntax)
 simptestcase (parse/instruction-name-variants)
+simptestcase (parse/invalid-instruction-line)
 
 simptestcase (comments-blanklines-single-file)
 

@@ -3,10 +3,7 @@
 m4_include(../common.m4)
 
 #
-# Tests variants of the instruction names:
-# - case insensitivity
-# - aliases
-#
+# Tests variants of the instruction names.
 # (Note: this test could be split into several tests.)
 #
 

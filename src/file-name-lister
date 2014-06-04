@@ -48,7 +48,7 @@ EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 ###############################################################################
 
 
-debugEnabled = False
+debugEnabled = True
 
 
 def debug(s):
@@ -68,6 +68,8 @@ def debug_begin(s):
 def debug_end(s):
     debug(s + " END")
 
+def q(s):
+    return "\"" + s + "\""
 
 def cq(s):
     return " : \"" + s + "\""
@@ -861,7 +863,9 @@ class FileParser:
         return File(instructions)
 
     def parse_instruction_line(self):
+        debug(q(self.line))
         (name, argument) = self._split_name_and_argument()
+        debug("instruction line: \"" + name + "\" (\"" + argument + "\")")
         try:
             parser = self._parsing_settings.parserForInstruction(name.upper())
             return parser.apply(self._parsing_settings, argument)
