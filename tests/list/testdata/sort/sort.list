@@ -2,6 +2,6 @@
 # This makes the test fail if all printed files would be
 # sorted.
 
-@FILE sort.list
+sort.list
 @LIST dir --sort
-@FILE sort.list
+sort.list

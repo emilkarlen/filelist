@@ -10,5 +10,5 @@ setup.install:M4_TEST_DIR/testdata
 
 test.run.cmdline:M4_EXECUTABLE testdata/invalid-line-syntax.list
 
-check.exitcode:M4_EXIT_SYNTAX
+check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
 check.stdout.empty
