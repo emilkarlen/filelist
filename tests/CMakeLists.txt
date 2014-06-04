@@ -82,7 +82,7 @@ simptestcase (parse/invalid-line-syntax)
 simptestcase (parse/instruction-name-variants)
 #simptestcase (parse/invalid-instruction-line) TODO ta bort data
 
-simptestcase (comments-blanklines-single-file)
+simptestcase (comments-blanklines-single-print)
 
 simptestcase2 (print simple-print)
 simptestcase2 (print suppress-print-output)
