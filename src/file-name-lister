@@ -1133,7 +1133,7 @@ description_of_include = InstructionDescription(
 blank_line = ""
 
 description_header_of_program_paragraphs = [
-    "Prints a list of file paths given a list of file path instructions.",
+    "Prints a list of file paths given file containing file path specifications.",
     "",
     """\
     This is a tool for maintaining a distributed list of files
@@ -1151,31 +1151,34 @@ description_header_of_program_paragraphs = [
     included file is relative the location of the file itself.
     """,
     blank_line,
+    "The specification file is line oriented.",
+    "There are three types of specification lines:",
+    "1. file path",
+    "2. instruction",
+    "3. ignored (white-space or comment)",
+    blank_line,
+    "A file path line only contains the file path itself.",
+    "The path is relative the location of the specification file.",
+    "File path lines may not contain comments.",
+    blank_line,
+    "An instruction has the form: @INSTRUCTION_NAME [ARGUMENT...]",
+    "Instruction lines may not contain comments.",
     """\
-    Each line in the input is an instruction that either resolves to one
-    or more file paths, or it includes.
+    INSTRUCTION_NAME is case insensitive, and may have one or more aliases.
+    """,
+    """\
+    The syntax and meaning of ARGUMENT depend on the instruction.
+    """,
+    "(Below is a list of instructions.)",
+    blank_line,
+    """\
+    Comments begin with a # and continue to the end of line.
+    The # may be preceded by any sequence of white-space.
     """,
     blank_line,
     """\
-    Note: Designed to only work with file names
+    Note: This program is designed to only work with file names
     that does not contain new-lines.
-    """,
-    blank_line,
-    """\
-    Input files consist of white-space lines (ignored),
-    comment lines (ignored) and instruction lines.
-    Comments begin with a #.
-    Instruction lines may not contain comments.
-    """,
-    blank_line,
-    """\
-    An instruction line has the form INSTRUCTION-NAME ARGUMENTS.
-    """,
-    """\
-    An INSTRUCTION-NAME is case insensitive, and may have one or more aliases.
-    """,
-    """\
-    The syntax and meaning of ARGUMENTS depend on the instruction, of course.
     """,
     blank_line,
     """\
