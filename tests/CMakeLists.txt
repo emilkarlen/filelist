@@ -109,3 +109,4 @@ simptestcase (include-existing-dir)
 
 simptestcase2 (other normalize-paths)
 simptestcase2 (other normalize-paths-relative-file-argument)
+simptestcase2 (other absolute-paths)

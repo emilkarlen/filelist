@@ -1,0 +1,10 @@
+@print LOCAL
+file.txt
+dir
+dir/dir-file.txt
+
+@print LIST
+@list dir
+
+@print INCLUDE
+@include included-for-absolute-paths.list

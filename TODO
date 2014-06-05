@@ -25,8 +25,6 @@ Reason it has not been done is,
    Especially if file-existence is not check.  In that case,
    the comment character could be interpreted later down
    the pipe.
-** Switch to print absolute file names
-** Case insensitive instruction-names
 ** Strip ws at both ends of paths
 ** Better error messages
 Should display hierarchy of included file.

@@ -1,0 +1,16 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:absolute-paths
+home:..
+
+setup.install:data/home
+
+test.run.cmdline:M4_EXECUTABLE --absolute-paths home/absolute-paths.list
+
+check.prepare.replace-SIMPTEST-envvars/stdout
+
+check.exitcode:0
+check.stdout.file.eq/replaced:output/absolute-paths.txt
