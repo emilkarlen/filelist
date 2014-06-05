@@ -106,3 +106,6 @@ simptestcase (include-existing-in-same-dir)
 simptestcase (include-existing-in-subdir)
 simptestcase (include-non-existing)
 simptestcase (include-existing-dir)
+
+simptestcase2 (other normalize-paths)
+simptestcase2 (other normalize-paths-relative-file-argument)

@@ -1,0 +1,11 @@
+LOCAL
+file.txt
+file.txt
+file.txt
+dir
+dir/dir-file.txt
+LIST
+dir/dir-file.txt
+INCLUDE
+file.txt
+file.txt

@@ -58,7 +58,7 @@ EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 ###############################################################################
 
 
-debugEnabled = True
+debugEnabled = False
 
 
 def debug(s):
@@ -189,11 +189,13 @@ class RenditionSettings:
     """
     def __init__(self,
                  file_names_are_relative_file_argument_location: bool,
+                 normalize_paths: bool,
                  suppress_non_path_output: bool):
         """
         :rtype : RenditionSettings
         """
         self.file_names_are_relative_file_argument_location = file_names_are_relative_file_argument_location
+        self.normalize_paths = normalize_paths
         self.suppress_non_path_output = suppress_non_path_output
 
 
@@ -222,10 +224,14 @@ class RenditionEnvironment(Environment):
         self.rendition_settings = rendition_settings
 
     def render_file_name_according_to_settings(self, file_name) -> str:
+        retVal = file_name
         if self.rendition_settings.file_names_are_relative_file_argument_location:
-            return self.file_name_relative_top_level_source_file(file_name)
+            retVal = self.file_name_relative_top_level_source_file(file_name)
         else:
-            return self.file_name_relative_current_dir_of_process(file_name)
+            retVal = self.file_name_relative_current_dir_of_process(file_name)
+        if self.rendition_settings.normalize_paths:
+            retVal = os.path.normpath(retVal)
+        return retVal
 
 
 class ResultItem:
@@ -1247,9 +1253,17 @@ def parse_command_line():
                         default=False,
                         action='store_true',
                         help="""\
+                        Normalizes paths.
+                        E.g.: A//B, A/B/, A/./B and A/foo/../B all become A/B.""")
+    parser.add_argument("-n", "--normalize-paths",
+                        default=False,
+                        action='store_true',
+                        help="""\
                         File paths are relative the location of the FILE argument.
                         Without this option, file names are relative
-                        the location of the invocation of the program.""")
+                        the location of the invocation of the program.
+                        This string manipulation may change the meaning of
+                        a path that contains symbolic links.""")
     parser.add_argument("-S", "--suppress-non-path-output",
                         default=False,
                         action='store_true',
@@ -1259,6 +1273,7 @@ def parse_command_line():
                         """)
     args = parser.parse_args()
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
+                                           args.normalize_paths,
                                            args.suppress_non_path_output)
     try:
         os.path.exists(args.file)  # Must be a regular file

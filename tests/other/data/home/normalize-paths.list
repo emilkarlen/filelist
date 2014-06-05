@@ -1,0 +1,12 @@
+@print LOCAL
+./file.txt
+dir/../file.txt
+./dir/../file.txt
+dir/.
+dir//dir-file.txt
+
+@print LIST
+@list dir/../dir
+
+@print INCLUDE
+@include included.list
