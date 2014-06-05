@@ -18,7 +18,6 @@
    from the command line current dir, to the file name.
 
 * Improvements
-** Output normalized paths
 ** Allow comments at end of line for lines with file
 Reason it has not been done is,
 1. lack of time
