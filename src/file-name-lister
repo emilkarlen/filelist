@@ -22,10 +22,12 @@
 ###############################################################################
 
 ###############################################################################
-# Processing of a file
+# DESIGN
+# --------------------------------------
+# A file is processed by a FileParser:
 #
 # For each line:
-# LineParser             -> [Processor],
+# LineParser             -> [Processor]
 # Processor              -> ResultItemsConstructor
 # ResultItemsConstructor -> [ResultItem]
 # ResultItem             -> str
