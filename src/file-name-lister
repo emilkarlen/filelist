@@ -235,7 +235,7 @@ class RenditionEnvironment(Environment):
             ret_val = self.file_name_relative_current_dir_of_process(file_name)
         if self.rendition_settings.normalize_paths:
             ret_val = os.path.normpath(ret_val)
-        elif self.rendition_settings.absolute_paths:
+        if self.rendition_settings.absolute_paths:
             ret_val = os.path.abspath(ret_val)
         return ret_val
 
