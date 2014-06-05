@@ -1176,9 +1176,13 @@ description_header_of_program_paragraphs = [
     The # may be preceded by any sequence of white-space.
     """,
     blank_line,
+    "NOTES",
     """\
-    Note: This program is designed to only work with file names
+    1. This program is designed to only work with file names
     that does not contain new-lines.
+    """,
+    """\
+    2. It is undefined how white space in file paths are handled.
     """,
     blank_line,
     """\
