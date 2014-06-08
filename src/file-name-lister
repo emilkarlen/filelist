@@ -80,8 +80,10 @@ def debug_begin(s):
 def debug_end(s):
     debug(s + " END")
 
+
 def q(s):
     return "\"" + s + "\""
+
 
 def cq(s):
     return " : \"" + s + "\""
@@ -402,9 +404,6 @@ class ResultItemForFile(ResultItem):
 
     def render(self,
                env: RenditionEnvironment) -> str:
-        debug('  ResultItemForFile : ' + self.file_name)
-        debug("           env/fromTopLvl : " + env.fromTopLevelFile)
-        debug("           env/fromCurrDir: " + env.fromCurrDir)
         return env.render_file_name_according_to_settings(self.file_name)
 
 
@@ -493,16 +492,13 @@ class ResultItemIterableForFile:
 
     def __next__(self):
         while True:
-            debug('    iter loop  : instructions.length = ' + str(len(self.instructions)))
             if self.curr_result_item_iterable is None:
                 if not self.instructions:
-                    debug('   iter stop')
                     raise StopIteration
                 self.curr_result_item_iterable = self.instructions[0].result_item_iterable(self.parsing_settings,
                                                                                            self.env)
                 del self.instructions[0]
             try:
-                debug('       returning')
                 return self.curr_result_item_iterable.__next__()
             except StopIteration:
                 self.curr_result_item_iterable = None
@@ -697,9 +693,6 @@ class ProcessorForInclude(Processor):
         if not os.path.isfile(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
         env_for_file = env.new_for_included_file(self._file_name_relative_include_file)
-        debug("incl: " + self._file_name_relative_include_file)
-        debug("         env/fromTopLvl : " + env_for_file.fromTopLevelFile)
-        debug("         env/fromCurrDir: " + env_for_file.fromCurrDir)
         file_parser = FileParser(parsing_settings,
                                  self.source.as_include_file_chain(),
                                  file_path)
@@ -816,7 +809,6 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
 
 def wildcard_matcher(wildcard: str):
     """A mather that matches on Unix-style wildcards."""
-    debug("           wc: " + str(type(wildcard)) + cq(wildcard))
     try:
         regex_string = fnmatch.translate(wildcard)
         regex = re.compile(regex_string)
@@ -889,7 +881,6 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
             raise InstructionArgumentParserSyntaxErrorException(["A directory must be given."])
         directory = arguments[0]
         args = parser.parse_args(arguments[1:])
-        debug_cq("Args", args)
         matcher = self._parse_matcher(args.type,
                                       args.patterns)
         return ListSettings(directory,
@@ -978,7 +969,6 @@ class LineParserForInstruction(LineParser):
             return None
         (name, argument) = (name_and_argument_match.group(1),
                             name_and_argument_match.group(2))
-        debug("instruction line: \"" + name + "\" (\"" + argument + "\")")
         try:
             parser = parsing_settings.parser_for_instruction(name.upper())
             return parser.apply(parsing_settings, source, argument)
@@ -1062,7 +1052,6 @@ class FileParser:
 
     def processors_for_line(self):
 
-        debug("processors_for_line")
         for line_parser in self._parsing_settings.line_parsers:
             list_of_processors = line_parser.parse(self._parsing_settings, self._source_reference(), self.line_stripped)
             if list_of_processors is not None:
@@ -1427,18 +1416,14 @@ def process_file(file_name: str,
     file = file_parser.apply(open_file)
     env = RenditionEnvironment.for_top_level_file(file_name,
                                                   rendition_settings)
-    debug_begin('print result')
     for resultItem in file.result_item_iterable(parsing_settings, env):
         s = resultItem.render(env)
         if s is not None:
             print(s)
-    debug_end('print result')
 
 
 def main():
-    debug_begin('parse')
     (file_name, rendition_settings, open_file) = parse_command_line()
-    debug_end('parse')
     try:
         process_file(file_name,
                      open_file,
@@ -1446,14 +1431,11 @@ def main():
                      ParsingSettings(system_line_parsers,
                                      instruction_identifier_to_parser_dict()))
     except InstructionSyntaxErrorException as ex:
-        debug('InstructionSyntaxErrorException')
         ex.render(sys.stderr)
         sys.exit(EXIT_SYNTAX)
 
     except InstructionApplicationException as ex:
-        debug('InstructionApplicationException')
         ex.render(sys.stderr)
         sys.exit(ex.exitCode)
-
 
 main()
