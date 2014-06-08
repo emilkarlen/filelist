@@ -137,6 +137,69 @@ def constantly_true_matcher():
 
 
 ###############################################################################
+# - file positions -
+###############################################################################
+
+
+class SourceLine:
+    """Information about a line in a source file."""
+    def __init__(self,
+                 line_number: int,
+                 line_contents: str):
+        self.number = line_number
+        self.contents = line_contents
+
+
+class SourceLineInFile:
+    """Information about a line in a source file, including file name."""
+    def __init__(self,
+                 file_name: str,
+                 line: SourceLine):
+        self.file_name = file_name
+        self.line = line
+
+    def err_msg_file_ref(self):
+        return "File \"" + self.file_name + "\", line " + str(self.line.number)
+
+    def err_msg_file_ref_with_source_line(self):
+        return "File \"" + self.file_name + "\", line " + str(self.line.number) + \
+               "\n  " + self.line.contents
+
+
+class IncludeFileChain:
+    """Chain of files related via inclusions."""
+    def __init__(self,
+                 files: list):
+        self._files = files
+
+    @staticmethod
+    def new_for_top_level_file():
+        return IncludeFileChain([])
+
+    def new_include(self,
+                    source_line: SourceLineInFile):
+        new_files = self._files.copy()
+        new_files.append(source_line)
+        return IncludeFileChain(new_files)
+        
+    def from_top_to_bottom(self):
+        return self._files
+
+
+class SourceReference:
+    """A reference to a line in a source file, together with inclusion chain."""
+
+    def __init__(self,
+                 includes: IncludeFileChain,
+                 source_line: SourceLineInFile):
+        self.includes = includes
+        self.source_line = source_line
+
+    def as_include_file_chain(self):
+        return self.includes.new_include(self.source_line)
+
+
+###############################################################################
 # - classes -
 ###############################################################################
 
@@ -341,17 +404,43 @@ class ResultItemForFile(ResultItem):
 ###############################################################################
 
 
-class InstructionApplicationException(Exception):
+class WithSourceReferenceMixin:
+    """A mixin class for the property of having a IncludeFileChain."""
+    def __init__(self,
+                 source: SourceReference):
+        self._source = source
+
+    def source_reference(self):
+        return self._source
+
+    def render_include_chain(self, o_stream):
+        if self._source.includes:
+            for include in self._source.includes.from_top_to_bottom():
+                o_stream.write(include.err_msg_file_ref_with_source_line())
+                o_stream.write("\n\n")
+
+
+class InstructionApplicationException(WithSourceReferenceMixin, Exception):
     """
     Indicates failure of an instruction to produce one of
     its ResultItem:s.
     """
 
     def __init__(self,
+                 source: SourceReference,
                  exit_code: int):
+        WithSourceReferenceMixin.__init__(self, source)
         self.exitCode = exit_code
 
     def render(self, o_stream):
+        self.render_include_chain(o_stream)
+        self.render_sub_class_specifics(self.source_reference().source_line,
+                                        o_stream)
+
+    def render_sub_class_specifics(self,
+                                   source_line: SourceLineInFile,
+                                   o_stream):
+        """Implements the part that is specific per sub class."""
         raise NotImplementedError()
 
 
@@ -361,18 +450,20 @@ class Processor(ResultItemsConstructor):
 
     An instruction produces an iterable of ResultItem:s.
     """
+    def __init__(self, source: SourceReference):
+        self.source = source
 
 
 class File(ResultItemsConstructor):
     """A list of instructions in a single file."""
 
     def __init__(self,
+                 source: SourceReference,
                  processors: list):
+        Processor.__init__(self, source)
         self.processors = processors
 
-    def result_item_iterable(self,
-                             parsing_settings: ParsingSettings,
-                             env: Environment):
+    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
         return ResultItemIterableForFile(parsing_settings,
                                          self.processors,
                                          env)
@@ -419,12 +510,16 @@ class InstructionApplicationForMissingFileException(InstructionApplicationExcept
     """
 
     def __init__(self,
+                 source: SourceReference,
                  file_name_relative_current_dir_of_process: str):
         InstructionApplicationException.__init__(self,
+                                                 source,
                                                  EXIT_FILE_DOES_NOT_EXIST)
         self.file_name_relative_current_dir_of_process = file_name_relative_current_dir_of_process
 
-    def render(self, o_stream):
+    def render_sub_class_specifics(self,
+                                   source_line: SourceLineInFile,
+                                   o_stream):
         write_lines(o_stream,
                     [
                         "File does not exist: " +
@@ -442,12 +537,12 @@ class ProcessorForPrint(Processor):
     An instruction that resolves a single named file.
     """
     def __init__(self,
+                 source: SourceReference,
                  string: str):
+        Processor.__init__(self, source)
         self._string = string
 
-    def result_item_iterable(self,
-                             parsing_settings: ParsingSettings,
-                             env: Environment):
+    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
         return iter([ResultItemForPrint(self._string)])
 
 
@@ -461,7 +556,9 @@ class ProcessorForFile(Processor):
     An instruction that resolves a single named file.
     """
     def __init__(self,
+                 source: SourceReference,
                  file_name: str):
+        Processor.__init__(self, source)
         self.file_name = file_name 
 
     def result_item_iterable(self,
@@ -469,7 +566,7 @@ class ProcessorForFile(Processor):
                              env: Environment):
         file_path = env.file_name_relative_current_dir_of_process(self.file_name)
         if not os.path.exists(file_path):
-            raise InstructionApplicationForMissingFileException(file_path)
+            raise InstructionApplicationForMissingFileException(self.source, file_path)
         result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name))
         return iter([result_item])
 
@@ -525,16 +622,16 @@ class ProcessorForDirectoryListing(Processor):
     An instruction that resolves the contents of a directory.
     """
     def __init__(self,
+                 source: SourceReference,
                  settings: ListSettings):
+        Processor.__init__(self, source)
         self.settings = settings
         self.env_for_dir = None
 
-    def result_item_iterable(self,
-                             parsing_settings: ParsingSettings,
-                             env: Environment):
+    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
         dir_path = env.file_name_relative_current_dir_of_process(self.settings.relative_directory_name)
         if not os.path.isdir(dir_path):
-            raise InstructionApplicationForMissingFileException(dir_path)
+            raise InstructionApplicationForMissingFileException(self.source, dir_path)
         self.env_for_dir = env.new_for_directory(self.settings.relative_directory_name)
         if self.settings.sort:
             return self._sorted_iterable(dir_path)
@@ -570,33 +667,38 @@ class ProcessorForDirectoryListing(Processor):
             self.env_for_dir.file_name_relative_top_level_source_file(base_name))
 
 
+###############################################################################
+# - ProcessorForInclude -
+###############################################################################
+
+
 class ProcessorForInclude(Processor):
     """
     An instruction that resolves the contents of a list file.
     """
     def __init__(self,
+                 source: SourceReference,
                  file_name_relative_include_file: str):
+        Processor.__init__(self, source)
         self._file_name_relative_include_file = file_name_relative_include_file
 
-    def result_item_iterable(self,
-                             parsing_settings: ParsingSettings,
-                             env: Environment):
+    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
         file_path = env.file_name_relative_current_dir_of_process(self._file_name_relative_include_file)
         if not os.path.isfile(file_path):
-            raise InstructionApplicationForMissingFileException(file_path)
+            raise InstructionApplicationForMissingFileException(self.source, file_path)
         env_for_file = env.new_for_included_file(self._file_name_relative_include_file)
         debug("incl: " + self._file_name_relative_include_file)
         debug("         env/fromTopLvl : " + env_for_file.fromTopLevelFile)
         debug("         env/fromCurrDir: " + env_for_file.fromCurrDir)
         file_parser = FileParser(parsing_settings,
+                                 self.source.as_include_file_chain(),
                                  file_path)
         try:
             file = file_parser.apply(open(file_path,
                                           mode='r'))
         except OSError:
-            raise InstructionApplicationForMissingFileException(file_path)
-        return file.result_item_iterable(parsing_settings,
-                                         env_for_file)
+            raise InstructionApplicationForMissingFileException(self.source.includes, file_path)
+        return file.result_item_iterable(parsing_settings, env_for_file)
 
 
 ###############################################################################
@@ -604,67 +706,54 @@ class ProcessorForInclude(Processor):
 ###############################################################################
 
 
-class SourceInfo:
-    """Information about a part of a file source."""
-    def __init__(self,
-                 file_name: str,
-                 line_number: int,
-                 line_contents: str):
-        self.file_name = file_name
-        self.line_number = line_number
-        self.line_contents = line_contents
-
-    def err_msg_file_ref(self):
-        return "File \"" + self.file_name + "\", line " + str(self.line_number)
-
-
-class InstructionSyntaxErrorException(Exception):
+class InstructionSyntaxErrorException(WithSourceReferenceMixin, Exception):
     """A syntactic error in an instruction of a source file."""
     def __init__(self,
-                 source_info,
+                 source: SourceReference,
                  description):
-        self.source_info = source_info
+        WithSourceReferenceMixin.__init__(self, source)
         self.description = description
     
     def render(self, o_stream):
-        source_position = self.source_info.err_msg_file_ref()
+        self.render_include_chain(o_stream)
+        source_position = self.source_reference().source_line.err_msg_file_ref()
         write_lines(o_stream,
                     [
                         source_position,
                         "  " + self.description + ":",
-                        "    " + self.source_info.line_contents
+                        "    " + self.source_reference().source_line.line.contents
                     ])
 
 
 class InstructionLineSyntaxErrorException(InstructionSyntaxErrorException):
     """Invalid syntax of a line that should contain an instruction."""
     def __init__(self,
-                 source_info):
+                 source: SourceReference):
         description = "Invalid input line, cannot find instruction:"
         InstructionSyntaxErrorException.__init__(self,
-                                                 source_info,
+                                                 source,
                                                  description)
 
 
 class InstructionNameSyntaxErrorException(InstructionSyntaxErrorException):
     """Invalid name of an instruction of a source file."""
     def __init__(self,
-                 source_info: SourceInfo,
+                 source: SourceReference,
                  instruction_name: str):
         description = "Invalid instruction name `" + instruction_name + "'"
         InstructionSyntaxErrorException.__init__(self,
-                                                 source_info,
+                                                 source,
                                                  description)
 
 
 class InstructionArgumentSyntaxErrorException(InstructionSyntaxErrorException):
     """The arguments of an instruction are invalid."""
     def __init__(self,
-                 source_info: SourceInfo,
+                 source: SourceReference,
                  lines: list):
         description = "\n".join(lines)
         InstructionSyntaxErrorException.__init__(self,
-                                                 source_info,
+                                                 source,
                                                  description)
 
 
@@ -694,6 +783,7 @@ class InstructionArgumentParser:
 
     def apply(self,
               parsing_settings: ParsingSettings,
+              source: SourceReference,
               instruction_argument: str) -> list:
         """Returns a list of Processor:s."""
         raise NotImplementedError
@@ -704,8 +794,9 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
 
     def apply(self,
               parsing_settings: ParsingSettings,
+              source: SourceReference,
               instruction_argument: str):
-        return [ProcessorForPrint(instruction_argument)]
+        return [ProcessorForPrint(source, instruction_argument)]
 
 
 ###############################################################################
@@ -758,9 +849,10 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
 
     def apply(self,
               parsing_settings: ParsingSettings,
+              source: SourceReference,
               instruction_argument: str):
         list_settings = self._parse_arguments(instruction_argument)
-        return [ProcessorForDirectoryListing(list_settings)]
+        return [ProcessorForDirectoryListing(source, list_settings)]
 
     def _parse_arguments(self,
                          instruction_argument: str) -> ListSettings:
@@ -817,10 +909,11 @@ class InstructionArgumentParserForInclude(InstructionArgumentParser):
 
     def apply(self,
               parsing_settings: ParsingSettings,
+              source: SourceReference,
               instruction_argument: str):
         # TODO check syntax of instruction_argument - should be single
         # file name
-        return [ProcessorForInclude(instruction_argument)]
+        return [ProcessorForInclude(source, instruction_argument)]
 
 
 ###############################################################################
@@ -835,13 +928,12 @@ class LineParser:
 
     def parse(self,
               parsing_settings: ParsingSettings,
-              source_info: SourceInfo,
+              source: SourceReference,
               striped_line: str) -> list:
         """
         Returns None if the parser cannot parser the line.
         Otherwise, a list of Processors.
         This list may be empty.
-        :param source_info:
         """
         raise NotImplemented()
 
@@ -853,7 +945,7 @@ class LineParserForIgnoredLine(LineParser):
 
     def parse(self,
               parsing_settings: ParsingSettings,
-              source_info: SourceInfo,
+              source: SourceReference,
               striped_line: str) -> list:
         if self.ignored_line_re.match(striped_line):
             return []
@@ -866,9 +958,8 @@ class LineParserForInstruction(LineParser):
     name_and_argument_groups_re_string = "@(\w+)\s*(.*)"
     name_and_argument_groups_re = re.compile(name_and_argument_groups_re_string)
 
-    def parse(self,
-              parsing_settings: ParsingSettings,
-              source_info: SourceInfo,
+    def parse(self, parsing_settings: ParsingSettings,
+              source: SourceReference,
               striped_line: str) -> list:
 
         name_and_argument_match = re.match(self.name_and_argument_groups_re,
@@ -880,13 +971,13 @@ class LineParserForInstruction(LineParser):
         debug("instruction line: \"" + name + "\" (\"" + argument + "\")")
         try:
             parser = parsing_settings.parser_for_instruction(name.upper())
-            return parser.apply(parsing_settings, argument)
+            return parser.apply(parsing_settings, source, argument)
         except KeyError:
             raise InstructionNameSyntaxErrorException(
-                source_info,
+                source,
                 name)
         except InstructionArgumentParserSyntaxErrorException as ex:
-            raise InstructionArgumentSyntaxErrorException(source_info,
+            raise InstructionArgumentSyntaxErrorException(source,
                                                           ex.message_lines)
 
 
@@ -898,10 +989,10 @@ class LineParserForFile(LineParser):
     """
     def parse(self,
               parsing_settings: ParsingSettings,
-              source_info: SourceInfo,
+              source: SourceReference,
               striped_line: str) -> list:
 
-        return [ProcessorForFile(striped_line)]
+        return [ProcessorForFile(source, striped_line)]
 
 
 ###############################################################################
@@ -918,6 +1009,7 @@ class FileParser:
     def for_top_level(parsing_settings: ParsingSettings,
                       file_name: str):
         return FileParser(parsing_settings,
+                          IncludeFileChain.new_for_top_level_file(),
                           file_name)
 
     # Mutable state.
@@ -932,7 +1024,9 @@ class FileParser:
 
     def __init__(self,
                  parsing_settings: ParsingSettings,
+                 includes: IncludeFileChain,
                  file_name: str):
+        self._includes = includes
         self._parsing_settings = parsing_settings
         self.file_name = file_name
 
@@ -953,23 +1047,26 @@ class FileParser:
             self.line_stripped = self.line.strip()
             self.line_number += 1
             processors += self.processors_for_line()
-        return File(processors)
+        return File(self._source_reference(),
+                    processors)
 
     def processors_for_line(self):
 
         debug("processors_for_line")
         for line_parser in self._parsing_settings.line_parsers:
-            list_of_processors = line_parser.parse(self._parsing_settings,
-                                                   self._source_info(),
-                                                   self.line_stripped)
+            list_of_processors = line_parser.parse(self._parsing_settings, self._source_reference(), self.line_stripped)
             if list_of_processors is not None:
                 return list_of_processors
-        raise InstructionLineSyntaxErrorException(self._source_info())
+        raise InstructionLineSyntaxErrorException(self._source_reference())
 
-    def _source_info(self):
-        return SourceInfo(self.file_name,
-                          self.line_number,
-                          self.line)
+    def _source_reference(self) -> SourceReference:
+        return SourceReference(self._includes,
+                               self._source_info())
+
+    def _source_info(self) -> SourceLineInFile:
+        return SourceLineInFile(self.file_name,
+                                SourceLine(self.line_number,
+                                           self.line))
 
 
 ###############################################################################
