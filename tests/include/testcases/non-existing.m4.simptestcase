@@ -4,11 +4,11 @@ m4_include(common.m4)
 
 application:file-name-lister
 name:include-non-existing
-home:.
+home:..
 
-setup.install:testdata
+setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE testdata/include-non-existing.list
+test.run.cmdline:M4_EXECUTABLE data/include-non-existing.list
 
 check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
 check.stdout.empty

@@ -1,0 +1,3 @@
+existing-file.txt
+@INCLUDE dir-with-listfile/list-with-existing-file.list
+existing-file.txt

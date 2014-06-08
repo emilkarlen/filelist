@@ -8,11 +8,11 @@ m4_include(common.m4)
 
 application:file-name-lister
 name:include-existing-dir
-home:.
+home:..
 
-setup.install:testdata
+setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE testdata/include-existing-dir.list
+test.run.cmdline:M4_EXECUTABLE data/include-existing-dir.list
 
 # TODO is there a better exit code?
 check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
