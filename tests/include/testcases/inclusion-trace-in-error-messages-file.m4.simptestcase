@@ -1,0 +1,24 @@
+# -*- shell-script -*-
+
+#
+# * Tests that file-references in error messages are printed relative
+# the current working directory.
+#   This is tested by including lists in sub-directories.
+#
+# * Tests that error messages for application of instructions are
+# printed correctly (e.g., paths are relative CWD).
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:inclusion-trace-in-error-messages-file
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE data/includes-list-with-ref-to-non-existing-file.list
+
+check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
+check.stdout.empty
+check.stderr.file.eq:output/inclusion-trace-in-error-messages-file.txt

@@ -1,0 +1,2 @@
+# On line 2
+@INCLUDE dir-with-listfile/includes-list-with-ref-to-non-existing-file.list

@@ -1,0 +1,9 @@
+File "data/includes-list-with-ref-to-non-existing-file.list", line 2
+  @INCLUDE dir-with-listfile/includes-list-with-ref-to-non-existing-file.list
+
+File "data/dir-with-listfile/includes-list-with-ref-to-non-existing-file.list", line 4
+  @INCLUDE list-with-non-existing-file.list
+
+File "data/dir-with-listfile/list-with-non-existing-file.list", line 3
+  non-existing-file.txt
+  File does not exist: data/dir-with-listfile/non-existing-file.txt

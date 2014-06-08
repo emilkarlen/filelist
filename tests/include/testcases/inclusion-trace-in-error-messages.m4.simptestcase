@@ -1,7 +1,7 @@
 # -*- shell-script -*-
 
 #
-# It should be an error to try to include a directory.
+# Tests that error messages contain a the chain of list-inclusions.
 #
 
 m4_include(common.m4)

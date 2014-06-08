@@ -107,6 +107,7 @@ simptestcase2 (include existing-in-subdir)
 simptestcase2 (include non-existing)
 simptestcase2 (include existing-dir)
 simptestcase2 (include inclusion-trace-in-error-messages)
+simptestcase2 (include inclusion-trace-in-error-messages-file)
 
 simptestcase2 (other normalize-paths)
 simptestcase2 (other normalize-paths-relative-file-argument)

@@ -102,6 +102,15 @@ def write_lines(o_stream, lines):
 
 
 ###############################################################################
+# - constants -
+###############################################################################
+
+
+# TODO Move this info to some kind of printer / settings.
+ERROR_MESSAGE_INDENT_STRING = "  "
+
+
+###############################################################################
 # - matcher utils -
 ###############################################################################
 
@@ -522,7 +531,8 @@ class InstructionApplicationForMissingFileException(InstructionApplicationExcept
                                    o_stream):
         write_lines(o_stream,
                     [
-                        "File does not exist: " +
+                        source_line.err_msg_file_ref_with_source_line(),
+                        ERROR_MESSAGE_INDENT_STRING + "File does not exist: " +
                         self.file_name_relative_current_dir_of_process
                     ])
 
@@ -697,7 +707,7 @@ class ProcessorForInclude(Processor):
             file = file_parser.apply(open(file_path,
                                           mode='r'))
         except OSError:
-            raise InstructionApplicationForMissingFileException(self.source.includes, file_path)
+            raise InstructionApplicationForMissingFileException(self.source, file_path)
         return file.result_item_iterable(parsing_settings, env_for_file)
 
 
@@ -720,8 +730,8 @@ class InstructionSyntaxErrorException(WithSourceReferenceMixin, Exception):
         write_lines(o_stream,
                     [
                         source_position,
-                        "  " + self.description + ":",
-                        "    " + self.source_reference().source_line.line.contents
+                        ERROR_MESSAGE_INDENT_STRING + self.source_reference().source_line.line.contents,
+                        ERROR_MESSAGE_INDENT_STRING + self.description + ":"
                     ])
 
 
@@ -1358,7 +1368,7 @@ def parse_command_line():
                                      description=program_description())
     parser.add_argument("file",
                         metavar="FILE",
-                        help="A file that contains the resolve specification.")
+                        help="The list file.")
     parser.add_argument("-f", "--relative-file-argument-location",
                         default=False,
                         action='store_true',
@@ -1381,7 +1391,7 @@ def parse_command_line():
                         action='store_true',
                         help="""\
                         Make paths absolute = non-relative.
-                        Paths start with a /..
+                        Paths start with a "/".
                         """)
     parser.add_argument("-S", "--suppress-non-path-output",
                         default=False,
