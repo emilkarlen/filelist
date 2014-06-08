@@ -1,0 +1,3 @@
+
+# Line 3 includes a file that contains an error.
+@INCLUDE inclusion-trace-in-error-messages-file-with-error.list

@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# It should be an error to try to include a directory.
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:inclusion-trace-in-error-messages
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE data/inclusion-trace-in-error-messages.list
+
+check.exitcode:M4_EXIT_SYNTAX
+check.stdout.empty
+check.stderr.file.eq:output/inclusion-trace-in-error-messages.txt

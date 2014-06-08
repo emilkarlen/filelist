@@ -1,0 +1,9 @@
+File included from "data/inclusion-trace-in-error-messages.list", line 2:
+  @INCLUDE inclusion-trace-in-error-messages-2.list
+
+File included from "data/inclusion-trace-in-error-messages-2.list", line 3:
+  @INCLUDE inclusion-trace-in-error-messages-file-with-error.list
+
+File "data/inclusion-trace-in-error-messages-file-with-error.list", line 4
+  Invalid instruction name `INVALID_INSTRUCTION':
+    @INVALID_INSTRUCTION
