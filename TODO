@@ -26,8 +26,7 @@ Reason it has not been done is,
    the comment character could be interpreted later down
    the pipe.
 ** Strip ws at both ends of paths
-** Better error messages
-Should display hierarchy of included file.
+** Error messages should display hierarchy of included files
 ** List
 *** match file-name using reg-ex
 * Features
