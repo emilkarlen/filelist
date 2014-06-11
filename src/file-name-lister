@@ -215,6 +215,31 @@ class SourceReference:
 ###############################################################################
 
 
+class Tags:
+    """
+    The file path tags of an Environment.
+    Each tag is a string.
+    Tags stores a list of tags and implements some functionality for
+    modifying and querying this list.
+    """
+
+    def __init__(self,
+                 tags: list):
+        self._tag_list = tags
+
+    @staticmethod
+    def new_empty():
+        return Tags([])
+
+    def copy(self):
+        return Tags(self._tag_list.copy())
+
+    def set(self,
+            tags: list):
+        self._tag_list = tags
+
+
+
 class Environment:
     """
     Environment for executing instructions.
@@ -222,21 +247,38 @@ class Environment:
 
     def __init__(self,
                  from_curr_dir: str,
-                 from_top_level_file: str):
+                 from_top_level_file: str,
+                 tags: Tags):
         self.fromCurrDir = from_curr_dir
         self.fromTopLevelFile = from_top_level_file
+        self._tags = tags
+
+    @staticmethod
+    def new_for_top_level_file(self,
+                               from_curr_dir: str,
+                               from_top_level_file: str):
+        return Environment(from_curr_dir,
+                           from_top_level_file)
 
     def new_for_directory(self, name_of_directory):
         if name_of_directory == ".":
-            return self
+            return self.copy()
         else:
-            return self._append_dir(name_of_directory)
+            return self._new_for_appended_dir(name_of_directory)
 
     def new_for_included_file(self, file_name_relative_include_file):
         dir_delta = os.path.dirname(file_name_relative_include_file)
         if not dir_delta:  # file is in same directory
             return self
-        return self._append_dir(dir_delta)
+        return self._new_for_appended_dir(dir_delta)
+
+    def copy(self):
+        return Environment(self.fromCurrDir,
+                           self.fromTopLevelFile,
+                           self._tags.copy())
+
+    def tags(self):
+        return self._tags
 
     def file_name_relative_current_dir_of_process(self, file_name):
         return self.fromCurrDir + file_name
@@ -244,14 +286,15 @@ class Environment:
     def file_name_relative_top_level_source_file(self, file_name):
         return self.fromTopLevelFile + file_name
 
-    def _append_dir(self, dir_delta):
+    def _new_for_appended_dir(self, dir_delta):
         if dir_delta[-1] != os.path.sep:
             dir_delta += os.path.sep
         return Environment(
             os.path.join(self.fromCurrDir,
                          dir_delta),
             os.path.join(self.fromTopLevelFile,
-                         dir_delta))
+                         dir_delta),
+            self._tags.copy())
 
 
 ###############################################################################
@@ -298,7 +341,8 @@ class RenditionEnvironment(Environment):
                  rendition_settings: RenditionSettings):
         Environment.__init__(self,
                              from_curr_dir,
-                             from_top_level_file)
+                             from_top_level_file,
+                             Tags.new_empty())
         self.rendition_settings = rendition_settings
 
     def render_file_name_according_to_settings(self, file_name) -> str:
@@ -792,6 +836,11 @@ class InstructionArgumentParser:
         raise NotImplementedError
 
 
+###############################################################################
+# - InstructionArgumentParserForPrint -
+###############################################################################
+
+
 class InstructionArgumentParserForPrint(InstructionArgumentParser):
     """Parser for printing a string."""
 
@@ -800,6 +849,39 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
               source: SourceReference,
               instruction_argument: str):
         return [ProcessorForPrint(source, instruction_argument)]
+
+
+###############################################################################
+# - Tags -
+###############################################################################
+
+
+class InstructionArgumentParserForTags(InstructionArgumentParser):
+    """Parser for printing a string."""
+
+    def apply(self,
+              parsing_settings: ParsingSettings,
+              source: SourceReference,
+              instruction_argument: str):
+        command_and_tags = instruction_argument.split()
+        if not command_and_tags or command_and_tags[0].upper() != "ADD":
+            raise InstructionArgumentParserSyntaxErrorException(["usage: ADD [TAG...]"])
+        return [ProcessorForTagsSet(source, command_and_tags[1:])]
+
+
+class ProcessorForTagsSet(Processor):
+    """
+    An instruction that sets the tags in the environment.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 tags: list):
+        Processor.__init__(self, source)
+        self._tags = tags
+
+    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
+        env.tags().set(self._tags)
+        return iter([])
 
 
 ###############################################################################

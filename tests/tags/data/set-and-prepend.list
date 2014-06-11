@@ -1,0 +1,15 @@
+# This first file should have no tags set on it
+existing-file-1.txt
+
+# This second file should have a tag set on it
+@tags set tag1
+existing-file-2.txt
+
+# This third file should have different tags set on it.
+@tags set tag21 tag22
+existing-file-3.txt
+
+# This fourth file should have no tags set on it.
+@tags set
+existing-file-4.txt
+

@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+#
+# Tests setting tags and including them in the output by prepending them.
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:set-and-prepend
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE data/set-and-prepend.list
+
+check.exitcode:0
+check.stdout.file.eq:output/set-and-prepend.txt
