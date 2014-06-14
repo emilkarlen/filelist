@@ -1,7 +1,7 @@
 # -*- shell-script -*-
 
 #
-# Tests how tags are exported to included files.
+# Tests that tags are exported to included files.
 #
 
 m4_include(common.m4)
