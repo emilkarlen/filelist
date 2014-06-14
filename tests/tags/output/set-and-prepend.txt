@@ -1,4 +1,4 @@
-:existing-file-1.txt
-tag1:existing-file-2.txt
-tag21 tag22:existing-file-3.txt
-:existing-file-4.txt
+:data/existing-file-1.txt
+tag1:data/existing-file-2.txt
+tag21 tag22:data/existing-file-3.txt
+:data/existing-file-4.txt

@@ -217,7 +217,7 @@ class SourceReference:
 
 class Tags:
     """
-    The file path tags of an Environment.
+    The file path tags part of an Environment.
     Each tag is a string.
     Tags stores a list of tags and implements some functionality for
     modifying and querying this list.
@@ -234,10 +234,12 @@ class Tags:
     def copy(self):
         return Tags(self._tag_list.copy())
 
+    def frozen_tags(self) -> frozenset:
+        return frozenset(self._tag_list)
+
     def set(self,
             tags: list):
         self._tag_list = tags
-
 
 
 class Environment:
@@ -277,16 +279,19 @@ class Environment:
                            self.fromTopLevelFile,
                            self._tags.copy())
 
-    def tags(self):
+    def tags(self) -> Tags:
         return self._tags
 
-    def file_name_relative_current_dir_of_process(self, file_name):
+    def file_name_relative_current_dir_of_process(self,
+                                                  file_name: str) -> str:
         return self.fromCurrDir + file_name
 
-    def file_name_relative_top_level_source_file(self, file_name):
+    def file_name_relative_top_level_source_file(self,
+                                                 file_name: str) -> str:
         return self.fromTopLevelFile + file_name
 
-    def _new_for_appended_dir(self, dir_delta):
+    def _new_for_appended_dir(self,
+                              dir_delta: str):
         if dir_delta[-1] != os.path.sep:
             dir_delta += os.path.sep
         return Environment(
@@ -302,6 +307,65 @@ class Environment:
 ###############################################################################
 
 
+DEFAULT_TAGS_AND_PATH_SEPARATOR = ":"
+
+
+class TagsRenditionSettings:
+    def __init__(self,
+                 is_prepend: bool):
+        self.is_prepend = is_prepend
+
+    @staticmethod
+    def new_without_output():
+        return TagsRenditionSettings(None)
+
+    @staticmethod
+    def new_prepend():
+        return TagsRenditionSettings(True)
+
+    @staticmethod
+    def new_append():
+        return TagsRenditionSettings(False)
+
+    def is_output_tags(self) -> bool:
+        return self.is_prepend is not None
+
+    def is_prepend(self) -> bool:
+        return self.is_prepend
+
+    def tags_and_path_separator(self) -> str:
+        return DEFAULT_TAGS_AND_PATH_SEPARATOR
+
+    def render_path(self,
+                    tags: frozenset,
+                    path: str):
+        if not self.is_output_tags():
+            return path
+        return self._concatenate(self._render_tags_string(tags),
+                                 path)
+
+    @staticmethod
+    def _render_tags_string(tags: frozenset) -> str:
+        # TODO improve impl, à la join, ...
+        sorted_tags = list(tags)
+        sorted_tags.sort()
+        ret_val = ""
+        for tag in sorted_tags:
+            if ret_val == "":
+                ret_val = tag
+            else:
+                ret_val += " " + tag
+        return ret_val
+
+    def _concatenate(self,
+                     tags_string: str,
+                     path: str):
+        if self.is_prepend:
+            return tags_string + self.tags_and_path_separator() + path
+        else:
+            return path + self.tags_and_path_separator() + tags_string
+
+
 class RenditionSettings:
     """
     Settings for rendering the output.
@@ -310,6 +374,7 @@ class RenditionSettings:
                  file_names_are_relative_file_argument_location: bool,
                  normalize_paths: bool,
                  absolute_paths: bool,
+                 tags_settings: TagsRenditionSettings,
                  suppress_non_path_output: bool):
         """
         :rtype : RenditionSettings
@@ -317,7 +382,11 @@ class RenditionSettings:
         self.file_names_are_relative_file_argument_location = file_names_are_relative_file_argument_location
         self.normalize_paths = normalize_paths
         self.absolute_paths = absolute_paths
+        self.tags_settings = tags_settings
         self.suppress_non_path_output = suppress_non_path_output
+
+    def tags_settings(self) -> TagsRenditionSettings:
+        return self.tags_settings
 
 
 class RenditionEnvironment(Environment):
@@ -333,19 +402,32 @@ class RenditionEnvironment(Environment):
             prefix = prefix + os.sep
         return RenditionEnvironment(prefix,
                                     '',
+                                    Tags.new_empty(),
                                     settings)
 
     def __init__(self,
                  from_curr_dir: str,
                  from_top_level_file: str,
+                 tags: Tags,
                  rendition_settings: RenditionSettings):
         Environment.__init__(self,
                              from_curr_dir,
                              from_top_level_file,
-                             Tags.new_empty())
+                             tags)
         self.rendition_settings = rendition_settings
 
-    def render_file_name_according_to_settings(self, file_name) -> str:
+    def render_file_path(self,
+                         file_name: str,
+                         tags: frozenset) -> str:
+        path = self._render_file_name_according_to_settings(file_name)
+        tags_settings = self.rendition_settings.tags_settings
+        if tags_settings.is_output_tags():
+            return tags_settings.render_path(tags, path)
+        else:
+            return path
+
+    def _render_file_name_according_to_settings(self,
+                                                file_name: str) -> str:
         ret_val = file_name
         if self.rendition_settings.file_names_are_relative_file_argument_location:
             ret_val = self.file_name_relative_top_level_source_file(file_name)
@@ -439,16 +521,19 @@ class ResultItemForFile(ResultItem):
     An result item that is a file name.
     """
     def __init__(self,
-                 file_name: str):
+                 file_name: str,
+                 tags: frozenset):
         """
         file_name : the name of the file as specified in the source file -
         i.e. it is relative the source file.
         """
         self.file_name = file_name
+        self.tags = tags
 
     def render(self,
                env: RenditionEnvironment) -> str:
-        return env.render_file_name_according_to_settings(self.file_name)
+        return env.render_file_path(self.file_name,
+                                    self.tags)
 
 
 ###############################################################################
@@ -617,7 +702,8 @@ class ProcessorForFile(Processor):
         file_path = env.file_name_relative_current_dir_of_process(self.file_name)
         if not os.path.exists(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
-        result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name))
+        result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name),
+                                        env.tags().frozen_tags())
         return iter([result_item])
 
 
@@ -644,7 +730,7 @@ class ListSettings:
 
 class FileMatchInfo:
     """Mutable info about a file to match for inclusion in the result of the program.
-    The info is mutable so that matchers can set information they need,
+    The info is mutable so that matchers can set information they need
     which may also be needed by later matchers.
     """
     def __init__(self,
@@ -678,18 +764,21 @@ class ProcessorForDirectoryListing(Processor):
         self.settings = settings
         self.env_for_dir = None
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: Environment):
         dir_path = env.file_name_relative_current_dir_of_process(self.settings.relative_directory_name)
         if not os.path.isdir(dir_path):
             raise InstructionApplicationForMissingFileException(self.source, dir_path)
         self.env_for_dir = env.new_for_directory(self.settings.relative_directory_name)
         if self.settings.sort:
-            return self._sorted_iterable(dir_path)
+            return self._sorted_iterable(dir_path, env)
         else:
-            return self._unsorted_iterable(dir_path)
+            return self._unsorted_iterable(dir_path, env)
 
     def _sorted_iterable(self,
-                         dir_path: str) -> iter:
+                         dir_path: str,
+                         env: Environment) -> iter:
         all_files = [self._new_file_match_info(file_name) for file_name in os.listdir(dir_path)]
         matching_base_names = list(map(FileMatchInfo.base_name,
                                    filter(self.settings.file_matcher,
@@ -698,23 +787,27 @@ class ProcessorForDirectoryListing(Processor):
         # Sorting here lets us sort on base_name, which is faster than sorting on
         # the complete result file name.
         matching_base_names.sort()
-        file_paths = [self._new_file_result(base_name) for base_name in matching_base_names]
+        file_paths = [self._new_file_result(base_name, env)
+                      for base_name in matching_base_names]
         return iter(file_paths)
 
     def _unsorted_iterable(self,
-                           dir_path: str) -> iter:
+                           dir_path: str,
+                           env: Environment) -> iter:
         for file_base_name in os.listdir(dir_path):
             if not self.settings.file_matcher(self._new_file_match_info(file_base_name)):
                 continue
-            yield self._new_file_result(file_base_name)
+            yield self._new_file_result(file_base_name, env)
 
     def _new_file_match_info(self, base_name: str) -> FileMatchInfo:
         return FileMatchInfo(self.env_for_dir.file_name_relative_current_dir_of_process(base_name),
                              base_name)
 
-    def _new_file_result(self, base_name: str) -> ResultItemForFile:
-        return ResultItemForFile(
-            self.env_for_dir.file_name_relative_top_level_source_file(base_name))
+    def _new_file_result(self,
+                         base_name: str,
+                         env: Environment) -> ResultItemForFile:
+        return ResultItemForFile(self.env_for_dir.file_name_relative_top_level_source_file(base_name),
+                                 env.tags().frozen_tags())
 
 
 ###############################################################################
@@ -864,8 +957,8 @@ class InstructionArgumentParserForTags(InstructionArgumentParser):
               source: SourceReference,
               instruction_argument: str):
         command_and_tags = instruction_argument.split()
-        if not command_and_tags or command_and_tags[0].upper() != "ADD":
-            raise InstructionArgumentParserSyntaxErrorException(["usage: ADD [TAG...]"])
+        if not command_and_tags or command_and_tags[0].upper() != "SET":
+            raise InstructionArgumentParserSyntaxErrorException(["usage: SET [TAG...]"])
         return [ProcessorForTagsSet(source, command_and_tags[1:])]
 
 
@@ -879,7 +972,9 @@ class ProcessorForTagsSet(Processor):
         Processor.__init__(self, source)
         self._tags = tags
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: Environment):
         env.tags().set(self._tags)
         return iter([])
 
@@ -1112,12 +1207,12 @@ class FileParser:
         self._parsing_settings = parsing_settings
         self.file_name = file_name
 
-    def apply(self, open_file):
+    def apply(self, open_file) -> File:
         """
         Returns a File.
         """
         # Read all lines from the file so that we can close it before
-        # opening any referenced files.
+        # opening any included files.
         # This prevents exhausting the number of open files.
         lines = open_file.readlines()
         open_file.close()
@@ -1132,10 +1227,11 @@ class FileParser:
         return File(self._source_reference(),
                     processors)
 
-    def processors_for_line(self):
-
+    def processors_for_line(self) -> list:
         for line_parser in self._parsing_settings.line_parsers:
-            list_of_processors = line_parser.parse(self._parsing_settings, self._source_reference(), self.line_stripped)
+            list_of_processors = line_parser.parse(self._parsing_settings,
+                                                   self._source_reference(),
+                                                   self.line_stripped)
             if list_of_processors is not None:
                 return list_of_processors
         raise InstructionLineSyntaxErrorException(self._source_reference())
@@ -1250,13 +1346,16 @@ description_of_print = InstructionDescription(
     """
 )
 
-description_of_file = InstructionDescription(
-    "Outputs the path of a file.",
-    "FILE",
-    [("FILE",
+description_of_tags = InstructionDescription(
+    """\
+    Sets a set of tags that will be associated with file paths
+    that appear after this instruction. These tags are used
+    until a new TAGS instruction.
+    """,
+    "SET TAG...",
+    [("TAG",
      """\
-     A name relative to the location of the list file.
-     The file must exist. It can be any type of file (regular, directory ...).
+     A string without white space.
      """)
      ],
     None
@@ -1385,6 +1484,10 @@ instruction_configurations = [
                              ["I"],
                              description_of_include,
                              InstructionArgumentParserForInclude()),
+    InstructionConfiguration("TAGS",
+                             ["T"],
+                             description_of_tags,
+                             InstructionArgumentParserForTags()),
 ]
 
 
@@ -1471,10 +1574,21 @@ def parse_command_line():
                         Suppresses all output other than file paths.
                         E.g., PRINT instructions will have no effect.
                         """)
+    parser.add_argument("-t", "--prepend-tags",
+                        default=False,
+                        action='store_true',
+                        help="""\
+                        For each file, print it's tags before it.
+                        The tags and the path are separated by \"""" +
+                        DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
     args = parser.parse_args()
+    tags_settings = TagsRenditionSettings.new_without_output()
+    if args.prepend_tags:
+        tags_settings = TagsRenditionSettings.new_prepend()
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,
+                                           tags_settings,
                                            args.suppress_non_path_output)
     try:
         os.path.exists(args.file)  # Must be a regular file
