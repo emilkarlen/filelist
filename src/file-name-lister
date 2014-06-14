@@ -1581,10 +1581,19 @@ def parse_command_line():
                         For each file, print it's tags before it.
                         The tags and the path are separated by \"""" +
                         DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
+    parser.add_argument("-T", "--append-tags",
+                        default=False,
+                        action='store_true',
+                        help="""\
+                        For each file, print it's tags after it.
+                        The tags and the path are separated by \"""" +
+                        DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
     args = parser.parse_args()
     tags_settings = TagsRenditionSettings.new_without_output()
     if args.prepend_tags:
         tags_settings = TagsRenditionSettings.new_prepend()
+    if args.append_tags:
+        tags_settings = TagsRenditionSettings.new_append()
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,

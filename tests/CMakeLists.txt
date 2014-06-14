@@ -114,3 +114,4 @@ simptestcase2 (other normalize-paths-relative-file-argument)
 simptestcase2 (other absolute-paths)
 
 simptestcase2 (tags set-and-prepend)
+simptestcase2 (tags set-and-append)
