@@ -1589,6 +1589,9 @@ def parse_command_line():
                         The tags and the path are separated by \"""" +
                         DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
     args = parser.parse_args()
+    # TODO Se till att prepend-tags o append-tags skriver till samma låda
+    # så att det garranterat är den sista som gäller.
+    # Även: parsern borde själv kunna skapa en TagsRenditionSettings.
     tags_settings = TagsRenditionSettings.new_without_output()
     if args.prepend_tags:
         tags_settings = TagsRenditionSettings.new_prepend()
