@@ -115,3 +115,4 @@ simptestcase2 (other absolute-paths)
 
 simptestcase2 (tags set-and-prepend)
 simptestcase2 (tags set-and-append)
+simptestcase2 (tags set-and-append-list)
