@@ -1,0 +1,3 @@
+# Should produce files WITH tags.
+@tags set tag1
+@include two-files.list
