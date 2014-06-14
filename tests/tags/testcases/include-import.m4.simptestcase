@@ -1,0 +1,20 @@
+# -*- shell-script -*-
+
+#
+# Tests how tags are imported from included files.
+#
+# Tags set in an included file should also be set in the including file.
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:include-import
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE --append-tags data/include-import.list
+
+check.exitcode:0
+check.stdout.file.eq:output/include-import.txt
