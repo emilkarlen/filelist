@@ -226,6 +226,7 @@ class Tags:
     def __init__(self,
                  tags: list):
         self._tag_list = tags
+        self._as_froze_set = frozenset(self._tag_list)
 
     @staticmethod
     def new_empty():
@@ -235,11 +236,12 @@ class Tags:
         return Tags(self._tag_list.copy())
 
     def frozen_tags(self) -> frozenset:
-        return frozenset(self._tag_list)
+        return self._as_froze_set
 
     def set(self,
             tags: list):
         self._tag_list = tags
+        self._as_froze_set = frozenset(self._tag_list)
 
 
 class Environment:
