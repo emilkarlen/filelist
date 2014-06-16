@@ -1617,6 +1617,7 @@ def parse_command_line():
                         Output only those file paths that are tagged
                         by any of the listed tags.
                         The argument is a comma-separated list of tags""")
+    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
     args = parser.parse_args()
     # TODO Se till att prepend-tags o append-tags skriver till samma låda
     # så att det garranterat är den sista som gäller.
