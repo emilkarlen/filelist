@@ -21,7 +21,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(filelist NONE)
 
-set (CMAKE_INSTALL_PREFIX /home/karlen/tmp/test-install/${CMAKE_PROJECT_NAME})
+# set (CMAKE_INSTALL_PREFIX /home/karlen/tmp/test-install/${CMAKE_PROJECT_NAME})
 
 install(PROGRAMS src/filelist DESTINATION bin)
 
