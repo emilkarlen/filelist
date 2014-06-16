@@ -109,12 +109,13 @@ simptestcase2 (include existing-dir)
 simptestcase2 (include inclusion-trace-in-error-messages)
 simptestcase2 (include inclusion-trace-in-error-messages-file)
 
-simptestcase2 (other normalize-paths)
-simptestcase2 (other normalize-paths-relative-file-argument)
-simptestcase2 (other absolute-paths)
-
 simptestcase2 (tags set-and-prepend)
 simptestcase2 (tags set-and-append)
 simptestcase2 (tags set-and-append-list)
 simptestcase2 (tags include-export)
 simptestcase2 (tags include-import)
+simptestcase2 (tags filter)
+
+simptestcase2 (other normalize-paths)
+simptestcase2 (other normalize-paths-relative-file-argument)
+simptestcase2 (other absolute-paths)

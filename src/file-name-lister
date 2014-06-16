@@ -250,17 +250,21 @@ class Environment:
     def __init__(self,
                  from_curr_dir: str,
                  from_top_level_file: str,
+                 filter_tags_or_none: frozenset,
                  tags: Tags):
         self.fromCurrDir = from_curr_dir
         self.fromTopLevelFile = from_top_level_file
+        self.filter_tags_or_none = filter_tags_or_none
         self._tags = tags
 
     @staticmethod
     def new_for_top_level_file(self,
                                from_curr_dir: str,
-                               from_top_level_file: str):
+                               from_top_level_file: str,
+                               filter_tags_or_none: frozenset):
         return Environment(from_curr_dir,
-                           from_top_level_file)
+                           from_top_level_file,
+                           filter_tags_or_none)
 
     def new_for_directory(self, name_of_directory):
         if name_of_directory == ".":
@@ -277,6 +281,7 @@ class Environment:
     def copy(self):
         return Environment(self.fromCurrDir,
                            self.fromTopLevelFile,
+                           self.filter_tags_or_none,
                            self._tags.copy())
 
     def tags(self) -> Tags:
@@ -290,6 +295,12 @@ class Environment:
                                                  file_name: str) -> str:
         return self.fromTopLevelFile + file_name
 
+    def satisfies_tags_condition(self,
+                                 file_tags: frozenset) -> bool:
+        if self.filter_tags_or_none is None:
+            return True
+        return self.filter_tags_or_none & file_tags
+
     def _new_for_appended_dir(self,
                               dir_delta: str):
         if dir_delta[-1] != os.path.sep:
@@ -299,6 +310,7 @@ class Environment:
                          dir_delta),
             os.path.join(self.fromTopLevelFile,
                          dir_delta),
+            self.filter_tags_or_none,
             self._tags.copy())
 
 
@@ -396,23 +408,27 @@ class RenditionEnvironment(Environment):
 
     @staticmethod
     def for_top_level_file(file_name: str,
+                           filter_tags_or_none: frozenset,
                            settings: RenditionSettings):
         prefix = os.path.dirname(file_name)
         if prefix:
             prefix = prefix + os.sep
         return RenditionEnvironment(prefix,
                                     '',
+                                    filter_tags_or_none,
                                     Tags.new_empty(),
                                     settings)
 
     def __init__(self,
                  from_curr_dir: str,
                  from_top_level_file: str,
+                 filter_tags_or_none: frozenset,
                  tags: Tags,
                  rendition_settings: RenditionSettings):
         Environment.__init__(self,
                              from_curr_dir,
                              from_top_level_file,
+                             filter_tags_or_none,
                              tags)
         self.rendition_settings = rendition_settings
 
@@ -600,7 +616,9 @@ class File(ResultItemsConstructor):
         Processor.__init__(self, source)
         self.processors = processors
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: Environment):
         return ResultItemIterableForFile(parsing_settings,
                                          self.processors,
                                          env)
@@ -702,8 +720,11 @@ class ProcessorForFile(Processor):
         file_path = env.file_name_relative_current_dir_of_process(self.file_name)
         if not os.path.exists(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
+        file_tags = env.tags().frozen_tags()
+        if not env.satisfies_tags_condition(file_tags):
+            return iter([])
         result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name),
-                                        env.tags().frozen_tags())
+                                        file_tags)
         return iter([result_item])
 
 
@@ -1588,6 +1609,12 @@ def parse_command_line():
                         For each file, print it's tags after it.
                         The tags and the path are separated by \"""" +
                         DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
+    parser.add_argument("-F", "--filter-tags",
+                        nargs=1,
+                        help="""\
+                        Output only those file paths that are tagged
+                        by any of the listed tags.
+                        The argument is a comma-separated list of tags""")
     args = parser.parse_args()
     # TODO Se till att prepend-tags o append-tags skriver till samma låda
     # så att det garranterat är den sista som gäller.
@@ -1597,6 +1624,9 @@ def parse_command_line():
         tags_settings = TagsRenditionSettings.new_prepend()
     if args.append_tags:
         tags_settings = TagsRenditionSettings.new_append()
+    filter_tags_or_none = None
+    if args.filter_tags is not None:
+        filter_tags_or_none = frozenset(args.filter_tags[0].split(","))
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,
@@ -1605,6 +1635,7 @@ def parse_command_line():
     try:
         os.path.exists(args.file)  # Must be a regular file
         return (args.file,
+                filter_tags_or_none,
                 rendition_settings,
                 open(args.file,
                      mode='r'))
@@ -1617,12 +1648,14 @@ def parse_command_line():
 
 def process_file(file_name: str,
                  open_file,
+                 filter_tags_or_none: frozenset,
                  rendition_settings: RenditionSettings,
                  parsing_settings: ParsingSettings):
     file_parser = FileParser.for_top_level(parsing_settings,
                                            file_name)
     file = file_parser.apply(open_file)
     env = RenditionEnvironment.for_top_level_file(file_name,
+                                                  filter_tags_or_none,
                                                   rendition_settings)
     for resultItem in file.result_item_iterable(parsing_settings, env):
         s = resultItem.render(env)
@@ -1631,10 +1664,11 @@ def process_file(file_name: str,
 
 
 def main():
-    (file_name, rendition_settings, open_file) = parse_command_line()
+    (file_name, filter_tags_or_none, rendition_settings, open_file) = parse_command_line()
     try:
         process_file(file_name,
                      open_file,
+                     filter_tags_or_none,
                      rendition_settings,
                      ParsingSettings(system_line_parsers,
                                      instruction_identifier_to_parser_dict()))
