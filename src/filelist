@@ -297,11 +297,14 @@ class Environment:
                                                  file_name: str) -> str:
         return self.fromTopLevelFile + file_name
 
-    def satisfies_tags_condition(self,
-                                 file_tags: frozenset) -> bool:
+    def satisfies_tags_filter(self,
+                              file_tags: frozenset) -> bool:
         if self.filter_tags_or_none is None:
             return True
         return self.filter_tags_or_none & file_tags
+
+    def current_tags_satisfies_tags_filter(self) -> bool:
+        return self.satisfies_tags_filter(self.tags().frozen_tags())
 
     def _new_for_appended_dir(self,
                               dir_delta: str):
@@ -722,11 +725,10 @@ class ProcessorForFile(Processor):
         file_path = env.file_name_relative_current_dir_of_process(self.file_name)
         if not os.path.exists(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
-        file_tags = env.tags().frozen_tags()
-        if not env.satisfies_tags_condition(file_tags):
+        if not env.current_tags_satisfies_tags_filter():
             return iter([])
         result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name),
-                                        file_tags)
+                                        env.tags().frozen_tags())
         return iter([result_item])
 
 
@@ -793,6 +795,8 @@ class ProcessorForDirectoryListing(Processor):
         dir_path = env.file_name_relative_current_dir_of_process(self.settings.relative_directory_name)
         if not os.path.isdir(dir_path):
             raise InstructionApplicationForMissingFileException(self.source, dir_path)
+        if not env.current_tags_satisfies_tags_filter():
+            return iter([])
         self.env_for_dir = env.new_for_directory(self.settings.relative_directory_name)
         if self.settings.sort:
             return self._sorted_iterable(dir_path, env)

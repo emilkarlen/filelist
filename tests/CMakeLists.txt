@@ -116,6 +116,7 @@ simptestcase2 (tags include-export)
 simptestcase2 (tags include-import)
 simptestcase2 (tags filter)
 simptestcase2 (tags filter-include)
+simptestcase2 (tags filter-list)
 
 simptestcase2 (other normalize-paths)
 simptestcase2 (other normalize-paths-relative-file-argument)

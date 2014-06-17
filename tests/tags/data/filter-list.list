@@ -1,0 +1,22 @@
+# Untagged file should not be output
+@list . existing-file-1.txt
+
+# File with the first of the filter-tags should be output
+@tags set included1
+@list . existing-file-2.txt
+
+# File with the second of the filter-tags should be output
+@tags set included2
+@list . existing-file-3.txt
+
+# File with all of the filter-tags should be output
+@tags set included1 included2
+@list . existing-file-4.txt
+
+# File with all of the filter-tags, and more, should be output
+@tags set included1 included2 other-tag
+existing-file-5.txt
+
+# File with other tags than those in the filter should not be output
+@tags set not-included-tag
+existing-file-6.txt
