@@ -1,0 +1,21 @@
+# -*- shell-script -*-
+
+#
+# When a tags filter is used, then only files that are
+# tagged with any of the given tags should be output.
+#
+# This should be true for files in included lists.
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:tags-filter-include
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE --filter-tags included1,included2 data/filter-include.list
+
+check.exitcode:0
+check.stdout.file.eq:output/filter.txt

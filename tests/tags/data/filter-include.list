@@ -1,0 +1,3 @@
+# Includes the list used for the test of plain files.
+# So the output should be identical as that of that test.
+@include filter.list
