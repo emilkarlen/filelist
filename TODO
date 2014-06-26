@@ -55,6 +55,8 @@ or for debugging.
 A variant of this is to print only INCLUDE instructions, to get
 an overview of all references.
 
+** Switch to give program that preprocesses files
+Usefull, e.g., for using a macro language like m4.
 * Build system
 ** Support parallell builds
    Current, only one build is supported, since the file
