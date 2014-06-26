@@ -12,7 +12,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Wilde is distributed in the hope that it will be useful,
+# filelist is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -217,7 +217,7 @@ class SourceReference:
 
 class Tags:
     """
-    The file path tags part of an Environment.
+    The file path tags part of an ResultItemsConstructionEnvironment.
     Each tag is a string.
     Tags stores a list of tags and implements some functionality for
     modifying and querying this list.
@@ -244,9 +244,9 @@ class Tags:
         self._as_froze_set = frozenset(self._tag_list)
 
 
-class Environment:
+class ResultItemsConstructionEnvironment:
     """
-    Environment for executing instructions.
+    ResultItemsConstructionEnvironment for executing instructions.
     """
 
     def __init__(self,
@@ -264,7 +264,7 @@ class Environment:
                                from_curr_dir: str,
                                from_top_level_file: str,
                                filter_tags_or_none: frozenset):
-        return Environment(from_curr_dir,
+        return ResultItemsConstructionEnvironment(from_curr_dir,
                            from_top_level_file,
                            filter_tags_or_none)
 
@@ -281,7 +281,7 @@ class Environment:
         return self._new_for_appended_dir(dir_delta)
 
     def copy(self):
-        return Environment(self.fromCurrDir,
+        return ResultItemsConstructionEnvironment(self.fromCurrDir,
                            self.fromTopLevelFile,
                            self.filter_tags_or_none,
                            self._tags.copy())
@@ -310,7 +310,7 @@ class Environment:
                               dir_delta: str):
         if dir_delta[-1] != os.path.sep:
             dir_delta += os.path.sep
-        return Environment(
+        return ResultItemsConstructionEnvironment(
             os.path.join(self.fromCurrDir,
                          dir_delta),
             os.path.join(self.fromTopLevelFile,
@@ -406,9 +406,9 @@ class RenditionSettings:
         return self.tags_settings
 
 
-class RenditionEnvironment(Environment):
+class RenditionEnvironment(ResultItemsConstructionEnvironment):
     """
-    Environment used during the rendition of a ResultItem.
+    ResultItemsConstructionEnvironment used during the rendition of a ResultItem.
     """
 
     @staticmethod
@@ -430,7 +430,7 @@ class RenditionEnvironment(Environment):
                  filter_tags_or_none: frozenset,
                  tags: Tags,
                  rendition_settings: RenditionSettings):
-        Environment.__init__(self,
+        ResultItemsConstructionEnvironment.__init__(self,
                              from_curr_dir,
                              from_top_level_file,
                              filter_tags_or_none,
@@ -507,7 +507,7 @@ class ResultItemsConstructor:
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
-                             env: Environment):
+                             env: ResultItemsConstructionEnvironment):
         """
         Gives an iterable of all ResultItem:s that this object represents.
 
@@ -623,7 +623,7 @@ class File(ResultItemsConstructor):
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
-                             env: Environment):
+                             env: ResultItemsConstructionEnvironment):
         return ResultItemIterableForFile(parsing_settings,
                                          self.processors,
                                          env)
@@ -633,7 +633,7 @@ class ResultItemIterableForFile:
     def __init__(self,
                  parsing_settings: ParsingSettings,
                  instructions: list,
-                 env: Environment):
+                 env: ResultItemsConstructionEnvironment):
         self.instructions = instructions
         self.parsing_settings = parsing_settings
         self.env = env
@@ -700,7 +700,7 @@ class ProcessorForPrint(Processor):
         Processor.__init__(self, source)
         self._string = string
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
+    def result_item_iterable(self, parsing_settings: ParsingSettings, env: ResultItemsConstructionEnvironment):
         return iter([ResultItemForPrint(self._string)])
 
 
@@ -721,7 +721,7 @@ class ProcessorForFile(Processor):
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
-                             env: Environment):
+                             env: ResultItemsConstructionEnvironment):
         file_path = env.file_name_relative_current_dir_of_process(self.file_name)
         if not os.path.exists(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
@@ -791,7 +791,7 @@ class ProcessorForDirectoryListing(Processor):
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
-                             env: Environment):
+                             env: ResultItemsConstructionEnvironment):
         dir_path = env.file_name_relative_current_dir_of_process(self.settings.relative_directory_name)
         if not os.path.isdir(dir_path):
             raise InstructionApplicationForMissingFileException(self.source, dir_path)
@@ -805,7 +805,7 @@ class ProcessorForDirectoryListing(Processor):
 
     def _sorted_iterable(self,
                          dir_path: str,
-                         env: Environment) -> iter:
+                         env: ResultItemsConstructionEnvironment) -> iter:
         all_files = [self._new_file_match_info(file_name) for file_name in os.listdir(dir_path)]
         matching_base_names = list(map(FileMatchInfo.base_name,
                                    filter(self.settings.file_matcher,
@@ -820,7 +820,7 @@ class ProcessorForDirectoryListing(Processor):
 
     def _unsorted_iterable(self,
                            dir_path: str,
-                           env: Environment) -> iter:
+                           env: ResultItemsConstructionEnvironment) -> iter:
         for file_base_name in os.listdir(dir_path):
             if not self.settings.file_matcher(self._new_file_match_info(file_base_name)):
                 continue
@@ -832,7 +832,7 @@ class ProcessorForDirectoryListing(Processor):
 
     def _new_file_result(self,
                          base_name: str,
-                         env: Environment) -> ResultItemForFile:
+                         env: ResultItemsConstructionEnvironment) -> ResultItemForFile:
         return ResultItemForFile(self.env_for_dir.file_name_relative_top_level_source_file(base_name),
                                  env.tags().frozen_tags())
 
@@ -852,7 +852,7 @@ class ProcessorForInclude(Processor):
         Processor.__init__(self, source)
         self._file_name_relative_include_file = file_name_relative_include_file
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings, env: Environment):
+    def result_item_iterable(self, parsing_settings: ParsingSettings, env: ResultItemsConstructionEnvironment):
         file_path = env.file_name_relative_current_dir_of_process(self._file_name_relative_include_file)
         if not os.path.isfile(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
@@ -1001,7 +1001,7 @@ class ProcessorForTagsSet(Processor):
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
-                             env: Environment):
+                             env: ResultItemsConstructionEnvironment):
         env.tags().set(self._tags)
         return iter([])
 
