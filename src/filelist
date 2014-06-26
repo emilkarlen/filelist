@@ -22,6 +22,11 @@
 ###############################################################################
 
 ###############################################################################
+# NOTES
+# --------------------------------------
+# This file is way to large.  The reason for having the program in a single
+# file is ease of installation.
+#
 # DESIGN
 # --------------------------------------
 # A file is processed by a FileParser:
@@ -265,8 +270,8 @@ class ResultItemsConstructionEnvironment:
                                from_top_level_file: str,
                                filter_tags_or_none: frozenset):
         return ResultItemsConstructionEnvironment(from_curr_dir,
-                           from_top_level_file,
-                           filter_tags_or_none)
+                                                  from_top_level_file,
+                                                  filter_tags_or_none)
 
     def new_for_directory(self, name_of_directory):
         if name_of_directory == ".":
@@ -282,9 +287,9 @@ class ResultItemsConstructionEnvironment:
 
     def copy(self):
         return ResultItemsConstructionEnvironment(self.fromCurrDir,
-                           self.fromTopLevelFile,
-                           self.filter_tags_or_none,
-                           self._tags.copy())
+                                                  self.fromTopLevelFile,
+                                                  self.filter_tags_or_none,
+                                                  self._tags.copy())
 
     def tags(self) -> Tags:
         return self._tags
@@ -1317,7 +1322,7 @@ class InstructionDescription:
 
     def _render_arguments(self, wrapper):
         ret_val = []
-        for (identifier,description) in self.arguments:
+        for (identifier, description) in self.arguments:
             ret_val += wrapper.wrap(identifier + " - " + textwrap.dedent(description))
         return ret_val
 
