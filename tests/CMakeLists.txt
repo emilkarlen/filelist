@@ -109,6 +109,9 @@ simptestcase2 (include existing-dir)
 simptestcase2 (include inclusion-trace-in-error-messages)
 simptestcase2 (include inclusion-trace-in-error-messages-file)
 
+simptestcase2 (print-inclusion-hierarchy in-same-directory)
+simptestcase2 (print-inclusion-hierarchy in-sub-directory)
+
 simptestcase2 (tags set-and-prepend)
 simptestcase2 (tags set-and-append)
 simptestcase2 (tags set-and-append-list)
