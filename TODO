@@ -26,11 +26,14 @@ Reason it has not been done is,
    the comment character could be interpreted later down
    the pipe.
 ** Strip ws at both ends of paths
-** Error messages should display hierarchy of included files
 ** List
 *** match file-name using reg-ex
+** Include
+*** absolute filenames
+*** preserve home directory of that of the including file
+    Usefull, e.g., for including a "standard list" that lists files that
+    exist in many directories.
 * Features
-** Command to print program version
 ** Switches for turning on/off checking the existence of files
 ** Command for displaying the inclusion-hierarchy
 ** Multiple command line FILE-arguments
@@ -51,29 +54,6 @@ or for debugging.
 
 A variant of this is to print only INCLUDE instructions, to get
 an overview of all references.
-
-** Associating tags with each file
-Consists of two parts:
-1. New instruction that produces no output:
-   TAG <list of tags>
-2. Switch to turn on output of tags
-
-The first part sets a number of "tags" that will be associated with each file
-up until a new TAG instruction.
-
-In the output: each file will be preceded by the tags associated with it.
-
-This feature could be usefull for combining information about different
-categories of files using a single file list.
-E.g. in which "phase" a file should be executed - "pre-install", "install",
-"post-install".
-Without this feature, categorizing files in this way requires a single
-file list for each category.  And maintaining several files has some
-drawbacks:
-1. Difficulty to get an overview of all involved categories.
-2. If a similair sub-directory structure is used for all categories,
-   then this structure has to be repeated in each file
-   (the INCLUDEs will be identical, except for concrete file-name).
 
 * Build system
 ** Support parallell builds
