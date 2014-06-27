@@ -1927,10 +1927,14 @@ def open_file_argument(file_name: str) -> FileType:
         return open(file_name,
                     mode='r')
     except OSError:
-        msg = "Cannot open file: \"" + file_name + "\""
+        msg = error_header_line("Cannot open file: \"" + file_name + "\"")
         write_lines(sys.stderr,
                     [msg])
         sys.exit(EXIT_INVALID_ARGUMENTS)
+
+
+def error_header_line(s: str):
+    return os.path.basename(__file__) + ": " + s
 
 
 def main():
