@@ -1,6 +1,5 @@
 -*- org -*-
 
-
 * HOWTO implement a TODO
   1. Checkout new branch
   2. TDD impl functionality
@@ -30,7 +29,7 @@ Reason it has not been done is,
 *** match file-name using reg-ex
 ** Include
 *** absolute filenames
-*** preserve home directory of that of the including file
+*** option to preserve home directory of that of the including file
     Usefull, e.g., for including a "standard list" that lists files that
     exist in many directories.
 * Features
