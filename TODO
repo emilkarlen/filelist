@@ -35,7 +35,6 @@ Reason it has not been done is,
     exist in many directories.
 * Features
 ** Switches for turning on/off checking the existence of files
-** Command for displaying the inclusion-hierarchy
 ** Multiple command line FILE-arguments
    Names should be relative the location of each file.
    The option to print names relative the FILE argument causes trouble with
