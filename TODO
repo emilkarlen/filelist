@@ -17,6 +17,9 @@
    from the command line current dir, to the file name.
 
 * Improvements
+** Customize the instruction token
+   Make it possible to specify the prefix for instruction lines via a command
+   line switch.
 ** Allow comments at end of line for lines with file
 Reason it has not been done is,
 1. lack of time
