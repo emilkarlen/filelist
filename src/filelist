@@ -633,14 +633,19 @@ class FileProcessor(ResultItemsConstructor):
 
     def __init__(self,
                  file_name: str,
+                 file_name_relative_including_file: str,
                  source: SourceReference,
                  processors: list):
         Processor.__init__(self, source)
         self._file_name = file_name
+        self._file_name_relative_including_file = file_name_relative_including_file
         self._processors = processors
 
     def file_name(self) -> str:
         return self._file_name
+
+    def file_name_relative_including_file(self) -> str:
+        return self._file_name_relative_including_file
 
     def processors(self) -> list:
         return self._processors
@@ -911,6 +916,7 @@ class ProcessorForInclude(Processor):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
         file_parser = FileParser(parsing_settings,
                                  self.source.as_include_file_chain(),
+                                 self._file_name_relative_including_file,
                                  file_path)
         try:
             self._file_processor = file_parser.apply(open(file_path,
@@ -1265,6 +1271,7 @@ class FileParser:
                       file_name: str):
         return FileParser(parsing_settings,
                           IncludeFileChain.new_for_top_level_file(),
+                          file_name,
                           file_name)
 
     # Mutable state.
@@ -1280,15 +1287,14 @@ class FileParser:
     def __init__(self,
                  parsing_settings: ParsingSettings,
                  includes: IncludeFileChain,
+                 file_name_relative_including_file: str,
                  file_name: str):
         self._includes = includes
         self._parsing_settings = parsing_settings
+        self.file_name_relative_including_file = file_name_relative_including_file
         self.file_name = file_name
 
     def apply(self, open_file) -> FileProcessor:
-        """
-        Returns a File.
-        """
         # Read all lines from the file so that we can close it before
         # opening any included files.
         # This prevents exhausting the number of open files.
@@ -1303,6 +1309,7 @@ class FileParser:
             self.line_number += 1
             processors += self._processors_for_line()
         return FileProcessor(self.file_name,
+                             self.file_name_relative_including_file,
                              self._source_reference(),
                              processors)
 
@@ -1387,8 +1394,10 @@ class HierarchyPrinter:
 class PrintInclusionHierarchyCommand(Command):
 
     def __init__(self,
-                 printer: HierarchyPrinter):
+                 printer: HierarchyPrinter,
+                 print_file_names_relative_including_file: bool):
         self._printer = printer
+        self._print_file_names_relative_including_file = print_file_names_relative_including_file
         self._parsing_settings = None
 
     """
@@ -1412,7 +1421,7 @@ class PrintInclusionHierarchyCommand(Command):
     def _print(self,
                file_processor: FileProcessor,
                env: RenditionEnvironment):
-        self._printer.begin_hierarchy(file_processor.file_name())
+        self._printer.begin_hierarchy(self.file_name_for(file_processor))
         for processor in file_processor.processors():
             file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(self._parsing_settings,
                                                                                                  env)
@@ -1420,6 +1429,13 @@ class PrintInclusionHierarchyCommand(Command):
                 self._print(file_processor_and_env[0],
                             file_processor_and_env[1])
         self._printer.end_hierarchy()
+
+    def file_name_for(self,
+                      file_processor: FileProcessor):
+        if self._print_file_names_relative_including_file:
+            return file_processor.file_name_relative_including_file()
+        else:
+            return file_processor.file_name()
 
 
 class SimpleHierarchyPrinter(HierarchyPrinter):
@@ -1469,17 +1485,23 @@ class PrettyHierarchyPrinter(HierarchyPrinter):
     def _handle_non_root_node(self,
                               node: str):
         if self._vert_space_before_next_node_per_level[-1]:
-            print(self._bars_indent_string())
-        self._set_vertical_space_before_next_node_on_all_but_last_levels()
-        print(self._bars_indent_string() + "--" + node)
+            self._print_empty_line()
+        self._set_vertical_space_before_next_node_on_all_but_last_level()
+        self._print_node(node)
         self._vert_space_before_next_node_per_level = self._vert_space_before_next_node_per_level + [True]
+
+    def _set_vertical_space_before_next_node_on_all_but_last_level(self):
+        num_levels = len(self._vert_space_before_next_node_per_level)
+        self._vert_space_before_next_node_per_level = ([True] * (num_levels-1)) + [False]
+
+    def _print_empty_line(self):
+        print(self._bars_indent_string())
+
+    def _print_node(self, node):
+        print(self._bars_indent_string() + "--" + node)
 
     def _bars_indent_string(self):
         return "  ".join("|" * len(self._vert_space_before_next_node_per_level))
-
-    def _set_vertical_space_before_next_node_on_all_but_last_levels(self):
-        num_levels = len(self._vert_space_before_next_node_per_level)
-        self._vert_space_before_next_node_per_level = ([True] * (num_levels-1)) + [False]
 
 
 ###############################################################################
@@ -1833,7 +1855,7 @@ def parse_command_line():
     parser.add_argument("-i", "--print-inclusion-hierarchy",
                         action='store_const',
                         dest='command',
-                        const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter()),
+                        const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter(), False),
                         default=PrintPathsCommand(),
                         help="""\
                         Prints the file inclusion hierarchy -
@@ -1841,7 +1863,7 @@ def parse_command_line():
     parser.add_argument("-I", "--print-inclusion-hierarchy-pretty",
                         action='store_const',
                         dest='command',
-                        const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter()),
+                        const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter(), True),
                         default=PrintPathsCommand(),
                         help="""\
                         Prints the file inclusion hierarchy, in
