@@ -1,14 +1,15 @@
 # -*- shell-script -*-
 
 #
-# Tests printing the file inclusion hierarchy, pretty layout.
+# Tests printing the file inclusion hierarchy.
 # All file lists are located in the same directory.
+# Pretty layout.
 #
 
 m4_include(common.m4)
 
 application:file-name-lister
-name:in-same-directory
+name:in-same-directory-pretty
 home:..
 
 setup.install:data
