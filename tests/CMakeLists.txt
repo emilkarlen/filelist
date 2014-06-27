@@ -73,7 +73,7 @@ endmacro (simptestcase2)
 ###############################################################################
 
 
-simptestcase (invalid-usage-no-arguments)
+simptestcase (usage-no-file-arguments)
 simptestcase (invalid-arguments-file-does-not-exist)
 
 simptestcase (parse/ignored-lines)

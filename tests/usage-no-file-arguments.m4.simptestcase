@@ -3,10 +3,10 @@
 m4_include(common.m4)
 
 application:file-name-lister
-name:invalid-usage-no-arguments
+name:usage-no-file-arguments
 home:.
 
 test.run.cmdline:M4_EXECUTABLE
 
-check.exitcode:M4_EXIT_USAGE
+check.exitcode:0
 check.stdout.empty

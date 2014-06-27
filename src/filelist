@@ -1342,8 +1342,7 @@ class Command:
     The top-level representation of what the program should do.
     """
     def execute(self,
-                file_name: str,
-                open_file,
+                file_names: list,
                 filter_tags_or_none: frozenset,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
@@ -1355,19 +1354,34 @@ class PrintPathsCommand(Command):
     Command that prints file paths -
     the task that the program is mainly designed for.
     """
+    def __init__(self):
+        self._filter_tags_or_none = None
+        self._rendition_settings = None
+        self._parsing_settings = None
+
     def execute(self,
-                file_name: str,
-                open_file,
+                file_names: str,
                 filter_tags_or_none: frozenset,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
-        file_parser = FileParser.for_top_level(parsing_settings,
+
+        self._filter_tags_or_none = filter_tags_or_none
+        self._rendition_settings = rendition_settings
+        self._parsing_settings = parsing_settings
+        for file_name in file_names:
+            self.handle_single_file(file_name)
+
+    def handle_single_file(self,
+                           file_name: str):
+        open_file = open_file_argument(file_name)
+        file_parser = FileParser.for_top_level(self._parsing_settings,
                                                file_name)
         file_processor = file_parser.apply(open_file)
         env = RenditionEnvironment.for_top_level_file(file_name,
-                                                      filter_tags_or_none,
-                                                      rendition_settings)
-        for resultItem in file_processor.result_item_iterable(parsing_settings, env):
+                                                      self._filter_tags_or_none,
+                                                      self._rendition_settings)
+        for resultItem in file_processor.result_item_iterable(self._parsing_settings,
+                                                              env):
             s = resultItem.render(env)
             if s is not None:
                 print(s)
@@ -1404,12 +1418,24 @@ class PrintInclusionHierarchyCommand(Command):
     Command that prints the file inclusion hierarchy.
     """
     def execute(self,
-                file_name: str,
-                open_file,
+                file_names: str,
                 filter_tags_or_none: frozenset,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
         self._parsing_settings = parsing_settings
+        for file_name in file_names:
+            self.handle_single_file(file_name,
+                                    filter_tags_or_none,
+                                    rendition_settings,
+                                    parsing_settings)
+
+    def handle_single_file(self,
+                           file_name: str,
+                           filter_tags_or_none: frozenset,
+                           rendition_settings: RenditionSettings,
+                           parsing_settings: ParsingSettings):
+        open_file = open_file_argument(file_name)
+
         file_parser = FileParser.for_top_level(parsing_settings,
                                                file_name)
         file_processor = file_parser.apply(open_file)
@@ -1794,13 +1820,14 @@ def instruction_identifier_to_parser_dict() -> dict:
 
 def parse_command_line():
     """
-    Returns an (Command,file name,RenditionSettings,open file).
+    Returns an (Command,list of file names,RenditionSettings).
     """
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=program_description())
-    parser.add_argument("file",
+    parser.add_argument("files",
                         metavar="FILE",
-                        help="The list file.")
+                        nargs='*',
+                        help="The list files.")
     parser.add_argument("-f", "--relative-file-argument-location",
                         default=False,
                         action='store_true',
@@ -1869,8 +1896,8 @@ def parse_command_line():
                         dest='command',
                         const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter(), True),
                         help="""\
-                        Prints the file inclusion hierarchy, in
-                        a pretty layout.
+                        Prints the file inclusion hierarchy,
+                        in a pretty layout.
                         The normal output of file paths is suppressed.""")
     parser.add_argument('--version',
                         action='version',
@@ -1884,26 +1911,32 @@ def parse_command_line():
                                            args.absolute_paths,
                                            args.tags_settings,
                                            args.suppress_non_path_output)
+    return (args.command,
+            args.files,
+            filter_tags_or_none,
+            rendition_settings)
+
+
+def open_file_argument(file_name: str) -> FileType:
+    """
+    Opens a file that is one of the file arguments of the command line arguments.
+
+    Exists if the file cannot be opened.
+    """
     try:
-        os.path.exists(args.file)  # Must be a regular file
-        return (args.command,
-                args.file,
-                filter_tags_or_none,
-                rendition_settings,
-                open(args.file,
-                     mode='r'))
+        return open(file_name,
+                    mode='r')
     except OSError:
-        msg = "Cannot open file: \"" + args.file + "\""
+        msg = "Cannot open file: \"" + file_name + "\""
         write_lines(sys.stderr,
                     [msg])
         sys.exit(EXIT_INVALID_ARGUMENTS)
 
 
 def main():
-    (command, file_name, filter_tags_or_none, rendition_settings, open_file) = parse_command_line()
+    (command, file_names, filter_tags_or_none, rendition_settings) = parse_command_line()
     try:
-        command.execute(file_name,
-                        open_file,
+        command.execute(file_names,
                         filter_tags_or_none,
                         rendition_settings,
                         ParsingSettings(system_line_parsers,
