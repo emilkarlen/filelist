@@ -114,6 +114,7 @@ simptestcase2 (print-inclusion-hierarchy in-same-directory)
 simptestcase2 (print-inclusion-hierarchy in-sub-directory)
 simptestcase2 (print-inclusion-hierarchy in-same-directory-pretty)
 simptestcase2 (print-inclusion-hierarchy in-sub-directory-pretty)
+simptestcase2 (print-inclusion-hierarchy in-same-directory-multiple-args)
 
 simptestcase2 (tags set-and-prepend)
 simptestcase2 (tags set-and-append)

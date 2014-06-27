@@ -1,0 +1,10 @@
+data/in-same-directory.list
+ data/sub-1.list
+  data/sub-sub-1.list
+  data/sub-sub-2.list
+ data/sub-2.list
+data/in-same-directory.list
+ data/sub-1.list
+  data/sub-sub-1.list
+  data/sub-sub-2.list
+ data/sub-2.list
