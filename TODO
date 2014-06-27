@@ -37,11 +37,6 @@ Reason it has not been done is,
     exist in many directories.
 * Features
 ** Switches for turning on/off checking the existence of files
-** Multiple command line FILE-arguments
-   Names should be relative the location of each file.
-   The option to print names relative the FILE argument causes trouble with
-   this functionality, since these locations can be different among FILE
-   arguments, causing the produced list to use different "anchor points".
 ** stdin as FILE argument
 File
 ** Flatten file
