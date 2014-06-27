@@ -25,6 +25,9 @@ Reason it has not been done is,
    the comment character could be interpreted later down
    the pipe.
 ** Strip ws at both ends of paths
+** Filter on tags
+*** condition: print only paths that have _all_ the given tags
+*** condition: print only paths that have _exactly_ the given tags
 ** List
 *** match file-name using reg-ex
 ** Include
