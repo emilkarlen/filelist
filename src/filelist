@@ -7,7 +7,7 @@
 # 
 # This file is part of filelist.
 # 
-# Wilde is free software: you can redistribute it and/or modify
+# filelist is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -18,7 +18,7 @@
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with Wilde.  If not, see <http://www.gnu.org/licenses/>.
+# along with filelist.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 
 ###############################################################################
@@ -616,21 +616,45 @@ class Processor(ResultItemsConstructor):
     def __init__(self, source: SourceReference):
         self.source = source
 
+    def file_processor_if_this_is_a_processor_for_include(self,
+                                                          parsing_settings: ParsingSettings,
+                                                          env: ResultItemsConstructionEnvironment):
+        """
+        This method was introduced for implementing the command
+        that prints the file inclusion hierarchy.
+        :return: FileProcessor. None, if this is not a processor for an include instruction.
+        Otherwise, the FileProcessor for the include instruction.
+        """
+        return None
 
-class File(ResultItemsConstructor):
-    """A list of instructions in a single file."""
+
+class FileProcessor(ResultItemsConstructor):
+    """A list of processors from a single file."""
 
     def __init__(self,
+                 file_name: str,
+                 file_name_relative_including_file: str,
                  source: SourceReference,
                  processors: list):
         Processor.__init__(self, source)
-        self.processors = processors
+        self._file_name = file_name
+        self._file_name_relative_including_file = file_name_relative_including_file
+        self._processors = processors
+
+    def file_name(self) -> str:
+        return self._file_name
+
+    def file_name_relative_including_file(self) -> str:
+        return self._file_name_relative_including_file
+
+    def processors(self) -> list:
+        return self._processors
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
         return ResultItemIterableForFile(parsing_settings,
-                                         self.processors,
+                                         self._processors,
                                          env)
 
 
@@ -855,22 +879,50 @@ class ProcessorForInclude(Processor):
                  source: SourceReference,
                  file_name_relative_include_file: str):
         Processor.__init__(self, source)
-        self._file_name_relative_include_file = file_name_relative_include_file
+        self._file_name_relative_including_file = file_name_relative_include_file
+        self._env_for_file = None
+        self._file_processor = None
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings, env: ResultItemsConstructionEnvironment):
-        file_path = env.file_name_relative_current_dir_of_process(self._file_name_relative_include_file)
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
+        (file_processor, env) = self._get_file_processor_and_env(parsing_settings, env)
+        return file_processor.result_item_iterable(parsing_settings,
+                                                   env)
+
+    def file_processor_if_this_is_a_processor_for_include(self,
+                                                          parsing_settings: ParsingSettings,
+                                                          env: ResultItemsConstructionEnvironment):
+        return self._get_file_processor_and_env(parsing_settings, env)
+
+    def _get_file_processor_and_env(self,
+                                    parsing_settings: ParsingSettings,
+                                    env: ResultItemsConstructionEnvironment) -> tuple:
+        if self._file_processor is None:
+            self._set_file_processor_and_env(parsing_settings, env)
+        return self._file_processor, self._env_for_file
+
+    def _set_file_processor_and_env(self,
+                                    parsing_settings: ParsingSettings,
+                                    env: ResultItemsConstructionEnvironment):
+        """
+        Sets self._file_processor, self._env_for_file.
+
+        Raises an exception if the file cannot be accessed correctly.
+        """
+        self._env_for_file = env.new_for_included_file(self._file_name_relative_including_file)
+        file_path = env.file_name_relative_current_dir_of_process(self._file_name_relative_including_file)
         if not os.path.isfile(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
-        env_for_file = env.new_for_included_file(self._file_name_relative_include_file)
         file_parser = FileParser(parsing_settings,
                                  self.source.as_include_file_chain(),
+                                 self._file_name_relative_including_file,
                                  file_path)
         try:
-            file = file_parser.apply(open(file_path,
-                                          mode='r'))
+            self._file_processor = file_parser.apply(open(file_path,
+                                                     mode='r'))
         except OSError:
             raise InstructionApplicationForMissingFileException(self.source, file_path)
-        return file.result_item_iterable(parsing_settings, env_for_file)
 
 
 ###############################################################################
@@ -1219,6 +1271,7 @@ class FileParser:
                       file_name: str):
         return FileParser(parsing_settings,
                           IncludeFileChain.new_for_top_level_file(),
+                          file_name,
                           file_name)
 
     # Mutable state.
@@ -1234,15 +1287,14 @@ class FileParser:
     def __init__(self,
                  parsing_settings: ParsingSettings,
                  includes: IncludeFileChain,
+                 file_name_relative_including_file: str,
                  file_name: str):
         self._includes = includes
         self._parsing_settings = parsing_settings
+        self.file_name_relative_including_file = file_name_relative_including_file
         self.file_name = file_name
 
-    def apply(self, open_file) -> File:
-        """
-        Returns a File.
-        """
+    def apply(self, open_file) -> FileProcessor:
         # Read all lines from the file so that we can close it before
         # opening any included files.
         # This prevents exhausting the number of open files.
@@ -1255,11 +1307,13 @@ class FileParser:
             self.line = lineWithPossibleNewLine.strip('\n')
             self.line_stripped = self.line.strip()
             self.line_number += 1
-            processors += self.processors_for_line()
-        return File(self._source_reference(),
-                    processors)
+            processors += self._processors_for_line()
+        return FileProcessor(self.file_name,
+                             self.file_name_relative_including_file,
+                             self._source_reference(),
+                             processors)
 
-    def processors_for_line(self) -> list:
+    def _processors_for_line(self) -> list:
         for line_parser in self._parsing_settings.line_parsers:
             list_of_processors = line_parser.parse(self._parsing_settings,
                                                    self._source_reference(),
@@ -1276,6 +1330,178 @@ class FileParser:
         return SourceLineInFile(self.file_name,
                                 SourceLine(self.line_number,
                                            self.line))
+
+
+###############################################################################
+# - Command -
+###############################################################################
+
+
+class Command:
+    """
+    The top-level representation of what the program should do.
+    """
+    def execute(self,
+                file_name: str,
+                open_file,
+                filter_tags_or_none: frozenset,
+                rendition_settings: RenditionSettings,
+                parsing_settings: ParsingSettings):
+        raise NotImplementedError
+
+
+class PrintPathsCommand(Command):
+    """
+    Command that prints file paths -
+    the task that the program is mainly designed for.
+    """
+    def execute(self,
+                file_name: str,
+                open_file,
+                filter_tags_or_none: frozenset,
+                rendition_settings: RenditionSettings,
+                parsing_settings: ParsingSettings):
+        file_parser = FileParser.for_top_level(parsing_settings,
+                                               file_name)
+        file_processor = file_parser.apply(open_file)
+        env = RenditionEnvironment.for_top_level_file(file_name,
+                                                      filter_tags_or_none,
+                                                      rendition_settings)
+        for resultItem in file_processor.result_item_iterable(parsing_settings, env):
+            s = resultItem.render(env)
+            if s is not None:
+                print(s)
+
+
+class HierarchyPrinter:
+    """
+    Base class for printers that prints a hierarchy of nodes
+    in an indented layout.
+    """
+    def begin_hierarchy(self,
+                        root_node: str):
+        """
+        Begins a hierarchy.
+        Every node begins a hierarchy, and this hierarchy must be
+        ended using end_hierarchy.
+        """
+        raise NotImplementedError
+
+    def end_hierarchy(self):
+        raise NotImplementedError
+
+
+class PrintInclusionHierarchyCommand(Command):
+
+    def __init__(self,
+                 printer: HierarchyPrinter,
+                 print_file_names_relative_including_file: bool):
+        self._printer = printer
+        self._print_file_names_relative_including_file = print_file_names_relative_including_file
+        self._parsing_settings = None
+
+    """
+    Command that prints the file inclusion hierarchy.
+    """
+    def execute(self,
+                file_name: str,
+                open_file,
+                filter_tags_or_none: frozenset,
+                rendition_settings: RenditionSettings,
+                parsing_settings: ParsingSettings):
+        self._parsing_settings = parsing_settings
+        file_parser = FileParser.for_top_level(parsing_settings,
+                                               file_name)
+        file_processor = file_parser.apply(open_file)
+        env = RenditionEnvironment.for_top_level_file(file_name,
+                                                      filter_tags_or_none,
+                                                      rendition_settings)
+        self._print(file_processor, env)
+
+    def _print(self,
+               file_processor: FileProcessor,
+               env: RenditionEnvironment):
+        self._printer.begin_hierarchy(self.file_name_for(file_processor))
+        for processor in file_processor.processors():
+            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(self._parsing_settings,
+                                                                                                 env)
+            if file_processor_and_env is not None:
+                self._print(file_processor_and_env[0],
+                            file_processor_and_env[1])
+        self._printer.end_hierarchy()
+
+    def file_name_for(self,
+                      file_processor: FileProcessor):
+        if self._print_file_names_relative_including_file:
+            return file_processor.file_name_relative_including_file()
+        else:
+            return file_processor.file_name()
+
+
+class SimpleHierarchyPrinter(HierarchyPrinter):
+    """
+    Prints a hierarchy of nodes in an simple layout,
+    suitable for parsing by programs.
+    """
+    def __init__(self):
+        self._indent = 0
+        self._indent_string = " "
+
+    def begin_hierarchy(self,
+                        root_node: str):
+        self._print(root_node)
+        self._indent += 1
+
+    def end_hierarchy(self):
+        self._indent -= 1
+
+    def _print(self,
+               node: str):
+        print(" " * self._indent + node)
+
+
+class PrettyHierarchyPrinter(HierarchyPrinter):
+    """
+    Prints a hierarchy of nodes in an indented layout.
+    """
+    def __init__(self):
+        self._vert_space_before_next_node_per_level = []
+
+    def begin_hierarchy(self,
+                        node: str):
+        if not self._vert_space_before_next_node_per_level:
+            self._handle_root_node(node)
+        else:
+            self._handle_non_root_node(node)
+
+    def end_hierarchy(self):
+        self._vert_space_before_next_node_per_level = self._vert_space_before_next_node_per_level[:-1]
+
+    def _handle_root_node(self,
+                          node: str):
+        print(node)
+        self._vert_space_before_next_node_per_level = [True]
+
+    def _handle_non_root_node(self,
+                              node: str):
+        if self._vert_space_before_next_node_per_level[-1]:
+            self._print_empty_line()
+        self._set_vertical_space_before_next_node_on_all_but_last_level()
+        self._print_node(node)
+        self._vert_space_before_next_node_per_level = self._vert_space_before_next_node_per_level + [True]
+
+    def _set_vertical_space_before_next_node_on_all_but_last_level(self):
+        num_levels = len(self._vert_space_before_next_node_per_level)
+        self._vert_space_before_next_node_per_level = ([True] * (num_levels-1)) + [False]
+
+    def _print_empty_line(self):
+        print(self._bars_indent_string())
+
+    def _print_node(self, node):
+        print(self._bars_indent_string() + "--" + node)
+
+    def _bars_indent_string(self):
+        return "  ".join("|" * len(self._vert_space_before_next_node_per_level))
 
 
 ###############################################################################
@@ -1568,7 +1794,7 @@ def instruction_identifier_to_parser_dict() -> dict:
 
 def parse_command_line():
     """
-    Returns an (file name,RenditionSettings,open file).
+    Returns an (Command,file name,RenditionSettings,open file).
     """
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=program_description())
@@ -1626,7 +1852,26 @@ def parse_command_line():
                         Output only those file paths that are tagged
                         by any of the listed tags.
                         The argument is a comma-separated list of tags""")
-    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+    parser.add_argument("-i", "--print-inclusion-hierarchy",
+                        action='store_const',
+                        dest='command',
+                        const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter(), False),
+                        default=PrintPathsCommand(),
+                        help="""\
+                        Prints the file inclusion hierarchy -
+                        does not print file paths.""")
+    parser.add_argument("-I", "--print-inclusion-hierarchy-pretty",
+                        action='store_const',
+                        dest='command',
+                        const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter(), True),
+                        default=PrintPathsCommand(),
+                        help="""\
+                        Prints the file inclusion hierarchy, in
+                        a pretty layout -
+                        does not print file paths.""")
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s 1.0')
     args = parser.parse_args()
     # TODO Se till att prepend-tags o append-tags skriver till samma låda
     # så att det garranterat är den sista som gäller.
@@ -1646,7 +1891,8 @@ def parse_command_line():
                                            args.suppress_non_path_output)
     try:
         os.path.exists(args.file)  # Must be a regular file
-        return (args.file,
+        return (args.command,
+                args.file,
                 filter_tags_or_none,
                 rendition_settings,
                 open(args.file,
@@ -1658,32 +1904,15 @@ def parse_command_line():
         sys.exit(EXIT_INVALID_ARGUMENTS)
 
 
-def process_file(file_name: str,
-                 open_file,
-                 filter_tags_or_none: frozenset,
-                 rendition_settings: RenditionSettings,
-                 parsing_settings: ParsingSettings):
-    file_parser = FileParser.for_top_level(parsing_settings,
-                                           file_name)
-    file = file_parser.apply(open_file)
-    env = RenditionEnvironment.for_top_level_file(file_name,
-                                                  filter_tags_or_none,
-                                                  rendition_settings)
-    for resultItem in file.result_item_iterable(parsing_settings, env):
-        s = resultItem.render(env)
-        if s is not None:
-            print(s)
-
-
 def main():
-    (file_name, filter_tags_or_none, rendition_settings, open_file) = parse_command_line()
+    (command, file_name, filter_tags_or_none, rendition_settings, open_file) = parse_command_line()
     try:
-        process_file(file_name,
-                     open_file,
-                     filter_tags_or_none,
-                     rendition_settings,
-                     ParsingSettings(system_line_parsers,
-                                     instruction_identifier_to_parser_dict()))
+        command.execute(file_name,
+                        open_file,
+                        filter_tags_or_none,
+                        rendition_settings,
+                        ParsingSettings(system_line_parsers,
+                                        instruction_identifier_to_parser_dict()))
     except InstructionSyntaxErrorException as ex:
         ex.render(sys.stderr)
         sys.exit(EXIT_SYNTAX)

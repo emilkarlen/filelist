@@ -1,0 +1,3 @@
+data/in-sub-directory.list
+ data/sub-dir/main-in-subdir.list
+  data/sub-dir/included-in-subdir.list
