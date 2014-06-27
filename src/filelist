@@ -1366,10 +1366,29 @@ class PrintPathsCommand(Command):
                 print(s)
 
 
+class HierarchyPrinter:
+    """
+    Base class for printers that prints a hierarchy of nodes
+    in an indented layout.
+    """
+    def begin_hierarchy(self,
+                        root_node: str):
+        """
+        Begins a hierarchy.
+        Every node begins a hierarchy, and this hierarchy must be
+        ended using end_hierarchy.
+        """
+        raise NotImplementedError
+
+    def end_hierarchy(self):
+        raise NotImplementedError
+
+
 class PrintInclusionHierarchyCommand(Command):
 
-    def __init__(self):
-        self._printer = None
+    def __init__(self,
+                 printer: HierarchyPrinter):
+        self._printer = printer
         self._parsing_settings = None
 
     """
@@ -1388,7 +1407,6 @@ class PrintInclusionHierarchyCommand(Command):
         env = RenditionEnvironment.for_top_level_file(file_name,
                                                       filter_tags_or_none,
                                                       rendition_settings)
-        self._printer = HierarchyPrinter()
         self._print(file_processor, env)
 
     def _print(self,
@@ -1404,10 +1422,10 @@ class PrintInclusionHierarchyCommand(Command):
         self._printer.end_hierarchy()
 
 
-
-class HierarchyPrinter:
+class SimpleHierarchyPrinter(HierarchyPrinter):
     """
-    Prints a hierarchy of nodes in an indented manner.
+    Prints a hierarchy of nodes in an simple layout,
+    suitable for parsing by programs.
     """
     def __init__(self):
         self._indent = 0
@@ -1415,11 +1433,6 @@ class HierarchyPrinter:
 
     def begin_hierarchy(self,
                         root_node: str):
-        """
-        Begins a hierarchy.
-        Every node begins a hierarchy, and this hierarchy must be
-        ended using end_hierarchy.
-        """
         self._print(root_node)
         self._indent += 1
 
@@ -1429,6 +1442,44 @@ class HierarchyPrinter:
     def _print(self,
                node: str):
         print(" " * self._indent + node)
+
+
+class PrettyHierarchyPrinter(HierarchyPrinter):
+    """
+    Prints a hierarchy of nodes in an indented layout.
+    """
+    def __init__(self):
+        self._vert_space_before_next_node_per_level = []
+
+    def begin_hierarchy(self,
+                        node: str):
+        if not self._vert_space_before_next_node_per_level:
+            self._handle_root_node(node)
+        else:
+            self._handle_non_root_node(node)
+
+    def end_hierarchy(self):
+        self._vert_space_before_next_node_per_level = self._vert_space_before_next_node_per_level[:-1]
+
+    def _handle_root_node(self,
+                          node: str):
+        print(node)
+        self._vert_space_before_next_node_per_level = [True]
+
+    def _handle_non_root_node(self,
+                              node: str):
+        if self._vert_space_before_next_node_per_level[-1]:
+            print(self._bars_indent_string())
+        self._set_vertical_space_before_next_node_on_all_but_last_levels()
+        print(self._bars_indent_string() + "--" + node)
+        self._vert_space_before_next_node_per_level = self._vert_space_before_next_node_per_level + [True]
+
+    def _bars_indent_string(self):
+        return "  ".join("|" * len(self._vert_space_before_next_node_per_level))
+
+    def _set_vertical_space_before_next_node_on_all_but_last_levels(self):
+        num_levels = len(self._vert_space_before_next_node_per_level)
+        self._vert_space_before_next_node_per_level = ([True] * (num_levels-1)) + [False]
 
 
 ###############################################################################
@@ -1779,15 +1830,26 @@ def parse_command_line():
                         Output only those file paths that are tagged
                         by any of the listed tags.
                         The argument is a comma-separated list of tags""")
-    parser.add_argument("-I", "--print-inclusion-hierarchy",
+    parser.add_argument("-i", "--print-inclusion-hierarchy",
                         action='store_const',
                         dest='command',
-                        const=PrintInclusionHierarchyCommand(),
+                        const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter()),
                         default=PrintPathsCommand(),
                         help="""\
                         Prints the file inclusion hierarchy -
                         does not print file paths.""")
-    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+    parser.add_argument("-I", "--print-inclusion-hierarchy-pretty",
+                        action='store_const',
+                        dest='command',
+                        const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter()),
+                        default=PrintPathsCommand(),
+                        help="""\
+                        Prints the file inclusion hierarchy, in
+                        a pretty layout -
+                        does not print file paths.""")
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s 1.0')
     args = parser.parse_args()
     # TODO Se till att prepend-tags o append-tags skriver till samma låda
     # så att det garranterat är den sista som gäller.
