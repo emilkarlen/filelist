@@ -1,0 +1,16 @@
+# File without a tag.
+existing-file-1.txt
+
+# Add a single tag
+@tags add tag1
+existing-file-2.txt
+
+# Add multiple tags
+@tags add tag2 tag3
+existing-file-3.txt
+
+# Adding the same tag twice should make no difference
+@tags add tag2
+existing-file-4.txt
+existing-file-5.txt
+existing-file-6.txt

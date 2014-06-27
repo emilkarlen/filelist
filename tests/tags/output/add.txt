@@ -1,0 +1,4 @@
+:existing-file-1.txt
+tag1:existing-file-2.txt
+tag1 tag2 tag3:existing-file-3.txt
+tag1 tag2 tag3:existing-file-4.txt
