@@ -1833,15 +1833,18 @@ def parse_command_line():
                         E.g., PRINT instructions will have no effect.
                         """)
     parser.add_argument("-t", "--prepend-tags",
-                        default=False,
-                        action='store_true',
+                        dest='tags_settings',
+                        default=TagsRenditionSettings.new_without_output(),
+                        action='store_const',
+                        const=TagsRenditionSettings.new_prepend(),
                         help="""\
                         For each file, print it's tags before it.
                         The tags and the path are separated by \"""" +
                         DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
     parser.add_argument("-T", "--append-tags",
-                        default=False,
-                        action='store_true',
+                        dest='tags_settings',
+                        action='store_const',
+                        const=TagsRenditionSettings.new_append(),
                         help="""\
                         For each file, print it's tags after it.
                         The tags and the path are separated by \"""" +
@@ -1872,21 +1875,13 @@ def parse_command_line():
                         action='version',
                         version='%(prog)s 1.0')
     args = parser.parse_args()
-    # TODO Se till att prepend-tags o append-tags skriver till samma låda
-    # så att det garranterat är den sista som gäller.
-    # Även: parsern borde själv kunna skapa en TagsRenditionSettings.
-    tags_settings = TagsRenditionSettings.new_without_output()
-    if args.prepend_tags:
-        tags_settings = TagsRenditionSettings.new_prepend()
-    if args.append_tags:
-        tags_settings = TagsRenditionSettings.new_append()
     filter_tags_or_none = None
     if args.filter_tags is not None:
         filter_tags_or_none = frozenset(args.filter_tags[0].split(","))
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,
-                                           tags_settings,
+                                           args.tags_settings,
                                            args.suppress_non_path_output)
     try:
         os.path.exists(args.file)  # Must be a regular file
