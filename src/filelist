@@ -1864,7 +1864,6 @@ def parse_command_line():
                         action='store_const',
                         dest='command',
                         const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter(), True),
-                        default=PrintPathsCommand(),
                         help="""\
                         Prints the file inclusion hierarchy, in
                         a pretty layout -
