@@ -25,9 +25,13 @@ Reason it has not been done is,
    the comment character could be interpreted later down
    the pipe.
 ** Strip ws at both ends of paths
-** Filter on tags
-*** condition: print only paths that have _all_ the given tags
-*** condition: print only paths that have _exactly_ the given tags
+** Tags
+*** Command for adding tags
+*** Command for removing tags
+*** Commena for removing all tags
+*** Filter on tags
+**** condition: print only paths that have _all_ the given tags
+**** condition: print only paths that have _exactly_ the given tags
 ** List
 *** match file-name using reg-ex
 ** Include
@@ -53,6 +57,7 @@ an overview of all references.
 
 ** Switch to give program that preprocesses files
 Usefull, e.g., for using a macro language like m4.
+** Instruction for exec a program and treating the result as files
 * Build system
 ** Support parallell builds
    Current, only one build is supported, since the file
