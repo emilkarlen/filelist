@@ -1491,34 +1491,34 @@ class PrettyHierarchyPrinter(HierarchyPrinter):
     Prints a hierarchy of nodes in an indented layout.
     """
     def __init__(self):
-        self._vert_space_before_next_node_per_level = []
+        self._vertical_space_before_next_node_per_level = []
 
     def begin_hierarchy(self,
                         node: str):
-        if not self._vert_space_before_next_node_per_level:
+        if not self._vertical_space_before_next_node_per_level:
             self._handle_root_node(node)
         else:
             self._handle_non_root_node(node)
 
     def end_hierarchy(self):
-        self._vert_space_before_next_node_per_level = self._vert_space_before_next_node_per_level[:-1]
+        self._vertical_space_before_next_node_per_level = self._vertical_space_before_next_node_per_level[:-1]
 
     def _handle_root_node(self,
                           node: str):
         print(node)
-        self._vert_space_before_next_node_per_level = [True]
+        self._vertical_space_before_next_node_per_level = [True]
 
     def _handle_non_root_node(self,
                               node: str):
-        if self._vert_space_before_next_node_per_level[-1]:
+        if self._vertical_space_before_next_node_per_level[-1]:
             self._print_empty_line()
         self._set_vertical_space_before_next_node_on_all_but_last_level()
         self._print_node(node)
-        self._vert_space_before_next_node_per_level = self._vert_space_before_next_node_per_level + [True]
+        self._vertical_space_before_next_node_per_level = self._vertical_space_before_next_node_per_level + [True]
 
     def _set_vertical_space_before_next_node_on_all_but_last_level(self):
-        num_levels = len(self._vert_space_before_next_node_per_level)
-        self._vert_space_before_next_node_per_level = ([True] * (num_levels-1)) + [False]
+        num_levels = len(self._vertical_space_before_next_node_per_level)
+        self._vertical_space_before_next_node_per_level = ([True] * (num_levels-1)) + [False]
 
     def _print_empty_line(self):
         print(self._bars_indent_string())
@@ -1527,7 +1527,7 @@ class PrettyHierarchyPrinter(HierarchyPrinter):
         print(self._bars_indent_string() + "--" + node)
 
     def _bars_indent_string(self):
-        return "  ".join("|" * len(self._vert_space_before_next_node_per_level))
+        return "  ".join("|" * len(self._vertical_space_before_next_node_per_level))
 
 
 ###############################################################################
