@@ -1850,27 +1850,28 @@ def parse_command_line():
                         The tags and the path are separated by \"""" +
                         DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
     parser.add_argument("-F", "--filter-tags",
+                        metavar="LIST-OF-TAGS",
                         nargs=1,
                         help="""\
                         Output only those file paths that are tagged
                         by any of the listed tags.
-                        The argument is a comma-separated list of tags""")
+                        The argument is a comma-separated list of tags.""")
     parser.add_argument("-i", "--print-inclusion-hierarchy",
                         action='store_const',
                         dest='command',
                         const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter(), False),
                         default=PrintPathsCommand(),
                         help="""\
-                        Prints the file inclusion hierarchy -
-                        does not print file paths.""")
+                        Prints the file inclusion hierarchy.
+                        The normal output of file paths is suppressed.""")
     parser.add_argument("-I", "--print-inclusion-hierarchy-pretty",
                         action='store_const',
                         dest='command',
                         const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter(), True),
                         help="""\
                         Prints the file inclusion hierarchy, in
-                        a pretty layout -
-                        does not print file paths.""")
+                        a pretty layout.
+                        The normal output of file paths is suppressed.""")
     parser.add_argument('--version',
                         action='version',
                         version='%(prog)s 1.0')
