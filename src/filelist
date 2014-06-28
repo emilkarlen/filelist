@@ -1138,73 +1138,6 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
 ###############################################################################
 
 
-class TagsSetSubCommand(InstructionSubCommand):
-    def __init__(self,
-                 name: str,
-                 aliases: list):
-        InstructionSubCommand.__init__(self, name, aliases)
-
-    def add_arguments(self,
-                      parsing_settings: ParsingSettings,
-                      parser: argparse.ArgumentParser):
-        parser.add_argument('tags', nargs='*')
-
-    def execute(self,
-                parsing_settings: ParsingSettings,
-                source: SourceReference,
-                args: argparse.Namespace) -> list:
-        return [ProcessorForTagsSet(source, args.tags)]
-
-
-class TagsAddSubCommand(InstructionSubCommand):
-    def __init__(self,
-                 name: str,
-                 aliases: list):
-        InstructionSubCommand.__init__(self, name, aliases)
-
-    def add_arguments(self,
-                      parsing_settings: ParsingSettings,
-                      parser: argparse.ArgumentParser):
-        parser.add_argument('tags', nargs='*')
-
-    def execute(self,
-                parsing_settings: ParsingSettings,
-                source: SourceReference,
-                args: argparse.Namespace) -> list:
-        return [ProcessorForTagsAdd(source, args.tags)]
-
-
-class TagsRemoveSubCommand(InstructionSubCommand):
-    def __init__(self,
-                 name: str,
-                 aliases: list):
-        InstructionSubCommand.__init__(self, name, aliases)
-
-    def add_arguments(self,
-                      parsing_settings: ParsingSettings,
-                      parser: argparse.ArgumentParser):
-        parser.add_argument('tags', nargs='*')
-
-    def execute(self,
-                parsing_settings: ParsingSettings,
-                source: SourceReference,
-                args: argparse.Namespace) -> list:
-        return [ProcessorForTagsRemove(source, args.tags)]
-
-
-class InstructionArgumentParserForTags(InstructionWithSubCommandsArgumentParser):
-    """Parser for the tag instruction."""
-
-    def __init__(self):
-        InstructionWithSubCommandsArgumentParser.__init__(
-            self,
-            [
-                TagsSetSubCommand("SET", []),
-                TagsAddSubCommand("ADD", []),
-                TagsRemoveSubCommand("REMOVE", ["RM"]),
-            ])
-
-
 class ProcessorForTagsSet(Processor):
     """
     An instruction that sets the tags in the environment.
@@ -1257,6 +1190,80 @@ class ProcessorForTagsRemove(Processor):
         else:
             env.tags().remove(self._tags)
         return iter([])
+
+
+class TagsSubCommandForListOfTagsArgumentsBase(InstructionSubCommand):
+    """
+    Base class for sub commands for the tags instruction with.
+
+    These commands has a single argument which is a list of tags.
+    They also produces a single Processor, which constructor takes
+    the list of tags.
+    """
+    def __init__(self,
+                 name: str,
+                 aliases: list,
+                 processor_class):
+        InstructionSubCommand.__init__(self, name, aliases)
+        self.processor_class = processor_class
+
+    def add_arguments(self,
+                      parsing_settings: ParsingSettings,
+                      parser: argparse.ArgumentParser):
+        parser.add_argument('tags', nargs='*')
+
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
+        return [self.processor_class(source, args.tags)]
+
+
+class TagsSubCommandForSet(TagsSubCommandForListOfTagsArgumentsBase):
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        TagsSubCommandForListOfTagsArgumentsBase.__init__(
+            self,
+            name,
+            aliases,
+            ProcessorForTagsSet)
+
+
+class TagsSubCommandForAdd(TagsSubCommandForListOfTagsArgumentsBase):
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        TagsSubCommandForListOfTagsArgumentsBase.__init__(
+            self,
+            name,
+            aliases,
+            ProcessorForTagsAdd)
+
+
+class TagsSubCommandForRemove(TagsSubCommandForListOfTagsArgumentsBase):
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        TagsSubCommandForListOfTagsArgumentsBase.__init__(
+            self,
+            name,
+            aliases,
+            ProcessorForTagsRemove)
+
+
+class InstructionArgumentParserForTags(InstructionWithSubCommandsArgumentParser):
+    """Parser for the tag instruction."""
+
+    def __init__(self):
+        InstructionWithSubCommandsArgumentParser.__init__(
+            self,
+            [
+                TagsSubCommandForSet("SET", []),
+                TagsSubCommandForAdd("ADD", []),
+                TagsSubCommandForRemove("REMOVE", ["RM"]),
+            ]
+        )
 
 
 ###############################################################################
