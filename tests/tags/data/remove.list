@@ -15,7 +15,13 @@ existing-file-2.txt
 existing-file-3.txt
 
 @print
-@print * Remove all tags
+@print * Remove without arguments should remove all tags
 @tags set tag1 tag2
 @tags remove
 existing-file-4.txt
+
+@print
+@print * Alias rm should work the same as the full name
+@tags set tag1 tag2
+@tags rm tag1
+existing-file-5.txt

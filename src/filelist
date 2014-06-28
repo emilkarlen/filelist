@@ -1090,7 +1090,7 @@ class InstructionArgumentParserForTags(InstructionArgumentParser):
         parser_add.set_defaults(func=InstructionArgumentParserForTags._add)
 
         parser_remove = subparsers.add_parser('REMOVE',
-                                              aliases='RM')
+                                              aliases=["RM"])
         parser_remove.add_argument('tags', nargs='*')
         parser_remove.set_defaults(func=InstructionArgumentParserForTags._remove)
 

@@ -7,5 +7,8 @@ tag2:data/existing-file-2.txt
 * Remove multiple tags
 tag1:data/existing-file-3.txt
 
-* Remove all tags
+* Remove without arguments should remove all tags
 :data/existing-file-4.txt
+
+* Alias rm should work the same as the full name
+tag2:data/existing-file-5.txt
