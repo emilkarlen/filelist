@@ -1,0 +1,21 @@
+@print * Removing tags from the empty set of tags should have no effect
+@tags remove tag1 tag2
+existing-file-1.txt
+
+@print
+@print * Remove a single tag
+@tags set    tag1 tag2
+@tags remove tag1
+existing-file-2.txt
+
+@print
+@print * Remove multiple tags
+@tags set    tag1 tag2 tag3
+@tags remove      tag2 tag3 tag4
+existing-file-3.txt
+
+@print
+@print * Remove all tags
+@tags set tag1 tag2
+@tags remove
+existing-file-4.txt

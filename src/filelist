@@ -230,23 +230,32 @@ class Tags:
 
     def __init__(self,
                  tags: list):
-        self._tag_list = tags
-        self._as_froze_set = frozenset(self._tag_list)
+        self._as_froze_set = frozenset(tags)
 
     @staticmethod
     def new_empty():
         return Tags([])
 
     def copy(self):
-        return Tags(self._tag_list.copy())
+        return Tags(list(self._as_froze_set))
 
     def frozen_tags(self) -> frozenset:
         return self._as_froze_set
 
     def set(self,
             tags: list):
-        self._tag_list = tags
-        self._as_froze_set = frozenset(self._tag_list)
+        self._as_froze_set = frozenset(tags)
+
+    def add(self,
+            tags: list):
+        self._as_froze_set = self._as_froze_set.union(tags)
+
+    def remove(self,
+               tags):
+        self._as_froze_set = self._as_froze_set.difference(tags)
+
+    def clear(self):
+        self._as_froze_set = frozenset()
 
 
 class ResultItemsConstructionEnvironment:
@@ -1033,17 +1042,67 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
 ###############################################################################
 
 
+def my_error_handler(arg1,arg2):
+    print(str(arg1))
+    print(str(arg2))
+    sys.exit(0)
+
+
+def split_command_line_and_make_first_string_uppercase(command_line: str):
+    commands = command_line.split()
+    if commands:
+        commands[0] = commands[0].upper()
+    return commands
+
+
 class InstructionArgumentParserForTags(InstructionArgumentParser):
     """Parser for printing a string."""
+
+    @staticmethod
+    def _set(source: SourceReference,
+             args):
+        return [ProcessorForTagsSet(source, args.tags)]
+
+    @staticmethod
+    def _add(source: SourceReference,
+             args):
+        return [ProcessorForTagsAdd(source, args.tags)]
+
+    @staticmethod
+    def _remove(source: SourceReference,
+                args):
+        return [ProcessorForTagsRemove(source, args.tags)]
 
     def apply(self,
               parsing_settings: ParsingSettings,
               source: SourceReference,
               instruction_argument: str):
-        command_and_tags = instruction_argument.split()
-        if not command_and_tags or command_and_tags[0].upper() != "SET":
-            raise InstructionArgumentParserSyntaxErrorException(["usage: SET [TAG...]"])
-        return [ProcessorForTagsSet(source, command_and_tags[1:])]
+
+        parser = argparse.ArgumentParser()
+        subparsers = parser.add_subparsers()
+
+        parser_set = subparsers.add_parser('SET')
+        parser_set.add_argument('tags', nargs='*')
+        parser_set.set_defaults(func=InstructionArgumentParserForTags._set)
+
+        parser_add = subparsers.add_parser('ADD')
+        parser_add.add_argument('tags', nargs='*')
+        parser_add.set_defaults(func=InstructionArgumentParserForTags._add)
+
+        parser_remove = subparsers.add_parser('REMOVE',
+                                              aliases='RM')
+        parser_remove.add_argument('tags', nargs='*')
+        parser_remove.set_defaults(func=InstructionArgumentParserForTags._remove)
+
+        argparse.ArgumentParser.error = my_error_handler
+
+        args = parser.parse_args(split_command_line_and_make_first_string_uppercase(instruction_argument))
+        return args.func(source, args)
+
+#        command_and_tags = instruction_argument.split()
+#        if not command_and_tags or command_and_tags[0].upper() != "SET":
+#            raise InstructionArgumentParserSyntaxErrorException(["usage: SET [TAG...]"])
+#        return [ProcessorForTagsSet(source, command_and_tags[1:])]
 
 
 class ProcessorForTagsSet(Processor):
@@ -1060,6 +1119,43 @@ class ProcessorForTagsSet(Processor):
                              parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
         env.tags().set(self._tags)
+        return iter([])
+
+
+class ProcessorForTagsAdd(Processor):
+    """
+    An instruction that adds tags in the environment.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 tags: list):
+        Processor.__init__(self, source)
+        self._tags = tags
+
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
+        env.tags().add(self._tags)
+        return iter([])
+
+
+class ProcessorForTagsRemove(Processor):
+    """
+    An instruction that removes tags in the environment.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 tags: list):
+        Processor.__init__(self, source)
+        self._tags = tags
+
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
+        if not self._tags:
+            env.tags().clear()
+        else:
+            env.tags().remove(self._tags)
         return iter([])
 
 

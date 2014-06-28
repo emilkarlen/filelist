@@ -1,0 +1,11 @@
+* Removing tags from the empty set of tags should have no effect
+:data/existing-file-1.txt
+
+* Remove a single tag
+tag2:data/existing-file-2.txt
+
+* Remove multiple tags
+tag1:data/existing-file-3.txt
+
+* Remove all tags
+:data/existing-file-4.txt

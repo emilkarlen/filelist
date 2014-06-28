@@ -1,4 +1,11 @@
-:existing-file-1.txt
-tag1:existing-file-2.txt
-tag1 tag2 tag3:existing-file-3.txt
-tag1 tag2 tag3:existing-file-4.txt
+* Add a single tag
+tag1:data/existing-file-1.txt
+
+* Add multiple tags
+tag1 tag2 tag3:data/existing-file-2.txt
+
+* Adding the same tag twice should make no difference
+tag1 tag2 tag3:data/existing-file-3.txt
+
+* Add without any tags should have no effect
+tag1 tag2 tag3:data/existing-file-4.txt

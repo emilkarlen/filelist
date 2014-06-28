@@ -12,7 +12,7 @@ home:..
 
 setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE data/add.list
+test.run.cmdline:M4_EXECUTABLE_PREPEND_TAGS data/add.list
 
 check.exitcode:0
 check.stdout.file.eq:output/add.txt
