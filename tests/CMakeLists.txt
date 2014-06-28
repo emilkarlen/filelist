@@ -126,6 +126,7 @@ testcase (tags filter-include)
 testcase (tags filter-list)
 testcase (tags add)
 testcase (tags remove)
+testcase (tags invalid-command)
 
 testcase (other normalize-paths)
 testcase (other normalize-paths-relative-file-argument)

@@ -153,6 +153,42 @@ def constantly_true_matcher():
 
 
 ###############################################################################
+# - argparse -
+###############################################################################
+
+
+class ArgumentParsingException(Exception):
+    """
+    Indicates an invalid command line - a command line that the
+    ArgumentParser cannot parse.
+    """
+    def __init__(self,
+                 argument_parser: argparse.ArgumentParser,
+                 error_message: str):
+        self.argument_parser = argument_parser
+        self.error_message = error_message
+
+
+def raise_exception_instead_of_exiting_on_error(parser: argparse.ArgumentParser,
+                                                arguments: list):
+    """
+    Corresponds to argparse.ArgumentParser.parse_args.
+
+    But instead of exiting on error, a ArgumentParsingException is raised.
+    """
+    original_error_handler = argparse.ArgumentParser.error
+
+    def error_handler(the_parser: argparse.ArgumentParser, the_message: str):
+        raise ArgumentParsingException(the_parser, the_message)
+
+    try:
+        argparse.ArgumentParser.error = error_handler
+        return parser.parse_args(arguments)
+    finally:
+        argparse.ArgumentParser.error = original_error_handler
+
+
+###############################################################################
 # - file positions -
 ###############################################################################
 
@@ -1042,12 +1078,6 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
 ###############################################################################
 
 
-def my_error_handler(arg1,arg2):
-    print(str(arg1))
-    print(str(arg2))
-    sys.exit(0)
-
-
 def split_command_line_and_make_first_string_uppercase(command_line: str):
     commands = command_line.split()
     if commands:
@@ -1057,21 +1087,6 @@ def split_command_line_and_make_first_string_uppercase(command_line: str):
 
 class InstructionArgumentParserForTags(InstructionArgumentParser):
     """Parser for printing a string."""
-
-    @staticmethod
-    def _set(source: SourceReference,
-             args):
-        return [ProcessorForTagsSet(source, args.tags)]
-
-    @staticmethod
-    def _add(source: SourceReference,
-             args):
-        return [ProcessorForTagsAdd(source, args.tags)]
-
-    @staticmethod
-    def _remove(source: SourceReference,
-                args):
-        return [ProcessorForTagsRemove(source, args.tags)]
 
     def apply(self,
               parsing_settings: ParsingSettings,
@@ -1094,15 +1109,28 @@ class InstructionArgumentParserForTags(InstructionArgumentParser):
         parser_remove.add_argument('tags', nargs='*')
         parser_remove.set_defaults(func=InstructionArgumentParserForTags._remove)
 
-        argparse.ArgumentParser.error = my_error_handler
+        prepared_args = split_command_line_and_make_first_string_uppercase(instruction_argument)
 
-        args = parser.parse_args(split_command_line_and_make_first_string_uppercase(instruction_argument))
-        return args.func(source, args)
+        try:
+            args = raise_exception_instead_of_exiting_on_error(parser, prepared_args)
+            return args.func(source, args)
+        except ArgumentParsingException as ex:
+            raise InstructionArgumentParserSyntaxErrorException([ex.error_message])
 
-#        command_and_tags = instruction_argument.split()
-#        if not command_and_tags or command_and_tags[0].upper() != "SET":
-#            raise InstructionArgumentParserSyntaxErrorException(["usage: SET [TAG...]"])
-#        return [ProcessorForTagsSet(source, command_and_tags[1:])]
+    @staticmethod
+    def _set(source: SourceReference,
+             args):
+        return [ProcessorForTagsSet(source, args.tags)]
+
+    @staticmethod
+    def _add(source: SourceReference,
+             args):
+        return [ProcessorForTagsAdd(source, args.tags)]
+
+    @staticmethod
+    def _remove(source: SourceReference,
+                args):
+        return [ProcessorForTagsRemove(source, args.tags)]
 
 
 class ProcessorForTagsSet(Processor):
