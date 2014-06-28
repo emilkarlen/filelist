@@ -1835,11 +1835,16 @@ description_of_print = InstructionDescription(
 
 description_of_tags = InstructionDescription(
     """\
-    Sets a set of tags that will be associated with file paths
-    that appear after this instruction. These tags are used
-    until a new TAGS instruction.
+    Manages a set of tags that will be associated with file paths
+    that appear after this instruction. These tags are associated
+    with all file paths until the following modification of the
+    tags.
+    SET - sets a constant set of tags.
+    ADD - adds the given tags to the current set.
+    REMOVE - removes the given tags from the current set;
+    or removes all tags if no tags are given.
     """,
-    "SET TAG...",
+    "[SET | ADD | REMOVE] TAG...",
     [("TAG",
      """\
      A string without white space.
