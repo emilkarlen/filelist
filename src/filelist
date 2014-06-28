@@ -1058,6 +1058,66 @@ class InstructionArgumentParser:
         raise NotImplementedError
 
 
+class InstructionSubCommand:
+    """
+    A sub command of an instruction.
+    """
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        self.name = name
+        self.aliases = aliases
+
+    def add_arguments(self,
+                      parsing_settings: ParsingSettings,
+                      parser: argparse.ArgumentParser):
+        raise NotImplementedError
+
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
+        """
+        :return: List of Processor:s.
+        """
+        raise NotImplementedError
+
+
+class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
+    """Argument parser for instructions with sub commands."""
+
+    def __init__(self,
+                 sub_commands: list):
+        self.sub_commands = sub_commands
+
+    def apply(self,
+              parsing_settings: ParsingSettings,
+              source: SourceReference,
+              instruction_argument: str):
+
+        parser = argparse.ArgumentParser()
+        subparsers = parser.add_subparsers()
+        for sub_command in self.sub_commands:
+            sub_parser = subparsers.add_parser(sub_command.name,
+                                               aliases=sub_command.aliases)
+            sub_command.add_arguments(parsing_settings, sub_parser)
+            sub_parser.set_defaults(func=sub_command)
+
+        prepared_args = self._split_command_line_and_make_first_string_uppercase(instruction_argument)
+        try:
+            args = raise_exception_instead_of_exiting_on_error(parser, prepared_args)
+            return args.func.execute(parsing_settings, source, args)
+        except ArgumentParsingException as ex:
+            raise InstructionArgumentParserSyntaxErrorException([ex.error_message])
+
+    @staticmethod
+    def _split_command_line_and_make_first_string_uppercase(command_line: str):
+        commands = command_line.split()
+        if commands:
+            commands[0] = commands[0].upper()
+        return commands
+
+
 ###############################################################################
 # - InstructionArgumentParserForPrint -
 ###############################################################################
@@ -1078,59 +1138,71 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
 ###############################################################################
 
 
-def split_command_line_and_make_first_string_uppercase(command_line: str):
-    commands = command_line.split()
-    if commands:
-        commands[0] = commands[0].upper()
-    return commands
+class TagsSetSubCommand(InstructionSubCommand):
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        InstructionSubCommand.__init__(self, name, aliases)
 
+    def add_arguments(self,
+                      parsing_settings: ParsingSettings,
+                      parser: argparse.ArgumentParser):
+        parser.add_argument('tags', nargs='*')
 
-class InstructionArgumentParserForTags(InstructionArgumentParser):
-    """Parser for printing a string."""
-
-    def apply(self,
-              parsing_settings: ParsingSettings,
-              source: SourceReference,
-              instruction_argument: str):
-
-        parser = argparse.ArgumentParser()
-        subparsers = parser.add_subparsers()
-
-        parser_set = subparsers.add_parser('SET')
-        parser_set.add_argument('tags', nargs='*')
-        parser_set.set_defaults(func=InstructionArgumentParserForTags._set)
-
-        parser_add = subparsers.add_parser('ADD')
-        parser_add.add_argument('tags', nargs='*')
-        parser_add.set_defaults(func=InstructionArgumentParserForTags._add)
-
-        parser_remove = subparsers.add_parser('REMOVE',
-                                              aliases=["RM"])
-        parser_remove.add_argument('tags', nargs='*')
-        parser_remove.set_defaults(func=InstructionArgumentParserForTags._remove)
-
-        prepared_args = split_command_line_and_make_first_string_uppercase(instruction_argument)
-
-        try:
-            args = raise_exception_instead_of_exiting_on_error(parser, prepared_args)
-            return args.func(source, args)
-        except ArgumentParsingException as ex:
-            raise InstructionArgumentParserSyntaxErrorException([ex.error_message])
-
-    @staticmethod
-    def _set(source: SourceReference,
-             args):
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
         return [ProcessorForTagsSet(source, args.tags)]
 
-    @staticmethod
-    def _add(source: SourceReference,
-             args):
+
+class TagsAddSubCommand(InstructionSubCommand):
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        InstructionSubCommand.__init__(self, name, aliases)
+
+    def add_arguments(self,
+                      parsing_settings: ParsingSettings,
+                      parser: argparse.ArgumentParser):
+        parser.add_argument('tags', nargs='*')
+
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
         return [ProcessorForTagsAdd(source, args.tags)]
 
-    @staticmethod
-    def _remove(source: SourceReference,
-                args):
+
+class TagsRemoveSubCommand(InstructionSubCommand):
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        InstructionSubCommand.__init__(self, name, aliases)
+
+    def add_arguments(self,
+                      parsing_settings: ParsingSettings,
+                      parser: argparse.ArgumentParser):
+        parser.add_argument('tags', nargs='*')
+
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
         return [ProcessorForTagsRemove(source, args.tags)]
+
+
+class InstructionArgumentParserForTags(InstructionWithSubCommandsArgumentParser):
+    """Parser for the tag instruction."""
+
+    def __init__(self):
+        InstructionWithSubCommandsArgumentParser.__init__(
+            self,
+            [
+                TagsSetSubCommand("SET", []),
+                TagsAddSubCommand("ADD", []),
+                TagsRemoveSubCommand("REMOVE", ["RM"]),
+            ])
 
 
 class ProcessorForTagsSet(Processor):
@@ -1321,7 +1393,7 @@ class LineParser:
         Otherwise, a list of Processors.
         This list may be empty.
         """
-        raise NotImplemented()
+        raise NotImplementedError
 
 
 class LineParserForIgnoredLine(LineParser):
