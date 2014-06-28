@@ -11,6 +11,10 @@
   3. Write program help
   4. Remove item from this file.
 * Defects
+** Exiting with correct status if invalid options to @list
+I believe this is not tested.
+Use same strategy as for how the argparser is used for sub-commands (those of
+@tags, e.g.).
 ** Handling of abolute file names
    Currently, all file names are assumed to be relative.
    A prefix is added to each name, consising of the path
@@ -29,12 +33,14 @@ Reason it has not been done is,
    the pipe.
 ** Strip ws at both ends of paths
 ** Tags
-*** Command for adding tags
-*** Command for removing tags
-*** Commena for removing all tags
+*** Command for printing the current tags
+    Could have as options, line-prefix and -suffix.
 *** Filter on tags
-**** condition: print only paths that have _all_ the given tags
-**** condition: print only paths that have _exactly_ the given tags
+**** conditions
+     The condition could be given by a single argument as a string.
+     E.g. "all",  "any", "exactly".
+***** print only paths that have _all_ the given tags
+***** print only paths that have _exactly_ the given tags
 ** List
 *** match file-name using reg-ex
 ** Include
