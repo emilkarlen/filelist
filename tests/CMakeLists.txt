@@ -136,6 +136,9 @@ testcase (shell tags-should-be-set)
 testcase (shell tags-filter-included)
 testcase (shell tags-filter-excluded)
 
+testcase (preprocessor only-top-level-file)
+# testcase (preprocessor preprocess)
+
 testcase (other normalize-paths)
 testcase (other normalize-paths-relative-file-argument)
 testcase (other absolute-paths)

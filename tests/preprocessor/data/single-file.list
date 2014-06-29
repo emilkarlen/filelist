@@ -1,0 +1,4 @@
+@print BEGINNING OF FILE
+# Files without the ".txt" suffix.
+existing-file-1
+existing-file-2

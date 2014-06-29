@@ -58,6 +58,7 @@ import subprocess
 EXIT_USAGE = 2
 EXIT_INVALID_ARGUMENTS = 3
 EXIT_SYNTAX = 4
+EXIT_PRE_PROCESSING = 5
 EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 EXIT_SHELL_COMMAND_EXECUTION_ERROR = 8 + 1
 
@@ -1652,6 +1653,28 @@ class FileParser:
 ###############################################################################
 
 
+class PreprocessorException(Exception):
+    def __init__(self,
+                 called_process_error: subprocess.CalledProcessError):
+        self._called_process_error = called_process_error
+
+    # def render_sub_class_specifics(self,
+    #                                source_line: SourceLineInFile,
+    #                                o_stream):
+    #     """Implements the part that is specific per sub class."""
+    #     write_lines(o_stream,
+    #                 [
+    #                     "Shell command failed.",
+    #                     "Command exit code: " + str(self._called_process_error.returncode)
+    #                 ])
+    #     if self._called_process_error.output:
+    #         write_lines(o_stream,
+    #                     [
+    #                         "Output from command:",
+    #                         self._called_process_error.output,
+    #                     ])
+
+
 class LinesSourceForFileBase(LinesSource):
     def __init__(self,
                  parsing_settings: ParsingSettings,
@@ -1659,20 +1682,45 @@ class LinesSourceForFileBase(LinesSource):
         self._parsing_settings = parsing_settings
         self._file_name = file_name
 
+    def _open(self, file_name: str):
+        raise NotImplementedError()
+
     def __iter__(self):
+        if self._parsing_settings.preprocessor_shell_command_or_none:
+            raw_lines = self._raw_lines_from_processed_file(self._parsing_settings.preprocessor_shell_command_or_none)
+        else:
+            raw_lines = self._raw_lines_directly_from_file()
+        return self._from_raw_lines(raw_lines)
+
+    def _raw_lines_directly_from_file(self):
         # Read all lines from the file so that we can close it before
         # opening any included files.
         # This prevents exhausting the number of open files.
         open_file = self._open(self._file_name)
         raw_lines = open_file.readlines()
         open_file.close()
+        return raw_lines
+
+    def _raw_lines_from_processed_file(self,
+                                       preprocessor_shell_command: str):
+        open_file = self._open(self._file_name)
+        try:
+            output = subprocess.check_output(preprocessor_shell_command,
+                                             shell=True,
+                                             universal_newlines=True,
+                                             stdin=open_file)
+        except subprocess.CalledProcessError as ex:
+            raise PreprocessorException(ex)
+        open_file.close()
+        raw_lines = output.splitlines()
+        return raw_lines
+
+    @staticmethod
+    def _from_raw_lines(raw_lines: list):
         lines = []
         for lineWithPossibleNewLine in raw_lines:
             lines.append(lineWithPossibleNewLine.strip('\n').rstrip())
         return iter(lines)
-
-    def _open(self, file_name: str):
-        raise NotImplementedError()
 
 
 class LinesSourceForFileArgument(LinesSourceForFileBase):
@@ -2328,5 +2376,9 @@ def main():
     except InstructionApplicationException as ex:
         ex.render(sys.stderr)
         sys.exit(ex.exitCode)
+
+    except PreprocessorException as ex:
+        ex.render(sys.stderr)
+        sys.exit(EXIT_PRE_PROCESSING)
 
 main()

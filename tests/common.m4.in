@@ -24,5 +24,7 @@ m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
 m4_define(`M4_EXIT_USAGE',2)
 m4_define(`M4_EXIT_INVALID_ARGUMENTS',3)
 m4_define(`M4_EXIT_SYNTAX',4)
+m4_define(`M4_EXIT_PRE_PROCESSING',5)
 m4_define(`M4_EXIT_FILE_DOES_NOT_EXIST',m4_eval(8 + 0))
 m4_define(`M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR',m4_eval(8 + 1))
+
