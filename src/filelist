@@ -1054,11 +1054,8 @@ class ProcessorForInclude(Processor):
                                  self.source.as_include_file_chain(),
                                  self._file_name_relative_including_file,
                                  file_path)
-        try:
-            self._file_processor = file_parser.apply(open(file_path,
-                                                     mode='r'))
-        except OSError:
-            raise InstructionApplicationForMissingFileException(self.source, file_path)
+        lines_source = LinesSourceForIncludedFile(file_path, self.source)
+        self._file_processor = file_parser.apply(lines_source)
 
 
 ###############################################################################
@@ -1574,10 +1571,12 @@ class LineParserForFile(LineParser):
 ###############################################################################
 
 
-class SourceFilesLinesForPlainFile:
-    def __init__(self,
-                 file_name: str):
-        self.file_name = file_name
+class LinesSource:
+    """
+    Iterable of lines. E.g. a file or stdin.
+    """
+    def __iter__(self):
+        raise NotImplementedError()
 
 
 class FileParser:
@@ -1613,18 +1612,13 @@ class FileParser:
         self.file_name_relative_including_file = file_name_relative_including_file
         self.file_name = file_name
 
-    def apply(self, open_file) -> FileProcessor:
-        # Read all lines from the file so that we can close it before
-        # opening any included files.
-        # This prevents exhausting the number of open files.
-        lines = open_file.readlines()
-        open_file.close()
-
+    def apply(self,
+              lines_source: LinesSource) -> FileProcessor:
         self.line_number = 0
         processors = []
-        for lineWithPossibleNewLine in lines:
-            self.line = lineWithPossibleNewLine.strip('\n')
-            self.line_stripped = self.line.strip()
+        for line in lines_source:
+            self.line = line  # TODO behövs verkligen denna??
+            self.line_stripped = line
             self.line_number += 1
             processors += self._processors_for_line()
         return FileProcessor(self.file_name,
@@ -1656,6 +1650,63 @@ class FileParser:
 ###############################################################################
 
 
+class LinesSourceForFileBase(LinesSource):
+    def __init__(self,
+                 file_name: str):
+        self._file_name = file_name
+
+    def __iter__(self):
+        # Read all lines from the file so that we can close it before
+        # opening any included files.
+        # This prevents exhausting the number of open files.
+        open_file = self._open(self._file_name)
+        raw_lines = open_file.readlines()
+        open_file.close()
+        lines = []
+        for lineWithPossibleNewLine in raw_lines:
+            lines.append(lineWithPossibleNewLine.strip('\n').strip())
+        return iter(lines)
+
+    def _open(self, file_name: str):
+        raise NotImplementedError()
+
+
+class LinesSourceForFileArgument(LinesSourceForFileBase):
+    """
+    A LinesSource for file arguments on the command line.
+    """
+    def __init__(self,
+                 file_name: str):
+        LinesSourceForFileBase.__init__(self,file_name)
+
+    def _open(self, file_name: str):
+        try:
+            return open(file_name,
+                        mode='r')
+        except OSError:
+            msg = error_header_line("Cannot open file: \"" + file_name + "\"")
+            write_lines(sys.stderr,
+                        [msg])
+            sys.exit(EXIT_INVALID_ARGUMENTS)
+
+
+class LinesSourceForIncludedFile(LinesSourceForFileBase):
+    """
+    A LinesSource for files used by the include instruction.
+    """
+    def __init__(self,
+                 file_name: str,
+                 source: SourceReference):
+        LinesSourceForFileBase.__init__(self, file_name)
+        self._source = source
+
+    def _open(self, file_name: str):
+        try:
+            return open(file_name, mode='r')
+        except OSError:
+            raise InstructionApplicationForMissingFileException(self._source, file_name)
+
+
 class Command:
     """
     Abstract The top-level representation of what the program should do.
@@ -1668,11 +1719,10 @@ class Command:
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
         for file_name in file_names:
-            open_file = open_file_argument(file_name)
-
             file_parser = FileParser.for_top_level(parsing_settings,
                                                    file_name)
-            file_processor = file_parser.apply(open_file)
+            lines_source = LinesSourceForFileArgument(file_name)
+            file_processor = file_parser.apply(lines_source)
             env = RenditionEnvironment.for_top_level_file(file_name,
                                                           filter_tags_or_none,
                                                           rendition_settings)
@@ -2238,22 +2288,6 @@ def parse_command_line():
             args.files,
             filter_tags_or_none,
             rendition_settings)
-
-
-def open_file_argument(file_name: str) -> FileType:
-    """
-    Opens a file that is one of the file arguments of the command line arguments.
-
-    Exists if the file cannot be opened.
-    """
-    try:
-        return open(file_name,
-                    mode='r')
-    except OSError:
-        msg = error_header_line("Cannot open file: \"" + file_name + "\"")
-        write_lines(sys.stderr,
-                    [msg])
-        sys.exit(EXIT_INVALID_ARGUMENTS)
 
 
 def error_header_line(s: str):
