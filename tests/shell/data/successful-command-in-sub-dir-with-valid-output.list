@@ -1,0 +1,6 @@
+@print * Paths from included file
+@include dir/list-with-successful-shell-command.list
+
+@print
+@print * Paths from top-level file
+@shell ${SIMPTEST_HOME}/scripts/print-arguments *.txt

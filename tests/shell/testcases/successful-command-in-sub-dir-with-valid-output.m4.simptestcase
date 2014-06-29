@@ -1,0 +1,25 @@
+# -*- shell-script -*-
+
+#
+# Tests executing a shell command and the handling of sub-directories.
+# (Each shell command should be executed with a current directory of
+# the directory where the file-list is located.)
+#
+# The shell command is executed from an included file-list in
+# a sub directory.
+# The shell command exists with successful status and outputs valid
+# file-names.
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:successful-command-in-sub-dir-with-valid-output
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE data/successful-command-in-sub-dir-with-valid-output.list
+
+check.exitcode:0
+check.stdout.file.eq:output/successful-command-in-sub-dir-with-valid-output.txt

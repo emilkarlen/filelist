@@ -131,7 +131,7 @@ testcase (tags invalid-command)
 testcase (shell successful-command-in-same-dir-with-valid-output)
 testcase (shell successful-command-in-same-dir-with-invalid-output)
 testcase (shell unsuccessful-exit-command)
-# testcase (shell successful-command-in-sub-dir-with-valid-output)
+testcase (shell successful-command-in-sub-dir-with-valid-output)
 
 testcase (other normalize-paths)
 testcase (other normalize-paths-relative-file-argument)

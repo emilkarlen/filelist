@@ -1,0 +1,7 @@
+* Paths from included file
+data/dir/../existing-file-1.txt
+data/dir/../existing-file-2.txt
+
+* Paths from top-level file
+data/existing-file-1.txt
+data/existing-file-2.txt
