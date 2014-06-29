@@ -1,0 +1,21 @@
+# -*- shell-script -*-
+
+#
+# Tests executing a shell command.
+# The shell command is executed from the file-list on the command line.
+# The shell command exists with successful status and outputs invalid
+# file-names.
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:successful-command-in-same-dir-with-invalid-output
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE data/successful-command-in-same-dir-with-invalid-output.list
+
+check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
+check.stdout.empty

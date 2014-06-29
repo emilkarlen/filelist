@@ -1,0 +1,1 @@
+@shell ${SIMPTEST_HOME}/scripts/print-arguments non-existing-file.txt
