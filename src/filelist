@@ -1055,7 +1055,7 @@ class InstructionArgumentParser:
               source: SourceReference,
               instruction_argument: str) -> list:
         """Returns a list of Processor:s."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class InstructionSubCommand:
@@ -1071,7 +1071,7 @@ class InstructionSubCommand:
     def add_arguments(self,
                       parsing_settings: ParsingSettings,
                       parser: argparse.ArgumentParser):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def execute(self,
                 parsing_settings: ParsingSettings,
@@ -1080,7 +1080,7 @@ class InstructionSubCommand:
         """
         :return: List of Processor:s.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
@@ -1400,7 +1400,7 @@ class LineParser:
         Otherwise, a list of Processors.
         This list may be empty.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class LineParserForIgnoredLine(LineParser):
@@ -1549,7 +1549,7 @@ class Command:
                 filter_tags_or_none: frozenset,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class PrintPathsCommand(Command):
@@ -1602,10 +1602,10 @@ class HierarchyPrinter:
         Every node begins a hierarchy, and this hierarchy must be
         ended using end_hierarchy.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def end_hierarchy(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class PrintInclusionHierarchyCommand(Command):
