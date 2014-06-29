@@ -137,6 +137,7 @@ testcase (shell tags-filter-included)
 testcase (shell tags-filter-excluded)
 
 testcase (preprocessor only-top-level-file)
+testcase (preprocessor included-file)
 testcase (preprocessor preprocessor-failure)
 
 testcase (other normalize-paths)

@@ -1,0 +1,6 @@
+@print * From top-level-file
+existing-file-1
+
+@print
+@print * From included file
+@include dir/included.list
