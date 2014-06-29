@@ -1574,9 +1574,15 @@ class LineParserForFile(LineParser):
 ###############################################################################
 
 
+class SourceFilesLinesForPlainFile:
+    def __init__(self,
+                 file_name: str):
+        self.file_name = file_name
+
+
 class FileParser:
     """
-    Parses a source file into a File object.
+    Parses a source file into a FileProcessor object.
     """
 
     @staticmethod
@@ -1652,13 +1658,30 @@ class FileParser:
 
 class Command:
     """
-    The top-level representation of what the program should do.
+    Abstract The top-level representation of what the program should do.
+
+    Concrete sub-classes must implement process_file.
     """
     def execute(self,
                 file_names: list,
                 filter_tags_or_none: frozenset,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
+        for file_name in file_names:
+            open_file = open_file_argument(file_name)
+
+            file_parser = FileParser.for_top_level(parsing_settings,
+                                                   file_name)
+            file_processor = file_parser.apply(open_file)
+            env = RenditionEnvironment.for_top_level_file(file_name,
+                                                          filter_tags_or_none,
+                                                          rendition_settings)
+            self.process_file(file_processor, parsing_settings, env)
+
+    def process_file(self,
+                     file_processor: FileProcessor,
+                     parsing_settings: ParsingSettings,
+                     env: RenditionEnvironment):
         raise NotImplementedError()
 
 
@@ -1672,28 +1695,11 @@ class PrintPathsCommand(Command):
         self._rendition_settings = None
         self._parsing_settings = None
 
-    def execute(self,
-                file_names: str,
-                filter_tags_or_none: frozenset,
-                rendition_settings: RenditionSettings,
-                parsing_settings: ParsingSettings):
-
-        self._filter_tags_or_none = filter_tags_or_none
-        self._rendition_settings = rendition_settings
-        self._parsing_settings = parsing_settings
-        for file_name in file_names:
-            self.handle_single_file(file_name)
-
-    def handle_single_file(self,
-                           file_name: str):
-        open_file = open_file_argument(file_name)
-        file_parser = FileParser.for_top_level(self._parsing_settings,
-                                               file_name)
-        file_processor = file_parser.apply(open_file)
-        env = RenditionEnvironment.for_top_level_file(file_name,
-                                                      self._filter_tags_or_none,
-                                                      self._rendition_settings)
-        for resultItem in file_processor.result_item_iterable(self._parsing_settings,
+    def process_file(self,
+                     file_processor: FileProcessor,
+                     parsing_settings: ParsingSettings,
+                     env: RenditionEnvironment):
+        for resultItem in file_processor.result_item_iterable(parsing_settings,
                                                               env):
             s = resultItem.render(env)
             if s is not None:
@@ -1725,48 +1731,19 @@ class PrintInclusionHierarchyCommand(Command):
                  print_file_names_relative_including_file: bool):
         self._printer = printer
         self._print_file_names_relative_including_file = print_file_names_relative_including_file
-        self._parsing_settings = None
 
-    """
-    Command that prints the file inclusion hierarchy.
-    """
-    def execute(self,
-                file_names: str,
-                filter_tags_or_none: frozenset,
-                rendition_settings: RenditionSettings,
-                parsing_settings: ParsingSettings):
-        self._parsing_settings = parsing_settings
-        for file_name in file_names:
-            self.handle_single_file(file_name,
-                                    filter_tags_or_none,
-                                    rendition_settings,
-                                    parsing_settings)
-
-    def handle_single_file(self,
-                           file_name: str,
-                           filter_tags_or_none: frozenset,
-                           rendition_settings: RenditionSettings,
-                           parsing_settings: ParsingSettings):
-        open_file = open_file_argument(file_name)
-
-        file_parser = FileParser.for_top_level(parsing_settings,
-                                               file_name)
-        file_processor = file_parser.apply(open_file)
-        env = RenditionEnvironment.for_top_level_file(file_name,
-                                                      filter_tags_or_none,
-                                                      rendition_settings)
-        self._print(file_processor, env)
-
-    def _print(self,
-               file_processor: FileProcessor,
-               env: RenditionEnvironment):
+    def process_file(self,
+                     file_processor: FileProcessor,
+                     parsing_settings: ParsingSettings,
+                     env: RenditionEnvironment):
         self._printer.begin_hierarchy(self.file_name_for(file_processor))
         for processor in file_processor.processors():
-            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(self._parsing_settings,
+            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(parsing_settings,
                                                                                                  env)
             if file_processor_and_env is not None:
-                self._print(file_processor_and_env[0],
-                            file_processor_and_env[1])
+                self.process_file(file_processor_and_env[0],
+                                  parsing_settings,
+                                  file_processor_and_env[1])
         self._printer.end_hierarchy()
 
     def file_name_for(self,
@@ -2221,6 +2198,14 @@ def parse_command_line():
                         Output only those file paths that are tagged
                         by any of the listed tags.
                         The argument is a comma-separated list of tags.""")
+    parser.add_argument("--preprocessor",
+                        metavar="PROCESSOR",
+                        nargs=1,
+                        help="""\
+                        Process each file-list with the given processor, before it is interpreted as a list file.
+                        Both files on the command line and files included by the include-instruction are pre-processed.
+                        The processor is given the list-file via stdin, and must output it's result
+                        on stdout.""")
     parser.add_argument("-i", "--print-inclusion-hierarchy",
                         action='store_const',
                         dest='command',
