@@ -1514,7 +1514,7 @@ class LineParser:
 
 class LineParserForIgnoredLine(LineParser):
 
-    ignored_line_re_string = "(#.*)?$"
+    ignored_line_re_string = "\s*(#.*)?$"
     ignored_line_re = re.compile(ignored_line_re_string)
 
     def parse(self,
@@ -1668,7 +1668,7 @@ class LinesSourceForFileBase(LinesSource):
         open_file.close()
         lines = []
         for lineWithPossibleNewLine in raw_lines:
-            lines.append(lineWithPossibleNewLine.strip('\n').strip())
+            lines.append(lineWithPossibleNewLine.strip('\n').rstrip())
         return iter(lines)
 
     def _open(self, file_name: str):
