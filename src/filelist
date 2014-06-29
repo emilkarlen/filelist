@@ -535,6 +535,7 @@ class ResultItem:
 
 class ParsingSettings:
     def __init__(self,
+                 preprocessor_shell_command_or_none: str,
                  line_parsers: list,
                  instruction_parsers_dict: dict):
         """
@@ -543,6 +544,7 @@ class ParsingSettings:
         :param instruction_parsers_dict: Maps instruction identifiers to
          parsers: str -> InstructionArgumentParser.
         """
+        self.preprocessor_shell_command_or_none = preprocessor_shell_command_or_none
         self.line_parsers = line_parsers
         self.instruction_parsers_dict = instruction_parsers_dict
 
@@ -1054,7 +1056,7 @@ class ProcessorForInclude(Processor):
                                  self.source.as_include_file_chain(),
                                  self._file_name_relative_including_file,
                                  file_path)
-        lines_source = LinesSourceForIncludedFile(file_path, self.source)
+        lines_source = LinesSourceForIncludedFile(parsing_settings, file_path, self.source)
         self._file_processor = file_parser.apply(lines_source)
 
 
@@ -1652,7 +1654,9 @@ class FileParser:
 
 class LinesSourceForFileBase(LinesSource):
     def __init__(self,
+                 parsing_settings: ParsingSettings,
                  file_name: str):
+        self._parsing_settings = parsing_settings
         self._file_name = file_name
 
     def __iter__(self):
@@ -1676,8 +1680,9 @@ class LinesSourceForFileArgument(LinesSourceForFileBase):
     A LinesSource for file arguments on the command line.
     """
     def __init__(self,
+                 parsing_settings: ParsingSettings,
                  file_name: str):
-        LinesSourceForFileBase.__init__(self,file_name)
+        LinesSourceForFileBase.__init__(self, parsing_settings, file_name)
 
     def _open(self, file_name: str):
         try:
@@ -1695,9 +1700,10 @@ class LinesSourceForIncludedFile(LinesSourceForFileBase):
     A LinesSource for files used by the include instruction.
     """
     def __init__(self,
+                 parsing_settings: ParsingSettings,
                  file_name: str,
                  source: SourceReference):
-        LinesSourceForFileBase.__init__(self, file_name)
+        LinesSourceForFileBase.__init__(self, parsing_settings, file_name)
         self._source = source
 
     def _open(self, file_name: str):
@@ -1721,7 +1727,7 @@ class Command:
         for file_name in file_names:
             file_parser = FileParser.for_top_level(parsing_settings,
                                                    file_name)
-            lines_source = LinesSourceForFileArgument(file_name)
+            lines_source = LinesSourceForFileArgument(parsing_settings, file_name)
             file_processor = file_parser.apply(lines_source)
             env = RenditionEnvironment.for_top_level_file(file_name,
                                                           filter_tags_or_none,
@@ -2183,10 +2189,21 @@ def instruction_identifier_to_parser_dict() -> dict:
 ###############################################################################
 
 
-def parse_command_line():
-    """
-    Returns an (Command,list of file names,RenditionSettings).
-    """
+class CommandLineParseResult:
+    def __init__(self,
+                 command: Command,
+                 file_names: list,
+                 filter_tags_or_none: frozenset,
+                 rendition_settings: RenditionSettings,
+                 preprocessor_shell_command: str):
+        self.command = command
+        self.file_names = file_names
+        self.filter_tags_or_none = filter_tags_or_none
+        self.rendition_settings = rendition_settings
+        self.preprocessor_shell_command = preprocessor_shell_command
+
+
+def parse_command_line() -> CommandLineParseResult:
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=program_description())
     parser.add_argument("files",
@@ -2284,10 +2301,11 @@ def parse_command_line():
                                            args.absolute_paths,
                                            args.tags_settings,
                                            args.suppress_non_path_output)
-    return (args.command,
-            args.files,
-            filter_tags_or_none,
-            rendition_settings)
+    return CommandLineParseResult(args.command,
+                                  args.files,
+                                  filter_tags_or_none,
+                                  rendition_settings,
+                                  args.preprocessor)
 
 
 def error_header_line(s: str):
@@ -2295,13 +2313,14 @@ def error_header_line(s: str):
 
 
 def main():
-    (command, file_names, filter_tags_or_none, rendition_settings) = parse_command_line()
+    parse_result = parse_command_line()
     try:
-        command.execute(file_names,
-                        filter_tags_or_none,
-                        rendition_settings,
-                        ParsingSettings(system_line_parsers,
-                                        instruction_identifier_to_parser_dict()))
+        parse_result.command.execute(parse_result.file_names,
+                                     parse_result.filter_tags_or_none,
+                                     parse_result.rendition_settings,
+                                     ParsingSettings(parse_result.preprocessor_shell_command,
+                                                     system_line_parsers,
+                                                     instruction_identifier_to_parser_dict()))
     except InstructionSyntaxErrorException as ex:
         ex.render(sys.stderr)
         sys.exit(EXIT_SYNTAX)
