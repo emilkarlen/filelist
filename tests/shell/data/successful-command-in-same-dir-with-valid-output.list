@@ -1,1 +1,6 @@
+@print * From shell instruction
 @shell ${SIMPTEST_HOME}/scripts/print-arguments *.txt
+
+@print * From file-names
+existing-file-1.txt
+

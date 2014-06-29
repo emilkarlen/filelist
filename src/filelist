@@ -53,11 +53,13 @@ import re
 import textwrap
 import fnmatch
 import stat
+import subprocess
 
 EXIT_USAGE = 2
 EXIT_INVALID_ARGUMENTS = 3
 EXIT_SYNTAX = 4
 EXIT_FILE_DOES_NOT_EXIST = 8 + 0
+EXIT_SHELL_COMMAND_EXECUTION_ERROR = 8 + 1
 
 
 ###############################################################################
@@ -774,13 +776,100 @@ class ProcessorForPrint(Processor):
         Processor.__init__(self, source)
         self._string = string
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings, env: ResultItemsConstructionEnvironment):
+    def result_item_iterable(self, parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
         return iter([ResultItemForPrint(self._string)])
+
+
+###############################################################################
+# - ProcessorForShell -
+###############################################################################
+
+
+class InstructionApplicationExceptionForShell(InstructionApplicationException):
+    def __init__(self,
+                 source: SourceReference,
+                 called_process_error: subprocess.CalledProcessError):
+        InstructionApplicationException.__init__(self,
+                                                 source,
+                                                 EXIT_SHELL_COMMAND_EXECUTION_ERROR)
+        self._called_process_error = called_process_error
+
+    def render_sub_class_specifics(self,
+                                   source_line: SourceLineInFile,
+                                   o_stream):
+        """Implements the part that is specific per sub class."""
+        write_lines(o_stream,
+                    ["Exit code: " + self._called_process_error.returncode])
+
+
+class ProcessorForShell(Processor):
+    """
+    An instruction that executes a shell command and interprets it's output a file names.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 command_line: str):
+        Processor.__init__(self, source)
+        self._command_line = command_line
+
+    def result_item_iterable(self, parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
+        if not env.current_tags_satisfies_tags_filter():
+            return iter([])
+        try:
+            cwd = env.fromCurrDir
+            if not cwd:
+                cwd = "."
+            output = subprocess.check_output(self._command_line,
+                                             shell=True,
+                                             cwd=cwd,
+                                             universal_newlines=True)
+            file_names = output.splitlines()
+            return ResultItemIteratorForFilesFromFileNames(self.source,
+                                                           env,
+                                                           iter(file_names)).__iter__()
+        except subprocess.CalledProcessError as ex:
+            raise InstructionApplicationExceptionForShell(self.source, ex)
 
 
 ###############################################################################
 # - ProcessorForFile -
 ###############################################################################
+
+
+class ResultItemIteratorForFilesFromFileNames:
+    """
+    An iterator of ResultItemForFile, constructed from an iterable of file-names.
+
+    Produces elements only for the files that passes all file conditions: tags-filtering, existence.
+
+    All files are expected to be referenced from the same list file.
+    All files are expected to be given the same tags.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 env: ResultItemsConstructionEnvironment,
+                 file_names_rel_list_file: iter):
+        self._source = source
+        self._env = env
+        self._file_names_rel_list_file = file_names_rel_list_file
+        self._tags = env.tags().frozen_tags()
+
+    def __iter__(self):
+        if not self._env.current_tags_satisfies_tags_filter():
+            return iter([])
+        else:
+            return self
+
+    def __next__(self):
+        file_name = self._file_names_rel_list_file.__next__()
+        file_path = self._env.file_name_relative_current_dir_of_process(file_name)
+        if not os.path.exists(file_path):
+            raise InstructionApplicationForMissingFileException(self._source, file_path)
+        result_item = ResultItemForFile(self._env.file_name_relative_top_level_source_file(file_name),
+                                        self._tags)
+        return result_item
 
 
 class ProcessorForFile(Processor):
@@ -796,14 +885,9 @@ class ProcessorForFile(Processor):
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
-        file_path = env.file_name_relative_current_dir_of_process(self.file_name)
-        if not os.path.exists(file_path):
-            raise InstructionApplicationForMissingFileException(self.source, file_path)
-        if not env.current_tags_satisfies_tags_filter():
-            return iter([])
-        result_item = ResultItemForFile(env.file_name_relative_top_level_source_file(self.file_name),
-                                        env.tags().frozen_tags())
-        return iter([result_item])
+        return ResultItemIteratorForFilesFromFileNames(self.source,
+                                                       env,
+                                                       iter([self.file_name])).__iter__()
 
 
 ###############################################################################
@@ -1054,7 +1138,11 @@ class InstructionArgumentParser:
               parsing_settings: ParsingSettings,
               source: SourceReference,
               instruction_argument: str) -> list:
-        """Returns a list of Processor:s."""
+        """
+        Returns a list of Processor:s.
+
+        Raises InstructionArgumentParserSyntaxErrorException in case of parsing error.
+        """
         raise NotImplementedError()
 
 
@@ -1131,6 +1219,24 @@ class InstructionArgumentParserForPrint(InstructionArgumentParser):
               source: SourceReference,
               instruction_argument: str):
         return [ProcessorForPrint(source, instruction_argument)]
+
+
+###############################################################################
+# - InstructionArgumentParserForShell -
+###############################################################################
+
+
+class InstructionArgumentParserForShell(InstructionArgumentParser):
+    """Parser for printing a string."""
+
+    def apply(self,
+              parsing_settings: ParsingSettings,
+              source: SourceReference,
+              instruction_argument: str):
+        stripped_arguments = instruction_argument.strip()
+        if not stripped_arguments:
+            raise InstructionArgumentParserSyntaxErrorException(["missing command-line"])
+        return [ProcessorForShell(source, instruction_argument)]
 
 
 ###############################################################################
@@ -1817,40 +1923,18 @@ class InstructionConfiguration:
         return wrapper.wrap(self.long_name + " " + str(self.name_aliases))
 
 
-description_of_print = InstructionDescription(
-    "Outputs the argument.",
-    "[STRING]",
-    [("STRING",
+description_of_include = InstructionDescription(
+    "Includes instructions from a file.",
+    "FILE",
+    [("FIE",
      """\
-     String to be printed.
-     Extends to the end of line.
-     Comment characters are not treated as comments, but is
-     included in the printed string.
+     A readable file, who's name is relative the including file.
      """)
      ],
     """\
-    If STRING is not given, then an empty line is printed.
+    File paths inside the included file are relative the
+    location of that file.
     """
-)
-
-description_of_tags = InstructionDescription(
-    """\
-    Manages a set of tags that will be associated with file paths
-    that appear after this instruction. These tags are associated
-    with all file paths until the following modification of the
-    tags.
-    SET - sets a constant set of tags.
-    ADD - adds the given tags to the current set.
-    REMOVE - removes the given tags from the current set;
-    or removes all tags if no tags are given.
-    """,
-    "[SET | ADD | REMOVE] TAG...",
-    [("TAG",
-     """\
-     A string without white space.
-     """)
-     ],
-    None
 )
 
 description_of_directory_list = InstructionDescription(
@@ -1885,18 +1969,56 @@ description_of_directory_list = InstructionDescription(
     None
 )
 
-description_of_include = InstructionDescription(
-    "Includes instructions from a file.",
-    "FILE",
-    [("FIE",
+description_of_print = InstructionDescription(
+    "Outputs the argument.",
+    "[STRING]",
+    [("STRING",
      """\
-     A readable file, who's name is relative the including file.
+     String to be printed.
+     Extends to the end of line.
+     Comment characters are not treated as comments, but is
+     included in the printed string.
      """)
      ],
     """\
-    File paths inside the included file are relative the
-    location of that file.
+    If STRING is not given, then an empty line is printed.
     """
+)
+
+description_of_shell = InstructionDescription(
+    "Retrieve file names by executing a shell command.",
+    "COMMAND-LINE",
+    [("COMMAND-LINE",
+     """\
+     A command line passed to, and executed by the shell.
+     """)
+     ],
+    """\
+    Gives the contents of the line following the instruction name
+    to the shell for execution.
+    Each line of the output from this command is treated as if
+    it was a file-path on a line of the list-file itself.
+    """
+)
+
+description_of_tags = InstructionDescription(
+    """\
+    Manages a set of tags that will be associated with file paths
+    that appear after this instruction. These tags are associated
+    with all file paths until the following modification of the
+    tags.
+    SET - sets a constant set of tags.
+    ADD - adds the given tags to the current set.
+    REMOVE - removes the given tags from the current set;
+    or removes all tags if no tags are given.
+    """,
+    "[SET | ADD | REMOVE] TAG...",
+    [("TAG",
+     """\
+     A string without white space.
+     """)
+     ],
+    None
 )
 
 blank_line = ""
@@ -1964,18 +2086,22 @@ system_line_parsers = [LineParserForIgnoredLine(),
                        LineParserForFile()]
 
 instruction_configurations = [
-    InstructionConfiguration("PRINT",
-                             ["P"],
-                             description_of_print,
-                             InstructionArgumentParserForPrint()),
-    InstructionConfiguration("LIST",
-                             ["L", "LS"],
-                             description_of_directory_list,
-                             InstructionArgumentParserForDirectoryListing()),
     InstructionConfiguration("INCLUDE",
                              ["I"],
                              description_of_include,
                              InstructionArgumentParserForInclude()),
+    InstructionConfiguration("LIST",
+                             ["L", "LS"],
+                             description_of_directory_list,
+                             InstructionArgumentParserForDirectoryListing()),
+    InstructionConfiguration("PRINT",
+                             ["P"],
+                             description_of_print,
+                             InstructionArgumentParserForPrint()),
+    InstructionConfiguration("SHELL",
+                             [],
+                             description_of_shell,
+                             InstructionArgumentParserForShell()),
     InstructionConfiguration("TAGS",
                              ["T"],
                              description_of_tags,
