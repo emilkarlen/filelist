@@ -801,6 +801,12 @@ class InstructionApplicationExceptionForShell(InstructionApplicationException):
         """Implements the part that is specific per sub class."""
         write_lines(o_stream,
                     ["Exit code: " + self._called_process_error.returncode])
+        if self._called_process_error.output:
+            write_lines(o_stream,
+                        [
+                            "Output from command:",
+                            self._called_process_error.output,
+                        ])
 
 
 class ProcessorForShell(Processor):
