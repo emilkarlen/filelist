@@ -66,7 +66,6 @@ an overview of all references.
 
 ** Switch to give program that preprocesses files
 Usefull, e.g., for using a macro language like m4.
-** Instruction for exec a program and treating the result as files
 * Build system
 ** Support parallell builds
    Current, only one build is supported, since the file
