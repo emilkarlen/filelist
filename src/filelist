@@ -1658,21 +1658,18 @@ class PreprocessorException(Exception):
                  called_process_error: subprocess.CalledProcessError):
         self._called_process_error = called_process_error
 
-    # def render_sub_class_specifics(self,
-    #                                source_line: SourceLineInFile,
-    #                                o_stream):
-    #     """Implements the part that is specific per sub class."""
-    #     write_lines(o_stream,
-    #                 [
-    #                     "Shell command failed.",
-    #                     "Command exit code: " + str(self._called_process_error.returncode)
-    #                 ])
-    #     if self._called_process_error.output:
-    #         write_lines(o_stream,
-    #                     [
-    #                         "Output from command:",
-    #                         self._called_process_error.output,
-    #                     ])
+    def render(self, o_stream):
+        write_lines(o_stream,
+                    [
+                        "Preprocessor failed.",
+                        "Command exit code: " + str(self._called_process_error.returncode)
+                    ])
+        if self._called_process_error.output:
+            write_lines(o_stream,
+                        [
+                            "Output from preprocessor:",
+                            self._called_process_error.output,
+                        ])
 
 
 class LinesSourceForFileBase(LinesSource):

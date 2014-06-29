@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# Tests preprocessing the list files.
+# The preprocessor fails.
+#
+
+m4_include(common.m4)
+
+application:file-name-lister
+name:preprocessor/preprocessor-failure
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE --preprocessor ${SIMPTEST_HOME}/scripts/not-a-program data/single-file.list
+
+check.exitcode:M4_EXIT_PRE_PROCESSING
+check.stdout.empty
