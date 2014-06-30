@@ -4,9 +4,9 @@ m4_include(common.m4)
 
 application:file-name-lister
 name:invalid-arguments-file-does-not-exist
-home:.
+home:..
 
-test.run.cmdline:M4_EXECUTABLE non-existing-file
+test.run.cmdline:M4_EXECUTABLE non-existing-file.list
 
 check.exitcode:M4_EXIT_INVALID_ARGUMENTS
 check.stdout.empty

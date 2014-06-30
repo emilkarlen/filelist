@@ -73,16 +73,16 @@ endmacro (testcase)
 ###############################################################################
 
 
+testcase (basic invalid-arguments-file-does-not-exist)
+testcase (basic comments-blanklines-single-print)
+
 simptestcase (usage-no-file-arguments)
-simptestcase (invalid-arguments-file-does-not-exist)
 simptestcase (multiple-file-arguments)
 
 simptestcase (parse/ignored-lines)
 simptestcase (parse/invalid-instruction-name)
 simptestcase (parse/invalid-line-syntax)
 simptestcase (parse/instruction-name-variants)
-
-simptestcase (comments-blanklines-single-print)
 
 testcase (print simple-print)
 testcase (print suppress-print-output)
