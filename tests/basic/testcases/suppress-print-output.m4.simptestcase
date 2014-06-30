@@ -11,9 +11,9 @@ application:file-name-lister
 name:suppress-print-output
 home:..
 
-setup.install:testdata
+setup.install:data/simple-print.list
 
-test.run.cmdline:M4_EXECUTABLE --suppress-non-path-output testdata/simple-print.list
+test.run.cmdline:M4_EXECUTABLE --suppress-non-path-output simple-print.list
 
 check.exitcode:0
 check.stdout.empty

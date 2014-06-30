@@ -6,9 +6,9 @@ application:file-name-lister
 name:simple-print
 home:..
 
-setup.install:testdata
+setup.install:data/simple-print.list
 
-test.run.cmdline:M4_EXECUTABLE testdata/simple-print.list
+test.run.cmdline:M4_EXECUTABLE simple-print.list
 
 check.exitcode:0
 check.stdout.file.eq:output/simple-print.txt
