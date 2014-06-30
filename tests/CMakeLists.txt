@@ -79,12 +79,9 @@ testcase (basic usage-no-file-arguments)
 testcase (basic parse-ignored-lines)
 testcase (basic parse-invalid-instruction-name)
 testcase (basic parse-invalid-line-syntax)
-
 testcase (basic simple-print)
 testcase (basic suppress-print-output)
-
-
-simptestcase (parse/instruction-name-variants)
+testcase (basic instruction-name-variants)
 
 simptestcase (multiple-file-arguments)
 
