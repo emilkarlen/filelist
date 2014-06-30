@@ -75,8 +75,8 @@ endmacro (testcase)
 
 testcase (basic invalid-arguments-file-does-not-exist)
 testcase (basic comments-blanklines-single-print)
+testcase (basic usage-no-file-arguments)
 
-simptestcase (usage-no-file-arguments)
 simptestcase (multiple-file-arguments)
 
 simptestcase (parse/ignored-lines)
