@@ -77,8 +77,8 @@ testcase (basic invalid-arguments-file-does-not-exist)
 testcase (basic comments-blanklines-single-print)
 testcase (basic usage-no-file-arguments)
 testcase (basic parse-ignored-lines)
+testcase (basic parse-invalid-instruction-name)
 
-simptestcase (parse/invalid-instruction-name)
 simptestcase (parse/invalid-line-syntax)
 simptestcase (parse/instruction-name-variants)
 
