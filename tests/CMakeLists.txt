@@ -82,6 +82,7 @@ testcase (basic parse-invalid-line-syntax)
 testcase (basic simple-print)
 testcase (basic suppress-print-output)
 testcase (basic instruction-name-variants)
+testcase (basic multiple-file-arguments)
 
 simptestcase (multiple-file-arguments) # ska till paketet "file-path"
 
