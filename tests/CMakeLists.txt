@@ -83,7 +83,7 @@ testcase (basic simple-print)
 testcase (basic suppress-print-output)
 testcase (basic instruction-name-variants)
 
-simptestcase (multiple-file-arguments)
+simptestcase (multiple-file-arguments) # ska till paketet "file-path"
 
 simptestcase (file-existing)
 simptestcase (file-existing-relative-file-argument)
@@ -140,4 +140,4 @@ testcase (preprocessor preprocessor-failure)
 
 testcase (other normalize-paths)
 testcase (other normalize-paths-relative-file-argument)
-testcase (other absolute-paths)
+testcase (other output-absolute-paths)

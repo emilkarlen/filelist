@@ -8,9 +8,9 @@ home:..
 
 setup.install:data/home
 
-test.run.cmdline:M4_EXECUTABLE --absolute-paths home/absolute-paths.list
+test.run.cmdline:M4_EXECUTABLE --absolute-paths home/output-absolute-paths.list
 
 check.prepare.replace-SIMPTEST-envvars/stdout
 
 check.exitcode:0
-check.stdout.file.eq/replaced:output/absolute-paths.txt
+check.stdout.file.eq/replaced:output/output-absolute-paths.txt
