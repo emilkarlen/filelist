@@ -46,7 +46,7 @@ Reason it has not been done is,
 *** match file-name using reg-ex
 ** Include
 *** absolute filenames
-*** option to preserve home directory of that of the including file
+*** option to preserve "home directory" of that of the including file
     Usefull, e.g., for including a "standard list" that lists files that
     exist in many directories.
 ** Source-file info in PreprocessorException
@@ -55,6 +55,8 @@ Currently, no source-info is included in case of error of preprocessor.
 It is a minor issue, since the preprocessor is independent of the file
 argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
+** File
+*** absolute filenames
 * Features
 ** Switches for turning on/off checking the existence of files
 ** stdin as FILE argument
