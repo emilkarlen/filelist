@@ -9,7 +9,7 @@ m4_include(common.m4)
 
 application:file-name-lister
 name:file-existing-with-suppress-non-path-output
-home:.
+home:..
 
 setup.install:testdata
 

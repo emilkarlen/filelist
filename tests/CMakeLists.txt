@@ -32,23 +32,6 @@ configure_file(
 ###############################################################################
 # Macro for test using simptestcase, with a test case that uses M4.
 #
-# Argument is the name of the test case file:
-# - without the test directory name prefix ("tests/")
-# - without the file type suffix (".m4.simptestcase")
-#
-# The argument will be used as-is as the tests name.
-###############################################################################
-macro (simptestcase testFileNameHead)
-  add_test (
-    NAME ${testFileNameHead}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMAND ${SIMPTESTCASE} --m4 -v ${testFileNameHead}.m4.simptestcase
-    )
-endmacro (simptestcase)
-
-###############################################################################
-# Macro for test using simptestcase, with a test case that uses M4.
-#
 # Arguments:
 # - testPkgDir relative path of the "home" of the test package.
 #              Inside this dir, testcases must be located in
@@ -84,12 +67,11 @@ testcase (basic suppress-print-output)
 testcase (basic instruction-name-variants)
 testcase (basic multiple-file-arguments)
 
-simptestcase (multiple-file-arguments) # ska till paketet "file-path"
-
-simptestcase (file-existing)
-simptestcase (file-existing-relative-file-argument)
-simptestcase (file-existing-with-suppress-non-path-output)
-simptestcase (file-non-existing)
+testcase (file-path multiple-file-arguments)
+testcase (file-path file-existing)
+testcase (file-path file-existing-relative-file-argument)
+testcase (file-path file-existing-with-suppress-non-path-output)
+testcase (file-path file-non-existing)
 
 testcase (list existing-directory)
 testcase (list existing-directory-relative-file-argument)

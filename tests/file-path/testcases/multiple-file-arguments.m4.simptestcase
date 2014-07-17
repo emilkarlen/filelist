@@ -4,7 +4,7 @@ m4_include(common.m4)
 
 application:file-name-lister
 name:multiple-file_arguments
-home:.
+home:..
 
 setup.install:testdata
 

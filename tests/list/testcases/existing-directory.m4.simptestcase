@@ -6,9 +6,9 @@ application:file-name-lister
 name:list-existing-directory
 home:..
 
-setup.install:M4_COMMON_TESTDATA_DIR
+setup.install:testdata/existing-directory
 
-test.run.cmdline:M4_EXECUTABLE testdata/list-existing-directory.list | sort
+test.run.cmdline:M4_EXECUTABLE existing-directory/existing-directory.list | sort
 
 check.exitcode:0
 check.stdout.file.eq:output/existing-directory.txt

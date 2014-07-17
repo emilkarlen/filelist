@@ -4,7 +4,7 @@ m4_include(common.m4)
 
 application:file-name-lister
 name:referenced-file-does-not-exist
-home:.
+home:..
 
 setup.install:testdata
 
