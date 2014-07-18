@@ -1,0 +1,16 @@
+@tags set tag1 tag2
+
+@print # Prefix
+@tags print --prefix PREFIX
+@tags print -p PREFIX
+@tags print --prefix "PREFIX WITH SPACE "
+
+@print
+@print # Suffix
+@tags print --suffix SUFFIX
+@tags print -s SUFFIX
+@tags print --suffix " SUFFIX WITH SPACE"
+
+@print
+@print # Prefix and suffix
+@tags print --prefix > --suffix <

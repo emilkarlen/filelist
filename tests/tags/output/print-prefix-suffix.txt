@@ -1,0 +1,12 @@
+# Prefix
+PREFIXtag1 tag2
+PREFIXtag1 tag2
+PREFIX WITH SPACE tag1 tag2
+
+# Suffix
+tag1 tag2SUFFIX
+tag1 tag2SUFFIX
+tag1 tag2 SUFFIX WITH SPACE
+
+# Prefix and suffix
+>tag1 tag2<

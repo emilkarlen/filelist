@@ -54,6 +54,7 @@ import textwrap
 import fnmatch
 import stat
 import subprocess
+import shlex
 
 EXIT_USAGE = 2
 EXIT_INVALID_ARGUMENTS = 3
@@ -1205,7 +1206,7 @@ class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
 
     @staticmethod
     def _split_command_line_and_make_first_string_uppercase(command_line: str):
-        commands = command_line.split()
+        commands = shlex.split(command_line)
         if commands:
             commands[0] = commands[0].upper()
         return commands
@@ -1254,12 +1255,18 @@ class ResultItemForTagsPrint(ResultItem):
     An result item that prints tags.
     """
     def __init__(self,
-                 tags: frozenset):
+                 tags: frozenset,
+                 prefix: str,
+                 suffix: str):
         self._tags = tags
+        self._prefix = prefix
+        self._suffix = suffix
 
     def render(self,
                env: RenditionEnvironment) -> str:
-        return env.rendition_settings.tags_settings.render_print_tags(self._tags)
+        return ''.join([self._prefix,
+                        env.rendition_settings.tags_settings.render_print_tags(self._tags),
+                        self._suffix])
 
 
 class ProcessorForTagsAdd(Processor):
@@ -1284,13 +1291,19 @@ class ProcessorForTagsPrint(Processor):
     An instruction that adds tags in the environment.
     """
     def __init__(self,
-                 source: SourceReference):
+                 source: SourceReference,
+                 prefix: str,
+                 suffix: str):
         Processor.__init__(self, source)
+        self._prefix = prefix
+        self._suffix = suffix
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
-        return iter([ResultItemForTagsPrint(env.tags().frozen_tags())])
+        return iter([ResultItemForTagsPrint(env.tags().frozen_tags(),
+                                            self._prefix,
+                                            self._suffix)])
 
 
 class ProcessorForTagsRemove(Processor):
@@ -1369,13 +1382,26 @@ class TagsSubCommandForPrint(InstructionSubCommand):
     def add_arguments(self,
                       parsing_settings: ParsingSettings,
                       parser: argparse.ArgumentParser):
-        pass
+        parser.add_argument("-p", "--prefix",
+                            metavar="STRING",
+                            nargs=1,
+                            default=[''],
+                            help="""\
+                            Print the given string before the tags (use quotes to include spaces).""")
+        parser.add_argument("-s", "--suffix",
+                            metavar="STRING",
+                            nargs=1,
+                            default=[''],
+                            help="""\
+                            Print the given string after the tags (use quotes to include spaces).""")
 
     def execute(self,
                 parsing_settings: ParsingSettings,
                 source: SourceReference,
                 args: argparse.Namespace) -> list:
-        return [ProcessorForTagsPrint(source)]
+        return [ProcessorForTagsPrint(source,
+                                      args.prefix[0],
+                                      args.suffix[0])]
 
 
 class TagsSubCommandForSet(TagsSubCommandForListOfTagsArgumentsBase):

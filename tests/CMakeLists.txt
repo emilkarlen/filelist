@@ -113,6 +113,7 @@ testcase (tags add)
 testcase (tags remove)
 testcase (tags invalid-command)
 testcase (tags print)
+testcase (tags print-prefix-suffix)
 # testcase (tags stack-push)
 # testcase (tags stack-push-pop)
 
