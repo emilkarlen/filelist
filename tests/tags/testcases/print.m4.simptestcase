@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# WHEN the tags print command is issued
+# THEN the current tags
+# SHOULD be printed on a single line in alphanumerical order.
+#
+
+m4_include(common.m4)
+
+name:tags-print
+home:..
+
+setup.install:data/print.list
+
+test.run.cmdline:M4_EXECUTABLE print.list
+
+check.exitcode:0
+check.stdout.file.eq:output/print.txt

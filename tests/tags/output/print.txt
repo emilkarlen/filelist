@@ -1,0 +1,5 @@
+# Empty set of tags
+
+
+# Non-empty set of tags
+tag1 tag2

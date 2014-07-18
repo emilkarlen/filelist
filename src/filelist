@@ -417,6 +417,10 @@ class TagsRenditionSettings:
         return self._concatenate(self._render_tags_string(tags),
                                  path)
 
+    def render_print_tags(self,
+                          tags: frozenset):
+        return self._render_tags_string(tags)
+
     @staticmethod
     def _render_tags_string(tags: frozenset) -> str:
         # TODO improve impl, à la join, ...
@@ -458,7 +462,7 @@ class RenditionSettings:
 
 class RenditionEnvironment(ResultItemsConstructionEnvironment):
     """
-    ResultItemsConstructionEnvironment used during the rendition of a ResultItem.
+    Environment used during the rendition of a ResultItem.
     """
 
     @staticmethod
@@ -481,10 +485,10 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
                  tags: Tags,
                  rendition_settings: RenditionSettings):
         ResultItemsConstructionEnvironment.__init__(self,
-                             from_curr_dir,
-                             from_top_level_file,
-                             filter_tags_or_none,
-                             tags)
+                                                    from_curr_dir,
+                                                    from_top_level_file,
+                                                    filter_tags_or_none,
+                                                    tags)
         self.rendition_settings = rendition_settings
 
     def render_file_path(self,
@@ -1245,6 +1249,19 @@ class InstructionArgumentParserForShell(InstructionArgumentParser):
 ###############################################################################
 
 
+class ResultItemForTagsPrint(ResultItem):
+    """
+    An result item that prints tags.
+    """
+    def __init__(self,
+                 tags: frozenset):
+        self._tags = tags
+
+    def render(self,
+               env: RenditionEnvironment) -> str:
+        return env.rendition_settings.tags_settings.render_print_tags(self._tags)
+
+
 class ProcessorForTagsAdd(Processor):
     """
     An instruction that adds tags in the environment.
@@ -1262,21 +1279,18 @@ class ProcessorForTagsAdd(Processor):
         return iter([])
 
 
-class ProcessorForTagsAdd(Processor):
+class ProcessorForTagsPrint(Processor):
     """
     An instruction that adds tags in the environment.
     """
     def __init__(self,
-                 source: SourceReference,
-                 tags: list):
+                 source: SourceReference):
         Processor.__init__(self, source)
-        self._tags = tags
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
-        env.tags().add(self._tags)
-        return iter([])
+        return iter([ResultItemForTagsPrint(env.tags().frozen_tags())])
 
 
 class ProcessorForTagsRemove(Processor):
@@ -1361,7 +1375,7 @@ class TagsSubCommandForPrint(InstructionSubCommand):
                 parsing_settings: ParsingSettings,
                 source: SourceReference,
                 args: argparse.Namespace) -> list:
-        return [self.processor_class(source, args.tags)]
+        return [ProcessorForTagsPrint(source)]
 
 
 class TagsSubCommandForSet(TagsSubCommandForListOfTagsArgumentsBase):
