@@ -1,6 +1,12 @@
+###############################################################################
+# This file should be included at the top of every test case file
+#
 # Configuration and values common to all tests.
-
+#
 # All variables declared have the prefix "M4".
+###############################################################################
+
+application:filelist
 
 # Aboslute name of the test directory.
 m4_define(`M4_TEST_DIR',`@CMAKE_CURRENT_SOURCE_DIR@')

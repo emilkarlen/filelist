@@ -6,7 +6,6 @@
 
 m4_include(common.m4)
 
-application:file-name-lister
 name:include-existing-dir
 home:..
 

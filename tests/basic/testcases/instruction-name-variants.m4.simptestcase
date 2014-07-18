@@ -6,7 +6,6 @@ m4_include(common.m4)
 # Tests variants of the instruction names.
 #
 
-application:file-name-lister
 name:instruction-name-variants
 home:..
 

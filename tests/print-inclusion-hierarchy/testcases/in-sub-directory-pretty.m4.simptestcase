@@ -8,7 +8,6 @@
 
 m4_include(common.m4)
 
-application:file-name-lister
 name:in-sub-directory-pretty
 home:..
 

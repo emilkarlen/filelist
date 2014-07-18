@@ -2,7 +2,6 @@
 
 m4_include(common.m4)
 
-application:file-name-lister
 name:normalize-paths
 home:..
 
