@@ -116,7 +116,7 @@ testcase (tags print)
 testcase (tags print-prefix-suffix)
 testcase (tags stack-push)
 testcase (tags stack-pop-empty-stack)
-# testcase (tags stack-push-pop)
+testcase (tags stack-push-pop)
 
 testcase (shell successful-command-in-same-dir-with-valid-output)
 testcase (shell successful-command-in-same-dir-with-invalid-output)

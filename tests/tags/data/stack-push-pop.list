@@ -1,0 +1,25 @@
+@print # Setting and pushing #1
+@tags set push-1
+@tags push
+@tags print
+
+@print
+@print # Setting and pushing #2
+@tags set push-2
+@tags push
+@tags print
+
+@print
+@print # Setting current tags
+@tags set different-from-pushed-tags
+@tags print
+
+@print
+@print # Popping #2
+@tags pop
+@tags print
+
+@print
+@print # Popping #1
+@tags pop
+@tags print

@@ -1,0 +1,14 @@
+# Setting and pushing #1
+push-1
+
+# Setting and pushing #2
+push-2
+
+# Setting current tags
+different-from-pushed-tags
+
+# Popping #2
+push-2
+
+# Popping #1
+push-1
