@@ -1,0 +1,16 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+name:absolute-file-paths-existing-with-output-absolute-name
+home:..
+
+setup.install:data
+setup.run.cmdline:ex -s -c g:CURRENT_DIRECTORY:s:CURRENT_DIRECTORY:${SIMPTEST_TESTROOT}:g -c x data/absolute-file-paths-existing.list
+
+test.run.cmdline:M4_EXECUTABLE --absolute-paths data/absolute-file-paths-existing.list
+
+check.prepare.replace-SIMPTEST-envvars/stdout
+
+check.exitcode:0
+check.stdout.file.eq/replaced:output/absolute-file-paths-existing.txt
