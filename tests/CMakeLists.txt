@@ -76,6 +76,7 @@ testcase (file-path absolute-file-paths-existing)
 testcase (file-path absolute-file-paths-nonexisting)
 
 testcase (list existing-directory)
+testcase (list existing-directory-absolute)
 testcase (list existing-directory-relative-file-argument)
 testcase (list wildcards)
 testcase (list invalid-wildcard)
