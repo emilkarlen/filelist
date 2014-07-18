@@ -20,15 +20,12 @@ Use same strategy as for how the argparser is used for sub-commands (those of
    Make it possible to specify the prefix for instruction lines via a command
    line switch.
 ** Tags
-*** Command for printing the current tags
-    Could have as options, line-prefix and -suffix.
 *** Filter on tags
 **** conditions
      The condition could be given by a single argument as a string.
      E.g. "all",  "any", "exactly".
 ***** print only paths that have _all_ the given tags
 ***** print only paths that have _exactly_ the given tags
-*** Push, pop
 ** List
 *** match file-name using reg-ex
 ** Include
