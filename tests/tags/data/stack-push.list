@@ -1,0 +1,9 @@
+@print # Empty set of tags
+@tags push
+@tags print
+
+@print
+@print # Non-empty set of tags
+@tags set tag1 tag2
+@tags push
+@tags print

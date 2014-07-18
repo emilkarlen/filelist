@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# WHEN tags are pushed
+# THEN the current tags
+# SHOULD be unaffected.
+#
+
+m4_include(common.m4)
+
+name:stack-push
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE data/stack-push.list
+
+check.exitcode:0
+check.stdout.file.eq:output/stack-push.txt

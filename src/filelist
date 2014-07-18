@@ -62,6 +62,7 @@ EXIT_SYNTAX = 4
 EXIT_PRE_PROCESSING = 5
 EXIT_FILE_DOES_NOT_EXIST = 8 + 0
 EXIT_SHELL_COMMAND_EXECUTION_ERROR = 8 + 1
+EXIT_TAGS_ERROR = 8 + 2
 
 
 ###############################################################################
@@ -277,6 +278,7 @@ class Tags:
     def __init__(self,
                  tags: list):
         self._as_froze_set = frozenset(tags)
+        self.tags_stack = []
 
     @staticmethod
     def new_empty():
@@ -288,9 +290,23 @@ class Tags:
     def frozen_tags(self) -> frozenset:
         return self._as_froze_set
 
+    def stack(self) -> list:
+        return self.tags_stack
+
+    def push(self):
+        self.tags_stack = [self.frozen_tags()] + self.tags_stack
+
+    def pop(self):
+        self.set_frozen_set(self.tags_stack[0])
+        del self.tags_stack[0]
+
     def set(self,
             tags: list):
-        self._as_froze_set = frozenset(tags)
+        self.set_frozen_set(frozenset(tags))
+
+    def set_frozen_set(self,
+                       tags: frozenset):
+        self._as_froze_set = tags
 
     def add(self,
             tags: list):
@@ -1278,6 +1294,26 @@ class InstructionArgumentParserForShell(InstructionArgumentParser):
 ###############################################################################
 
 
+class InstructionApplicationPopEmptyStackException(InstructionApplicationExceptionBase):
+    """
+    Indicates a POP command was used while the stack was empty.
+    """
+
+    def __init__(self,
+                 source: SourceReference):
+        InstructionApplicationExceptionBase.__init__(self,
+                                                     source,
+                                                     EXIT_TAGS_ERROR)
+
+    def render_sub_class_specifics(self,
+                                   source_line: SourceLineInFile,
+                                   o_stream):
+        write_lines(o_stream,
+                    [
+                        "Pop of tags while the tags stack was empty."
+                    ])
+
+
 class ResultItemForTagsPrint(ResultItem):
     """
     An result item that prints tags.
@@ -1332,6 +1368,38 @@ class ProcessorForTagsPrint(Processor):
         return iter([ResultItemForTagsPrint(env.tags().frozen_tags(),
                                             self._prefix,
                                             self._suffix)])
+
+
+class ProcessorForTagsPush(Processor):
+    """
+    An instruction that pushes the current tags to the tags stack.
+    """
+    def __init__(self,
+                 source: SourceReference):
+        Processor.__init__(self, source)
+
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
+        env.tags().push()
+        return iter([])
+
+
+class ProcessorForTagsPop(Processor):
+    """
+    An instruction that pops the current tags of the tags stack.
+    """
+    def __init__(self,
+                 source: SourceReference):
+        Processor.__init__(self, source)
+
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
+        if not env.tags().stack():
+            raise InstructionApplicationPopEmptyStackException(self.source)
+        env.tags().pop()
+        return iter([])
 
 
 class ProcessorForTagsRemove(Processor):
@@ -1435,6 +1503,53 @@ class TagsSubCommandForPrint(InstructionSubCommand):
                                       args.suffix[0])]
 
 
+class TagsSubCommandForPush(InstructionSubCommand):
+    """
+    The tags PUSH sub command
+    """
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        InstructionSubCommand.__init__(self,
+                                       name,
+                                       aliases,
+                                       """Pushes the current tags on the stack of tags.
+                                       The current tags are unaffected.""")
+
+    def add_arguments(self,
+                      parser: argparse.ArgumentParser):
+        pass
+
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
+        return [ProcessorForTagsPush(source)]
+
+
+class TagsSubCommandForPop(InstructionSubCommand):
+    """
+    The tags POP sub command
+    """
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        InstructionSubCommand.__init__(self,
+                                       name,
+                                       aliases,
+                                       "Pops tags from the tags stack and sets the current tags to these tags.")
+
+    def add_arguments(self,
+                      parser: argparse.ArgumentParser):
+        pass
+
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
+        return [ProcessorForTagsPop(source)]
+
+
 class TagsSubCommandForSet(TagsSubCommandForListOfTagsArgumentsBase):
     def __init__(self,
                  name: str,
@@ -1480,7 +1595,9 @@ class InstructionArgumentParserForTags(InstructionWithSubCommandsArgumentParser)
             self,
             [
                 TagsSubCommandForAdd("ADD", []),
+                TagsSubCommandForPop("POP", []),
                 TagsSubCommandForPrint("PRINT", []),
+                TagsSubCommandForPush("PUSH", []),
                 TagsSubCommandForRemove("REMOVE", ["RM"]),
                 TagsSubCommandForSet("SET", []),
             ],
