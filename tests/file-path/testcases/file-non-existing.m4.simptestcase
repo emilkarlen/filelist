@@ -5,9 +5,9 @@ m4_include(common.m4)
 name:referenced-file-does-not-exist
 home:..
 
-setup.install:testdata
+setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE testdata/file-non-existing.list
+test.run.cmdline:M4_EXECUTABLE data/file-non-existing.list
 
 check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
 check.stdout.empty

@@ -1,2 +1,2 @@
-testdata/existing-file.txt
-testdata/dir-with-listfile/include-existing-file.txt
+data/existing-file.txt
+data/dir-with-listfile/include-existing-file.txt

@@ -1,2 +1,2 @@
-testdata/existing-file.txt
-testdata/dir
+data/existing-file.txt
+data/dir

@@ -5,9 +5,9 @@ m4_include(common.m4)
 name:file-existing
 home:..
 
-setup.install:testdata
+setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE testdata/file-existing.list
+test.run.cmdline:M4_EXECUTABLE data/file-existing.list
 
 check.exitcode:0
 check.stdout.file.eq:output/file-existing.txt

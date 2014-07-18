@@ -5,9 +5,9 @@ m4_include(common.m4)
 name:multiple-file_arguments
 home:..
 
-setup.install:testdata
+setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE testdata/list-with-existing-in-same-dir.list testdata/dir-with-listfile/list-with-existing-file.list
+test.run.cmdline:M4_EXECUTABLE data/list-with-existing-in-same-dir.list data/dir-with-listfile/list-with-existing-file.list
 
 check.exitcode:0
 check.stdout.file.eq:output/multiple-file-arguments.txt
