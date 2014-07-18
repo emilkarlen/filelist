@@ -10,7 +10,7 @@ m4_include(common.m4)
 name:list-home-dir
 home:..
 
-setup.install:testdata/home-dir
+setup.install:data/home-dir
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST home-dir/list-home-dir.list | sort
 

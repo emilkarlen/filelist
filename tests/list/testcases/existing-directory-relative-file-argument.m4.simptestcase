@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:directory-existing-relative-file-argument
 home:..
 
-setup.install:testdata/existing-directory
+setup.install:data/existing-directory
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST existing-directory/existing-directory.list | sort
 

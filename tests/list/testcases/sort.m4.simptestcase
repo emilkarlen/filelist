@@ -24,7 +24,7 @@ m4_include(common.m4)
 name:sort
 home:..
 
-setup.install:testdata/sort
+setup.install:data/sort
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST sort/sort.list
 

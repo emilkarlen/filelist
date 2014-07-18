@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:list-existing-directory
 home:..
 
-setup.install:testdata/existing-directory
+setup.install:data/existing-directory
 
 test.run.cmdline:M4_EXECUTABLE existing-directory/existing-directory.list | sort
 

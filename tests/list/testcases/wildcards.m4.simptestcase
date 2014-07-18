@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:wildecards
 home:..
 
-setup.install:testdata/pattern-and-types
+setup.install:data/pattern-and-types
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-and-types/wildcards.list | sort
 

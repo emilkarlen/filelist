@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:invalid-wildcard
 home:..
 
-setup.install:testdata/pattern-and-types
+setup.install:data/pattern-and-types
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-and-types/invalid-wildcard.list
 

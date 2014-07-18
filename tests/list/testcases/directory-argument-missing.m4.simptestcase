@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:directory-argument-missing
 home:..
 
-setup.install:testdata/pattern-and-types
+setup.install:data/pattern-and-types
 
 test.run.cmdline:M4_EXECUTABLE pattern-and-types/directory-argument-missing.list
 
