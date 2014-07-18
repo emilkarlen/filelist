@@ -422,13 +422,7 @@ class TagsRenditionSettings:
         # TODO improve impl, à la join, ...
         sorted_tags = list(tags)
         sorted_tags.sort()
-        ret_val = ""
-        for tag in sorted_tags:
-            if ret_val == "":
-                ret_val = tag
-            else:
-                ret_val += " " + tag
-        return ret_val
+        return ' '.join(sorted_tags)
 
     def _concatenate(self,
                      tags_string: str,
@@ -1251,9 +1245,9 @@ class InstructionArgumentParserForShell(InstructionArgumentParser):
 ###############################################################################
 
 
-class ProcessorForTagsSet(Processor):
+class ProcessorForTagsAdd(Processor):
     """
-    An instruction that sets the tags in the environment.
+    An instruction that adds tags in the environment.
     """
     def __init__(self,
                  source: SourceReference,
@@ -1264,7 +1258,7 @@ class ProcessorForTagsSet(Processor):
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
-        env.tags().set(self._tags)
+        env.tags().add(self._tags)
         return iter([])
 
 
@@ -1305,6 +1299,23 @@ class ProcessorForTagsRemove(Processor):
         return iter([])
 
 
+class ProcessorForTagsSet(Processor):
+    """
+    An instruction that sets the tags in the environment.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 tags: list):
+        Processor.__init__(self, source)
+        self._tags = tags
+
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
+                             env: ResultItemsConstructionEnvironment):
+        env.tags().set(self._tags)
+        return iter([])
+
+
 class TagsSubCommandForListOfTagsArgumentsBase(InstructionSubCommand):
     """
     Base class for sub commands for the tags instruction with.
@@ -1324,6 +1335,27 @@ class TagsSubCommandForListOfTagsArgumentsBase(InstructionSubCommand):
                       parsing_settings: ParsingSettings,
                       parser: argparse.ArgumentParser):
         parser.add_argument('tags', nargs='*')
+
+    def execute(self,
+                parsing_settings: ParsingSettings,
+                source: SourceReference,
+                args: argparse.Namespace) -> list:
+        return [self.processor_class(source, args.tags)]
+
+
+class TagsSubCommandForPrint(InstructionSubCommand):
+    """
+    The tags PRINT sub command
+    """
+    def __init__(self,
+                 name: str,
+                 aliases: list):
+        InstructionSubCommand.__init__(self, name, aliases)
+
+    def add_arguments(self,
+                      parsing_settings: ParsingSettings,
+                      parser: argparse.ArgumentParser):
+        pass
 
     def execute(self,
                 parsing_settings: ParsingSettings,
@@ -1372,9 +1404,10 @@ class InstructionArgumentParserForTags(InstructionWithSubCommandsArgumentParser)
         InstructionWithSubCommandsArgumentParser.__init__(
             self,
             [
-                TagsSubCommandForSet("SET", []),
                 TagsSubCommandForAdd("ADD", []),
+                TagsSubCommandForPrint("PRINT", []),
                 TagsSubCommandForRemove("REMOVE", ["RM"]),
+                TagsSubCommandForSet("SET", []),
             ]
         )
 
