@@ -344,7 +344,10 @@ class ResultItemsConstructionEnvironment:
 
     def file_name_relative_current_dir_of_process(self,
                                                   file_name: str) -> str:
-        return self.fromCurrDir + file_name
+        if os.path.isabs(file_name):
+            return file_name
+        else:
+            return self.fromCurrDir + file_name
 
     def file_name_relative_top_level_source_file(self,
                                                  file_name: str) -> str:
@@ -787,7 +790,7 @@ class ProcessorForPrint(Processor):
 ###############################################################################
 
 
-class InstructionApplicationExceptionForShell(InstructionApplicationException):
+class InstructionApplicationForShellException(InstructionApplicationException):
     def __init__(self,
                  source: SourceReference,
                  called_process_error: subprocess.CalledProcessError):
@@ -840,7 +843,7 @@ class ProcessorForShell(Processor):
                                                            env,
                                                            iter(file_names)).__iter__()
         except subprocess.CalledProcessError as ex:
-            raise InstructionApplicationExceptionForShell(self.source, ex)
+            raise InstructionApplicationForShellException(self.source, ex)
 
 
 ###############################################################################

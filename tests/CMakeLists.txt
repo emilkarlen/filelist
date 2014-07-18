@@ -72,6 +72,7 @@ testcase (file-path file-existing)
 testcase (file-path file-existing-relative-file-argument)
 testcase (file-path file-existing-with-suppress-non-path-output)
 testcase (file-path file-non-existing)
+testcase (file-path absolute-file-paths-existing)
 
 testcase (list existing-directory)
 testcase (list existing-directory-relative-file-argument)
