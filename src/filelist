@@ -430,10 +430,7 @@ class TagsRenditionSettings:
 
     @staticmethod
     def _render_tags_string(tags: frozenset) -> str:
-        # TODO improve impl, à la join, ...
-        sorted_tags = list(tags)
-        sorted_tags.sort()
-        return ' '.join(sorted_tags)
+        return ' '.join(sorted(tags))
 
     def _concatenate(self,
                      tags_string: str,
@@ -640,10 +637,10 @@ class WithSourceReferenceMixin:
             o_stream.write(os.linesep * 2)
 
 
-class InstructionApplicationException(WithSourceReferenceMixin, Exception):
+class InstructionApplicationExceptionBase(WithSourceReferenceMixin, Exception):
     """
-    Indicates failure of an instruction to produce one of
-    its ResultItem:s.
+    Base class for exceptions that indicates failure of an instruction
+    to produce one of its ResultItem:s.
     """
 
     def __init__(self,
@@ -747,7 +744,7 @@ class ResultItemIterableForFile:
 ###############################################################################
 
 
-class InstructionApplicationForMissingFileException(InstructionApplicationException):
+class InstructionApplicationForMissingFileException(InstructionApplicationExceptionBase):
     """
     Indicates that a referenced file does not exist.
     """
@@ -755,7 +752,7 @@ class InstructionApplicationForMissingFileException(InstructionApplicationExcept
     def __init__(self,
                  source: SourceReference,
                  file_name_relative_current_dir_of_process: str):
-        InstructionApplicationException.__init__(self,
+        InstructionApplicationExceptionBase.__init__(self,
                                                  source,
                                                  EXIT_FILE_DOES_NOT_EXIST)
         self.file_name_relative_current_dir_of_process = file_name_relative_current_dir_of_process
@@ -795,11 +792,11 @@ class ProcessorForPrint(Processor):
 ###############################################################################
 
 
-class InstructionApplicationForShellException(InstructionApplicationException):
+class InstructionApplicationForShellException(InstructionApplicationExceptionBase):
     def __init__(self,
                  source: SourceReference,
                  called_process_error: subprocess.CalledProcessError):
-        InstructionApplicationException.__init__(self,
+        InstructionApplicationExceptionBase.__init__(self,
                                                  source,
                                                  EXIT_SHELL_COMMAND_EXECUTION_ERROR)
         self._called_process_error = called_process_error
@@ -1164,12 +1161,13 @@ class InstructionSubCommand:
     """
     def __init__(self,
                  name: str,
-                 aliases: list):
+                 aliases: list,
+                 help_text: str):
         self.name = name
         self.aliases = aliases
+        self.help_text = help_text
 
     def add_arguments(self,
-                      parsing_settings: ParsingSettings,
                       parser: argparse.ArgumentParser):
         raise NotImplementedError()
 
@@ -1187,32 +1185,52 @@ class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
     """Argument parser for instructions with sub commands."""
 
     def __init__(self,
-                 sub_commands: list):
+                 sub_commands: list,
+                 command_name_for_help_text: str,
+                 title_for_help_text: str,
+                 description_for_help_text: str):
         self.sub_commands = sub_commands
+        self._sub_command_parsers = {}
+        self._parser = argparse.ArgumentParser(prog=command_name_for_help_text,
+                                               add_help=False)
+        self._set_sub_commands(self._parser, title_for_help_text, description_for_help_text)
 
-    def parser(self,
-               parsing_settings: ParsingSettings) -> argparse.ArgumentParser:
-        parser = argparse.ArgumentParser()
-        subparsers = parser.add_subparsers()
-        for sub_command in self.sub_commands:
-            sub_parser = subparsers.add_parser(sub_command.name,
-                                               aliases=sub_command.aliases)
-            sub_command.add_arguments(parsing_settings, sub_parser)
-            sub_parser.set_defaults(func=sub_command)
-        return parser
+    def arg_parser(self) -> argparse.ArgumentParser:
+        return self._parser
+
+    def sub_command_parsers(self) -> dict:
+        """
+        :return: Dict SUB-COMMAND -> argparse.ArgumentParser
+        """
+        return self._sub_command_parsers
 
     def apply(self,
               parsing_settings: ParsingSettings,
               source: SourceReference,
               instruction_argument: str):
 
-        parser = self.parser(parsing_settings)
         prepared_args = self._split_command_line_and_make_first_string_uppercase(instruction_argument)
         try:
-            args = raise_exception_instead_of_exiting_on_error(parser, prepared_args)
+            args = raise_exception_instead_of_exiting_on_error(self.arg_parser(), prepared_args)
             return args.func.execute(parsing_settings, source, args)
         except ArgumentParsingException as ex:
             raise InstructionArgumentParserSyntaxErrorException([ex.error_message])
+
+    def _set_sub_commands(self,
+                          parser: argparse.ArgumentParser,
+                          title_for_help_text: str,
+                          description_for_help_text: str) -> argparse.ArgumentParser:
+        subparsers = parser.add_subparsers(title=title_for_help_text,
+                                           description=description_for_help_text)
+        for sub_command in self.sub_commands:
+            sub_parser = subparsers.add_parser(sub_command.name,
+                                               add_help=False,
+                                               aliases=sub_command.aliases,
+                                               help=sub_command.help_text)
+            sub_command.add_arguments(sub_parser)
+            sub_parser.set_defaults(func=sub_command)
+            self._sub_command_parsers[sub_command.name] = sub_parser
+        return parser
 
     @staticmethod
     def _split_command_line_and_make_first_string_uppercase(command_line: str):
@@ -1364,14 +1382,15 @@ class TagsSubCommandForListOfTagsArgumentsBase(InstructionSubCommand):
     def __init__(self,
                  name: str,
                  aliases: list,
+                 help_text: str,
                  processor_class):
-        InstructionSubCommand.__init__(self, name, aliases)
+        InstructionSubCommand.__init__(self, name, aliases, help_text)
         self.processor_class = processor_class
 
     def add_arguments(self,
-                      parsing_settings: ParsingSettings,
                       parser: argparse.ArgumentParser):
-        parser.add_argument('tags', nargs='*')
+        parser.add_argument('tags', nargs='*',
+                            metavar="TAG")
 
     def execute(self,
                 parsing_settings: ParsingSettings,
@@ -1387,23 +1406,25 @@ class TagsSubCommandForPrint(InstructionSubCommand):
     def __init__(self,
                  name: str,
                  aliases: list):
-        InstructionSubCommand.__init__(self, name, aliases)
+        InstructionSubCommand.__init__(self,
+                                       name,
+                                       aliases,
+                                       "Prints the current set of tags listed in alphanumeric order.")
 
     def add_arguments(self,
-                      parsing_settings: ParsingSettings,
                       parser: argparse.ArgumentParser):
         parser.add_argument("-p", "--prefix",
                             metavar="STRING",
                             nargs=1,
                             default=[''],
                             help="""\
-                            Print the given string before the tags (use quotes to include spaces).""")
+                            Print the given string before the tags. (Use quotes to include space.)""")
         parser.add_argument("-s", "--suffix",
                             metavar="STRING",
                             nargs=1,
                             default=[''],
                             help="""\
-                            Print the given string after the tags (use quotes to include spaces).""")
+                            Print the given string after the tags. (Use quotes to include space.)""")
 
     def execute(self,
                 parsing_settings: ParsingSettings,
@@ -1422,6 +1443,7 @@ class TagsSubCommandForSet(TagsSubCommandForListOfTagsArgumentsBase):
             self,
             name,
             aliases,
+            "Sets the current set of tags to the given tags.",
             ProcessorForTagsSet)
 
 
@@ -1433,6 +1455,7 @@ class TagsSubCommandForAdd(TagsSubCommandForListOfTagsArgumentsBase):
             self,
             name,
             aliases,
+            "Adds the given tags to the current set of tags.",
             ProcessorForTagsAdd)
 
 
@@ -1444,13 +1467,15 @@ class TagsSubCommandForRemove(TagsSubCommandForListOfTagsArgumentsBase):
             self,
             name,
             aliases,
+            "Removes the given tags to the current set of tags. If no tags are given, then all tags are removed.",
             ProcessorForTagsRemove)
 
 
 class InstructionArgumentParserForTags(InstructionWithSubCommandsArgumentParser):
     """Parser for the tag instruction."""
 
-    def __init__(self):
+    def __init__(self,
+                 command_name_for_help_text: str):
         InstructionWithSubCommandsArgumentParser.__init__(
             self,
             [
@@ -1458,8 +1483,14 @@ class InstructionArgumentParserForTags(InstructionWithSubCommandsArgumentParser)
                 TagsSubCommandForPrint("PRINT", []),
                 TagsSubCommandForRemove("REMOVE", ["RM"]),
                 TagsSubCommandForSet("SET", []),
-            ]
-        )
+            ],
+            command_name_for_help_text,
+            "Tags sub commands",
+            """\
+            Manages a set of tags that will be associated with file paths.
+            Each file path is associated with the "current" set of tags.
+            Some of the sub commands modify this "current" set of tags.
+            Each "tag" is a string without whitespace or comma.""")
 
 
 ###############################################################################
@@ -2014,6 +2045,14 @@ class PrettyHierarchyPrinter(HierarchyPrinter):
 
 class InstructionDescription:
     """Detailed description of an instruction."""
+    def render_as_lines(self,
+                        wrapper: textwrap.TextWrapper) -> list:
+        """Renders the description as a list of lines."""
+        raise NotImplementedError()
+
+
+class InstructionDescriptionExplicit(InstructionDescription):
+    """Detailed description of an instruction."""
     def __init__(self,
                  one_line_description: str,
                  arguments_syntax: str,
@@ -2062,6 +2101,47 @@ class InstructionDescription:
             return []
 
 
+class InstructionDescriptionForInstructionWithSubCommands(InstructionDescription):
+    """Detailed description of an instruction that has sub commands."""
+
+    SUB_COMMAND_DETAILS_INDENT = "  "
+
+    def __init__(self,
+                 parser: InstructionWithSubCommandsArgumentParser):
+        self._parser = parser
+
+    def render_as_lines(self,
+                        wrapper: textwrap.TextWrapper) -> list:
+        ret_val = self.string_as_lines(wrapper,
+                                     self._parser.arg_parser().format_help())
+        for sub_command in sorted(self._parser.sub_command_parsers().keys()):
+            ret_val.extend([''])
+            arg_parser = self._parser.sub_command_parsers()[sub_command]
+            ret_val.extend(self.string_as_lines_add_indent_to_non_first_line(wrapper, arg_parser.format_help()))
+
+        return ret_val
+
+    @staticmethod
+    def string_as_lines(wrapper: textwrap.TextWrapper,
+                        lines_string: str):
+        return [wrapper.initial_indent + line
+                for line in lines_string.splitlines()]
+
+    @staticmethod
+    def string_as_lines_add_indent_to_non_first_line(wrapper: textwrap.TextWrapper,
+                                                     lines_string: str):
+        lines = lines_string.splitlines()
+        ret_val = []
+        if lines:
+            indent = wrapper.initial_indent
+            ret_val.append(wrapper.initial_indent +
+                           lines[0])
+            indent += InstructionDescriptionForInstructionWithSubCommands.SUB_COMMAND_DETAILS_INDENT
+            ret_val.extend([indent + line
+                            for line in lines[1:]])
+        return ret_val
+
+
 class InstructionConfiguration:
     """Complete information about an instruction."""
 
@@ -2074,6 +2154,15 @@ class InstructionConfiguration:
         self.name_aliases = name_aliases
         self.description = description
         self.argument_parser = argument_parser
+
+    @staticmethod
+    def for_instruction_with_sub_commands(long_name: str,
+                                          name_aliases: list,
+                                          argument_parser: InstructionWithSubCommandsArgumentParser):
+        return InstructionConfiguration(long_name,
+                                        name_aliases,
+                                        InstructionDescriptionForInstructionWithSubCommands(argument_parser),
+                                        argument_parser)
 
     def render_as_lines(self,
                         wrapper: textwrap.TextWrapper) -> list:
@@ -2091,10 +2180,10 @@ class InstructionConfiguration:
         return wrapper.wrap(self.long_name + " " + str(self.name_aliases))
 
 
-description_of_include = InstructionDescription(
+description_of_include = InstructionDescriptionExplicit(
     "Includes instructions from a file.",
     "FILE",
-    [("FIE",
+    [("FILE",
      """\
      A readable file, who's name is relative the including file.
      """)
@@ -2105,7 +2194,7 @@ description_of_include = InstructionDescription(
     """
 )
 
-description_of_directory_list = InstructionDescription(
+description_of_directory_list = InstructionDescriptionExplicit(
     "Prints paths of the files inside a directory.",
     "DIRECTORY [-t | --type TYPE] [-s | --sort] [PATTERN...]",
     [("DIRECTORY",
@@ -2137,7 +2226,7 @@ description_of_directory_list = InstructionDescription(
     None
 )
 
-description_of_print = InstructionDescription(
+description_of_print = InstructionDescriptionExplicit(
     "Outputs the argument.",
     "[STRING]",
     [("STRING",
@@ -2153,7 +2242,7 @@ description_of_print = InstructionDescription(
     """
 )
 
-description_of_shell = InstructionDescription(
+description_of_shell = InstructionDescriptionExplicit(
     "Retrieve file names by executing a shell command.",
     "COMMAND-LINE",
     [("COMMAND-LINE",
@@ -2167,26 +2256,6 @@ description_of_shell = InstructionDescription(
     Each line of the output from this command is treated as if
     it was a file-path on a line of the list-file itself.
     """
-)
-
-description_of_tags = InstructionDescription(
-    """\
-    Manages a set of tags that will be associated with file paths
-    that appear after this instruction. These tags are associated
-    with all file paths until the following modification of the
-    tags.
-    SET - sets a constant set of tags.
-    ADD - adds the given tags to the current set.
-    REMOVE - removes the given tags from the current set;
-    or removes all tags if no tags are given.
-    """,
-    "[SET | ADD | REMOVE] TAG...",
-    [("TAG",
-     """\
-     A string without white space.
-     """)
-     ],
-    None
 )
 
 blank_line = ""
@@ -2270,10 +2339,9 @@ instruction_configurations = [
                              [],
                              description_of_shell,
                              InstructionArgumentParserForShell()),
-    InstructionConfiguration("TAGS",
-                             ["T"],
-                             description_of_tags,
-                             InstructionArgumentParserForTags()),
+    InstructionConfiguration.for_instruction_with_sub_commands("TAGS",
+                                                               ["T"],
+                                                               InstructionArgumentParserForTags("TAGS")),
 ]
 
 
@@ -2456,7 +2524,7 @@ def main():
         ex.render(sys.stderr)
         sys.exit(EXIT_SYNTAX)
 
-    except InstructionApplicationException as ex:
+    except InstructionApplicationExceptionBase as ex:
         ex.render(sys.stderr)
         sys.exit(ex.exitCode)
 
