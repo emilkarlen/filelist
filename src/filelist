@@ -44,8 +44,6 @@
 ###############################################################################
 
 
-from types import FunctionType
-
 import sys
 import os
 import argparse
@@ -335,15 +333,6 @@ class ResultItemsConstructionEnvironment:
         self.filter_tags_or_none = filter_tags_or_none
         self._tags = tags
 
-    @staticmethod
-    def new_for_top_level_file(self,
-                               from_curr_dir: str,
-                               from_top_level_file: str,
-                               filter_tags_or_none: frozenset):
-        return ResultItemsConstructionEnvironment(from_curr_dir,
-                                                  from_top_level_file,
-                                                  filter_tags_or_none)
-
     def new_for_directory(self, name_of_directory):
         if name_of_directory == ".":
             return self.copy()
@@ -523,7 +512,6 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
 
     def _render_file_name_according_to_settings(self,
                                                 file_name: str) -> str:
-        ret_val = file_name
         if self.rendition_settings.file_names_are_relative_file_argument_location:
             ret_val = self.file_name_relative_top_level_source_file(file_name)
         else:
@@ -769,8 +757,8 @@ class InstructionApplicationForMissingFileException(InstructionApplicationExcept
                  source: SourceReference,
                  file_name_relative_current_dir_of_process: str):
         InstructionApplicationExceptionBase.__init__(self,
-                                                 source,
-                                                 EXIT_FILE_DOES_NOT_EXIST)
+                                                     source,
+                                                     EXIT_FILE_DOES_NOT_EXIST)
         self.file_name_relative_current_dir_of_process = file_name_relative_current_dir_of_process
 
     def render_sub_class_specifics(self,
@@ -813,8 +801,8 @@ class InstructionApplicationForShellException(InstructionApplicationExceptionBas
                  source: SourceReference,
                  called_process_error: subprocess.CalledProcessError):
         InstructionApplicationExceptionBase.__init__(self,
-                                                 source,
-                                                 EXIT_SHELL_COMMAND_EXECUTION_ERROR)
+                                                     source,
+                                                     EXIT_SHELL_COMMAND_EXECUTION_ERROR)
         self._called_process_error = called_process_error
 
     def render_sub_class_specifics(self,
