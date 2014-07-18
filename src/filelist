@@ -215,11 +215,17 @@ class SourceLineInFile:
         self.line = line
 
     def err_msg_file_ref(self):
-        return "File \"" + self.file_name + "\", line " + str(self.line.number)
+        return " ".join(["File",
+                         "\"" + self.file_name + "\",",
+                         "line",
+                         str(self.line.number)])
+
+    def err_msg_line_contents(self):
+        return ERROR_MESSAGE_INDENT_STRING + self.line.contents
 
     def err_msg_file_ref_with_source_line(self):
-        return "File \"" + self.file_name + "\", line " + str(self.line.number) + \
-               "\n  " + self.line.contents
+        return os.linesep.join([self.err_msg_file_ref(),
+                                self.err_msg_line_contents()])
 
 
 class IncludeFileChain:
@@ -631,7 +637,7 @@ class WithSourceReferenceMixin:
     def render_source_line_chain(self, o_stream):
         for include in self._source.as_include_file_chain().from_top_to_bottom():
             o_stream.write(include.err_msg_file_ref_with_source_line())
-            o_stream.write("\n\n")
+            o_stream.write(os.linesep * 2)
 
 
 class InstructionApplicationException(WithSourceReferenceMixin, Exception):
@@ -1110,7 +1116,7 @@ class InstructionArgumentSyntaxErrorException(InstructionSyntaxErrorException):
     def __init__(self,
                  source: SourceReference,
                  lines: list):
-        description = "\n".join(lines)
+        description = os.linesep.join(lines)
         InstructionSyntaxErrorException.__init__(self,
                                                  source,
                                                  description)
@@ -1184,11 +1190,8 @@ class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
                  sub_commands: list):
         self.sub_commands = sub_commands
 
-    def apply(self,
-              parsing_settings: ParsingSettings,
-              source: SourceReference,
-              instruction_argument: str):
-
+    def parser(self,
+               parsing_settings: ParsingSettings) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser()
         subparsers = parser.add_subparsers()
         for sub_command in self.sub_commands:
@@ -1196,7 +1199,14 @@ class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
                                                aliases=sub_command.aliases)
             sub_command.add_arguments(parsing_settings, sub_parser)
             sub_parser.set_defaults(func=sub_command)
+        return parser
 
+    def apply(self,
+              parsing_settings: ParsingSettings,
+              source: SourceReference,
+              instruction_argument: str):
+
+        parser = self.parser(parsing_settings)
         prepared_args = self._split_command_line_and_make_first_string_uppercase(instruction_argument)
         try:
             args = raise_exception_instead_of_exiting_on_error(parser, prepared_args)
@@ -2286,9 +2296,9 @@ def program_description():
         if paragraph:
             lines += top_level_wrapper.wrap(textwrap.dedent(paragraph))
         else:
-            lines.append("\n")
+            lines.append(os.linesep)
     lines += instruction_configurations_lines(instruction_wrapper)
-    return "\n".join(lines)
+    return os.linesep.join(lines)
 
 
 def instruction_identifier_to_parser_dict() -> dict:
