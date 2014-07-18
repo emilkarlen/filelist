@@ -65,6 +65,7 @@ A variant of this is to print only INCLUDE instructions, to get
 an overview of all references.
 
 * Build system
+** Derive path of python3
 ** Support parallell builds
    Current, only one build is supported, since the file
    tests/common.m4.in
