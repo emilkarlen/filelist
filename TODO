@@ -24,14 +24,6 @@ Use same strategy as for how the argparser is used for sub-commands (those of
 ** Customize the instruction token
    Make it possible to specify the prefix for instruction lines via a command
    line switch.
-** Allow comments at end of line for lines with file
-Reason it has not been done is,
-1. lack of time
-2. it could be useful to allow all form of names of files.
-   Especially if file-existence is not check.  In that case,
-   the comment character could be interpreted later down
-   the pipe.
-** Strip ws at both ends of paths
 ** Tags
 *** Command for printing the current tags
     Could have as options, line-prefix and -suffix.
@@ -57,8 +49,18 @@ argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
 ** File
 *** absolute filenames
+*** Switches for turning on/off checking the existence of files
+*** Strip ws at both ends of paths
+*** Allow comments at end of line for lines with file
+Reason it has not been done is,
+1. lack of time
+2. it could be useful to allow all form of names of files.
+   Especially if file-existence is not check.  In that case,
+   the comment character could be interpreted later down
+   the pipe.
+** Print
+*** Improve layout of pretty-printed tree
 * Features
-** Switches for turning on/off checking the existence of files
 ** stdin as FILE argument
 File
 ** Flatten file
