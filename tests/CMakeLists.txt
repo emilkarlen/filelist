@@ -88,6 +88,7 @@ testcase (list sort)
 
 testcase (include existing--relative-file-argument)
 testcase (include existing-in-same-dir)
+testcase (include existing-in-same-dir-absolute-filename)
 testcase (include existing-in-subdir)
 testcase (include non-existing)
 testcase (include existing-dir)

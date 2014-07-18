@@ -15,11 +15,6 @@
 I believe this is not tested.
 Use same strategy as for how the argparser is used for sub-commands (those of
 @tags, e.g.).
-** Handling of abolute file names
-   Currently, all file names are assumed to be relative.
-   A prefix is added to each name, consising of the path
-   from the command line current dir, to the file name.
-
 * Improvements
 ** Customize the instruction token
    Make it possible to specify the prefix for instruction lines via a command
@@ -37,7 +32,6 @@ Use same strategy as for how the argparser is used for sub-commands (those of
 ** List
 *** match file-name using reg-ex
 ** Include
-*** absolute filenames
 *** option to preserve "home directory" of that of the including file
     Usefull, e.g., for including a "standard list" that lists files that
     exist in many directories.
@@ -48,7 +42,6 @@ It is a minor issue, since the preprocessor is independent of the file
 argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
 ** File
-*** absolute filenames
 *** Switches for turning on/off checking the existence of files
 *** Strip ws at both ends of paths
 *** Allow comments at end of line for lines with file

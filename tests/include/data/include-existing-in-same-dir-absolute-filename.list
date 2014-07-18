@@ -1,0 +1,3 @@
+existing-file.txt
+@INCLUDE CURRENT_DIRECTORY/data/list-with-existing-in-same-dir.list
+existing-file.txt

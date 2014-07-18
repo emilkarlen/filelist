@@ -1,0 +1,3 @@
+data/existing-file.txt
+__SIMPTEST_TESTROOT__/data/existing-file.txt
+data/existing-file.txt
