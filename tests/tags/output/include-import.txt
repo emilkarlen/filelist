@@ -1,1 +1,5 @@
+# Print tags
 the-tag
+
+# Output file-path
+data/existing-file-1.txt:the-tag

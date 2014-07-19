@@ -1,4 +1,9 @@
 @include list-that-sets-tags.list
 
 # This should print the tags set in the included file.
+@print # Print tags
 @tags print
+
+@print
+@print # Output file-path
+existing-file-1.txt
