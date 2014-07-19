@@ -3,6 +3,8 @@
 #
 # Tests that tags are exported to included files.
 #
+# The included file is located in the SAME directory.
+#
 
 m4_include(common.m4)
 
