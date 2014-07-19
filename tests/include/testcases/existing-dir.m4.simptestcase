@@ -1,7 +1,9 @@
 # -*- shell-script -*-
 
 #
-# It should be an error to try to include a directory.
+# WHEN The file argument to @include is a directory,
+# THEN the program
+# SHOULD exit with error status.
 #
 
 m4_include(common.m4)

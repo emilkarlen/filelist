@@ -1,0 +1,19 @@
+# Set tags and push them,
+# so that both current tags and the tags stack are modified.
+@tags set PUSHED-TAG-FROM-MAIN
+@tags push
+@tags set UNPUSHED-TAG-FROM-MAIN
+
+# Include file that modifies the tags
+# (both the current tags and the tags stack).
+@include --do-not-import-tags pop-tags-and-set-current-tags.list
+
+@print # The current tags should be unmodified
+@tags print
+existing-file-1.txt
+
+@print
+@print # The tags stack should be unmodified
+@tags pop
+@tags print
+existing-file-1.txt

@@ -1,0 +1,7 @@
+# The current tags should be unmodified
+UNPUSHED-TAG-FROM-MAIN
+existing-file-1.txt:UNPUSHED-TAG-FROM-MAIN
+
+# The tags stack should be unmodified
+PUSHED-TAG-FROM-MAIN
+existing-file-1.txt:PUSHED-TAG-FROM-MAIN
