@@ -358,8 +358,10 @@ class FileReferenceEnvironment:
 
     def file_name_relative_top_level_source_file(self,
                                                  file_name: str) -> str:
-        # TODO DIR-ENV check for abs file
-        return self.fromTopLevelFile + file_name
+        if os.path.isabs(file_name):
+            return file_name
+        else:
+            return self.fromTopLevelFile + file_name
 
     def _new_for_appended_dir(self,
                               dir_delta: str):
