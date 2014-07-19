@@ -15,6 +15,7 @@
    Make it possible to specify the prefix for instruction lines via a command
    line switch.
 ** Tags
+*** sub-command: print-stack (for debugging)
 *** Filter on tags
 **** conditions
      The condition could be given by a single argument as a string.
