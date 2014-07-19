@@ -383,34 +383,29 @@ class ResultItemsConstructionEnvironment:
                  dir_env: FileReferenceEnvironment,
                  filter_tags_or_none: frozenset,
                  tags: Tags):
-        self.dir_env = dir_env
+        self.file_ref_env = dir_env
         self.filter_tags_or_none = filter_tags_or_none
         self._tags = tags
 
     def new_for_directory(self, name_of_directory):
         return ResultItemsConstructionEnvironment(
-            self.dir_env.new_for_directory(name_of_directory),
+            self.file_ref_env.new_for_directory(name_of_directory),
             self.filter_tags_or_none,
             self._tags)
 
     def new_for_included_file(self, file_name_relative_include_file):
         return ResultItemsConstructionEnvironment(
-            self.dir_env.new_for_included_file(file_name_relative_include_file),
+            self.file_ref_env.new_for_included_file(file_name_relative_include_file),
             self.filter_tags_or_none,
             self._tags)
 
     def tags(self) -> Tags:
         return self._tags
 
-    def file_name_relative_current_dir_of_process(self,
-                                                  file_name: str) -> str:
-        # TODO DIR-ENV inline
-        return self.dir_env.file_name_relative_current_dir_of_process(file_name)
-
     def file_name_relative_top_level_source_file(self,
                                                  file_name: str) -> str:
         # TODO DIR-ENV inline
-        return self.dir_env.file_name_relative_top_level_source_file(file_name)
+        return self.file_ref_env.file_name_relative_top_level_source_file(file_name)
 
     def satisfies_tags_filter(self,
                               file_tags: frozenset) -> bool:
@@ -544,7 +539,7 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
         if self.rendition_settings.file_names_are_relative_file_argument_location:
             ret_val = self.file_name_relative_top_level_source_file(file_name)
         else:
-            ret_val = self.file_name_relative_current_dir_of_process(file_name)
+            ret_val = self.file_ref_env.file_name_relative_current_dir_of_process(file_name)
         if self.rendition_settings.normalize_paths:
             ret_val = os.path.normpath(ret_val)
         if self.rendition_settings.absolute_paths:
@@ -866,7 +861,7 @@ class ProcessorForShell(Processor):
         if not env.current_tags_satisfies_tags_filter():
             return iter([])
         try:
-            cwd = env.dir_env.fromCurrDir
+            cwd = env.file_ref_env.fromCurrDir
             if not cwd:
                 cwd = "."
             output = subprocess.check_output(self._command_line,
@@ -912,7 +907,7 @@ class ResultItemIteratorForFilesFromFileNames:
 
     def __next__(self):
         file_name = self._file_names_rel_list_file.__next__()
-        file_path = self._env.file_name_relative_current_dir_of_process(file_name)
+        file_path = self._env.file_ref_env.file_name_relative_current_dir_of_process(file_name)
         if not os.path.exists(file_path):
             raise InstructionApplicationForMissingFileException(self._source, file_path)
         result_item = ResultItemForFile(self._env.file_name_relative_top_level_source_file(file_name),
@@ -998,7 +993,7 @@ class ProcessorForDirectoryListing(Processor):
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
-        dir_path = env.file_name_relative_current_dir_of_process(self.settings.relative_directory_name)
+        dir_path = env.file_ref_env.file_name_relative_current_dir_of_process(self.settings.relative_directory_name)
         if not os.path.isdir(dir_path):
             raise InstructionApplicationForMissingFileException(self.source, dir_path)
         if not env.current_tags_satisfies_tags_filter():
@@ -1033,7 +1028,7 @@ class ProcessorForDirectoryListing(Processor):
             yield self._new_file_result(file_base_name, env)
 
     def _new_file_match_info(self, base_name: str) -> FileMatchInfo:
-        return FileMatchInfo(self.env_for_dir.file_name_relative_current_dir_of_process(base_name),
+        return FileMatchInfo(self.env_for_dir.file_ref_env.file_name_relative_current_dir_of_process(base_name),
                              base_name)
 
     def _new_file_result(self,
@@ -1088,7 +1083,7 @@ class ProcessorForInclude(Processor):
         Raises an exception if the file cannot be accessed correctly.
         """
         self._env_for_file = env.new_for_included_file(self._file_name_relative_including_file)
-        file_path = env.file_name_relative_current_dir_of_process(self._file_name_relative_including_file)
+        file_path = env.file_ref_env.file_name_relative_current_dir_of_process(self._file_name_relative_including_file)
         if not os.path.isfile(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
         file_parser = FileParser(parsing_settings,
