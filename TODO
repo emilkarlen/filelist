@@ -18,15 +18,14 @@
 *** Filter on tags
 **** conditions
      The condition could be given by a single argument as a string.
-     E.g. "all",  "any", "exactly".
-***** print only paths that have _all_ the given tags
-***** print only paths that have _exactly_ the given tags
+     E.g. "all",  "any", "exactly", "not-all", "not-any", "not-exactly".
 ** List
 *** match file-name using reg-ex
 ** Include
 *** option to preserve "home directory" of that of the including file
     Usefull, e.g., for including a "standard list" that lists files that
     exist in many directories.
+*** options to prevent export/import of tags
 ** Source-file info in PreprocessorException
 Currently, no source-info is included in case of error of preprocessor.
 
@@ -34,7 +33,8 @@ It is a minor issue, since the preprocessor is independent of the file
 argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
 ** File
-*** Switches for turning on/off checking the existence of files
+*** Options for turning on/off checking the existence of files
+*** Option for ignoring non-existing files
 *** Strip ws at both ends of paths
 *** Allow comments at end of line for lines with file
 Reason it has not been done is,
