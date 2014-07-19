@@ -1806,7 +1806,7 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
                             metavar="FILE",
                             nargs=1,
                             help="A readable file, who's name is relative the including file.")
-        parser.add_argument('-i', '--do-not-import-tags',
+        parser.add_argument('-I', '--do-not-import-tags',
                             action='store_const',
                             const=True,
                             default=False,
