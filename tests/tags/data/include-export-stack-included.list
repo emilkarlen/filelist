@@ -1,0 +1,7 @@
+@print # Current tags from included file
+@tags print
+
+@print
+@print # Pushed tags from included file
+@tags pop
+@tags print
