@@ -1,0 +1,5 @@
+# Current tags from main file
+not-pushed-tag
+
+# Pushed tags from main file
+pushed-tag

@@ -1,1 +1,1 @@
-data/existing-file-1.txt:the-tag
+the-tag

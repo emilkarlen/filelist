@@ -1,0 +1,9 @@
+@include include-import-stack-included.list
+
+@print # Current tags from main file
+@tags print
+
+@print
+@print # Pushed tags from main file
+@tags pop
+@tags print

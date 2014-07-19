@@ -1,4 +1,4 @@
 @include list-that-sets-tags.list
 
-# This file should have the tags set in the included file.
-existing-file-1.txt
+# This should print the tags set in the included file.
+@tags print

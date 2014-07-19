@@ -1,0 +1,3 @@
+@tags set pushed-tag
+@tags push
+@tags set not-pushed-tag
