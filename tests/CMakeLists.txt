@@ -1,7 +1,7 @@
 ###############################################################################
 # Copyright 2014 Emil Karlén.
 # 
-# This file is part of file-name-resolver.
+# This file is part of filelist.
 # 
 # Wilde is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(file-name-lister/test NONE)
+project(filelist/test NONE)
 
 
 find_program(SIMPTESTCASE simptestcase)
