@@ -61,9 +61,6 @@ A variant of this is to print only INCLUDE instructions, to get
 an overview of all references.
 
 * Check current functionality
-** Tests of import/export of tags
-   May need to have separate test cases for when the included file is in the
-   same directory and when it is in a different directory.
 ** Exporting of tags to following command line files
    Currently, I believe, tags are forwarded to later command line arguments.
    A consequence is that using a file as a single file argument may be
