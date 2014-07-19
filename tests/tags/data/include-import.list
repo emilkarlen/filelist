@@ -1,4 +1,4 @@
-@include list-that-sets-tags.list
+@include set-tags.list
 
 # This should print the tags set in the included file.
 @print # Print tags
