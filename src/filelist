@@ -283,10 +283,10 @@ class Tags:
     def new_empty():
         return Tags([], [])
 
-    def copy(self):
-        return Tags(list(self._as_froze_set),
-                    self.tags_stack)
-
+    # def __deepcopy__(self):
+    #     return Tags(list(self._as_froze_set),
+    #                 copy.deepcopy(self.tags_stack))
+    #
     def frozen_tags(self) -> frozenset:
         return self._as_froze_set
 
@@ -393,11 +393,14 @@ class ResultItemsConstructionEnvironment:
             self.filter_tags_or_none,
             self._tags)
 
-    def new_for_included_file(self, file_name_relative_include_file):
+    def new_for_included_file(self,
+                              file_name_relative_include_file: str,
+                              do_not_import_tags: bool):
+        tags = self._tags if not do_not_import_tags else copy.deepcopy(self._tags)
         return ResultItemsConstructionEnvironment(
             self.file_ref_env.new_for_included_file(file_name_relative_include_file),
             self.filter_tags_or_none,
-            self._tags)
+            tags)
 
     def tags(self) -> Tags:
         return self._tags
@@ -1044,9 +1047,11 @@ class ProcessorForInclude(Processor):
     """
     def __init__(self,
                  source: SourceReference,
-                 file_name_relative_include_file: str):
+                 file_name_relative_include_file: str,
+                 do_not_import_tags: bool):
         Processor.__init__(self, source)
         self._file_name_relative_including_file = file_name_relative_include_file
+        self._do_not_import_tags = do_not_import_tags
         self._env_for_file = None
         self._file_processor = None
 
@@ -1064,21 +1069,23 @@ class ProcessorForInclude(Processor):
 
     def _get_file_processor_and_env(self,
                                     parsing_settings: ParsingSettings,
-                                    env: ResultItemsConstructionEnvironment) -> tuple:
+                                    current_env: ResultItemsConstructionEnvironment) -> tuple:
         if self._file_processor is None:
-            self._set_file_processor_and_env(parsing_settings, env)
+            self._set_file_processor_and_env(parsing_settings, current_env)
         return self._file_processor, self._env_for_file
 
     def _set_file_processor_and_env(self,
                                     parsing_settings: ParsingSettings,
-                                    env: ResultItemsConstructionEnvironment):
+                                    current_env: ResultItemsConstructionEnvironment):
         """
         Sets self._file_processor, self._env_for_file.
 
         Raises an exception if the file cannot be accessed correctly.
         """
-        self._env_for_file = env.new_for_included_file(self._file_name_relative_including_file)
-        file_path = env.file_ref_env.file_name_relative_current_dir_of_process(self._file_name_relative_including_file)
+        self._env_for_file = current_env.new_for_included_file(self._file_name_relative_including_file,
+                                                               self._do_not_import_tags)
+        file_path = current_env.file_ref_env.file_name_relative_current_dir_of_process(
+            self._file_name_relative_including_file)
         if not os.path.isfile(file_path):
             raise InstructionApplicationForMissingFileException(self.source, file_path)
         file_parser = FileParser(parsing_settings,
@@ -1784,7 +1791,9 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
               source: SourceReference,
               instruction_argument: str):
         args = self._parse_argument(instruction_argument)
-        return [ProcessorForInclude(source, args.file[0])]
+        return [ProcessorForInclude(source,
+                                    args.file[0],
+                                    args.do_not_import_tags)]
 
     def arg_parser(self) -> argparse.ArgumentParser:
         return self._parser
@@ -1801,6 +1810,11 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
                             metavar="FILE",
                             nargs=1,
                             help="A readable file, who's name is relative the including file.")
+        parser.add_argument('-i', '--do-not-import-tags',
+                            action='store_const',
+                            const=True,
+                            default=False,
+                            help='Do not import any modifications of the tags from the included file.')
         return parser
 
 

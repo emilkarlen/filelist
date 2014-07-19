@@ -27,7 +27,6 @@
     Usefull, e.g., for including a "standard list" that lists files that
     exist in many directories.
 *** option to prevent export of tags
-*** option to prevent import of tags
 ** Source-file info in PreprocessorException
 Currently, no source-info is included in case of error of preprocessor.
 
