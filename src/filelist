@@ -402,11 +402,6 @@ class ResultItemsConstructionEnvironment:
     def tags(self) -> Tags:
         return self._tags
 
-    def file_name_relative_top_level_source_file(self,
-                                                 file_name: str) -> str:
-        # TODO DIR-ENV inline
-        return self.file_ref_env.file_name_relative_top_level_source_file(file_name)
-
     def satisfies_tags_filter(self,
                               file_tags: frozenset) -> bool:
         if self.filter_tags_or_none is None:
@@ -537,7 +532,7 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
     def _render_file_name_according_to_settings(self,
                                                 file_name: str) -> str:
         if self.rendition_settings.file_names_are_relative_file_argument_location:
-            ret_val = self.file_name_relative_top_level_source_file(file_name)
+            ret_val = self.file_ref_env.file_name_relative_top_level_source_file(file_name)
         else:
             ret_val = self.file_ref_env.file_name_relative_current_dir_of_process(file_name)
         if self.rendition_settings.normalize_paths:
@@ -910,7 +905,7 @@ class ResultItemIteratorForFilesFromFileNames:
         file_path = self._env.file_ref_env.file_name_relative_current_dir_of_process(file_name)
         if not os.path.exists(file_path):
             raise InstructionApplicationForMissingFileException(self._source, file_path)
-        result_item = ResultItemForFile(self._env.file_name_relative_top_level_source_file(file_name),
+        result_item = ResultItemForFile(self._env.file_ref_env.file_name_relative_top_level_source_file(file_name),
                                         self._tags)
         return result_item
 
@@ -1034,7 +1029,7 @@ class ProcessorForDirectoryListing(Processor):
     def _new_file_result(self,
                          base_name: str,
                          env: ResultItemsConstructionEnvironment) -> ResultItemForFile:
-        return ResultItemForFile(self.env_for_dir.file_name_relative_top_level_source_file(base_name),
+        return ResultItemForFile(self.env_for_dir.file_ref_env.file_name_relative_top_level_source_file(base_name),
                                  env.tags().frozen_tags())
 
 
