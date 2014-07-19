@@ -391,12 +391,24 @@ class ResultItemsConstructionEnvironment:
 
     def new_for_included_file(self,
                               file_name_relative_include_file: str,
+                              do_not_export_tags: bool,
                               do_not_import_tags: bool):
-        tags = self._tags if not do_not_import_tags else copy.deepcopy(self._tags)
         return ResultItemsConstructionEnvironment(
             self.file_ref_env.new_for_included_file(file_name_relative_include_file),
             self.filter_tags_or_none,
-            tags)
+            self._tags_for_included_file(do_not_export_tags, do_not_import_tags))
+
+    def _tags_for_included_file(self,
+                                do_not_export_tags: bool,
+                                do_not_import_tags: bool) -> Tags:
+        if do_not_export_tags:
+            if do_not_import_tags:
+                return Tags.new_empty()
+            else:
+                self._tags = Tags.new_empty()
+                return self._tags
+        else:
+            return self._tags if not do_not_import_tags else copy.deepcopy(self._tags)
 
     def tags(self) -> Tags:
         return self._tags
@@ -1044,9 +1056,11 @@ class ProcessorForInclude(Processor):
     def __init__(self,
                  source: SourceReference,
                  file_name_relative_include_file: str,
+                 do_not_export_tags: bool,
                  do_not_import_tags: bool):
         Processor.__init__(self, source)
         self._file_name_relative_including_file = file_name_relative_include_file
+        self._do_not_export_tags = do_not_export_tags
         self._do_not_import_tags = do_not_import_tags
         self._env_for_file = None
         self._file_processor = None
@@ -1079,6 +1093,7 @@ class ProcessorForInclude(Processor):
         Raises an exception if the file cannot be accessed correctly.
         """
         self._env_for_file = current_env.new_for_included_file(self._file_name_relative_including_file,
+                                                               self._do_not_export_tags,
                                                                self._do_not_import_tags)
         file_path = current_env.file_ref_env.file_name_relative_current_dir_of_process(
             self._file_name_relative_including_file)
@@ -1789,6 +1804,7 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
         args = self._parse_argument(instruction_argument)
         return [ProcessorForInclude(source,
                                     args.file[0],
+                                    args.do_not_export_tags,
                                     args.do_not_import_tags)]
 
     def arg_parser(self) -> argparse.ArgumentParser:
@@ -1810,7 +1826,16 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
                             action='store_const',
                             const=True,
                             default=False,
-                            help='Do not import any modifications of the tags from the included file.')
+                            help='Do not import any modifications of the tags state from the included file.')
+        parser.add_argument('-E', '--do-not-export-tags',
+                            action='store_const',
+                            const=True,
+                            default=False,
+                            help="""Do not export the tags state to the included file.
+                            The included file will have an emtpy tags state, just as if it was
+                            the first processed file.
+                            Add the option to not import tag modifications if you want to
+                            preserve the tags state in the including file.""")
         return parser
 
 

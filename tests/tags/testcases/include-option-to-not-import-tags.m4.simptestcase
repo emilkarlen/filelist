@@ -2,8 +2,8 @@
 
 #
 # WHEN the @list is used with the option to not import tags
-# THEN modifications of the tags in the imported file
-# SHOULD be ignored by the importing file
+# THEN modifications of the tags in the included file
+# SHOULD be ignored by the including file.
 #
 
 m4_include(common.m4)

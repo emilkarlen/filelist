@@ -1,0 +1,5 @@
+# Push tags, so that it is possible to pop tags in this file.
+@tags set PUSHED-TAG-IN-MAIN-FILE
+@tags push
+
+@include --do-not-export-tags pop-tags.list

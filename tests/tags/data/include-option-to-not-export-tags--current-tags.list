@@ -1,0 +1,2 @@
+@tags set CURRENT-TAG-IN-MAIN-FILE
+@include --do-not-export-tags print-tags.list
