@@ -1,0 +1,7 @@
+@print # Print tags
+@tags print
+
+@print
+@print # Output files
+existing-file-1.txt
+existing-file-2.txt
