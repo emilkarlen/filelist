@@ -1159,6 +1159,20 @@ class InstructionArgumentParser:
         raise NotImplementedError()
 
 
+class InstructionWithArgparseArgumentParser(InstructionArgumentParser):
+    """Argument parser for instructions that uses argparse for parsing the arguments."""
+
+    def arg_parser(self) -> argparse.ArgumentParser:
+        raise NotImplementedError()
+
+    def _parse(self,
+               arguments: list) -> argparse.Namespace:
+        try:
+            return raise_exception_instead_of_exiting_on_error(self.arg_parser(), arguments)
+        except ArgumentParsingException as ex:
+            raise InstructionArgumentParserSyntaxErrorException([ex.error_message])
+
+
 class InstructionSubCommand:
     """
     A sub command of an instruction.
@@ -1185,7 +1199,7 @@ class InstructionSubCommand:
         raise NotImplementedError()
 
 
-class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
+class InstructionWithSubCommandsArgumentParser(InstructionWithArgparseArgumentParser):
     """Argument parser for instructions with sub commands."""
 
     def __init__(self,
@@ -1214,11 +1228,8 @@ class InstructionWithSubCommandsArgumentParser(InstructionArgumentParser):
               instruction_argument: str):
 
         prepared_args = self._split_command_line_and_make_first_string_uppercase(instruction_argument)
-        try:
-            args = raise_exception_instead_of_exiting_on_error(self.arg_parser(), prepared_args)
-            return args.func.execute(parsing_settings, source, args)
-        except ArgumentParsingException as ex:
-            raise InstructionArgumentParserSyntaxErrorException([ex.error_message])
+        args = self._parse(prepared_args)
+        return args.func.execute(parsing_settings, source, args)
 
     def _set_sub_commands(self,
                           parser: argparse.ArgumentParser,
@@ -1642,8 +1653,12 @@ def file_type_matcher(expected_type: FileType):
     return f
 
 
-class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
+class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgumentParser):
     """Parser for the contents of a directory."""
+
+    def __init__(self,
+                 instruction_name_for_help_test: str):
+        self._parser = self._construct_argparser(instruction_name_for_help_test)
 
     def apply(self,
               parsing_settings: ParsingSettings,
@@ -1652,31 +1667,17 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
         list_settings = self._parse_arguments(instruction_argument)
         return [ProcessorForDirectoryListing(source, list_settings)]
 
+    def arg_parser(self) -> argparse.ArgumentParser:
+        return self._parser
+
     def _parse_arguments(self,
                          instruction_argument: str) -> ListSettings:
-        parser = argparse.ArgumentParser(add_help=False,
-                                         description="Lists files in a directory")
-        parser.add_argument("patterns",
-                            metavar="PATTERN",
-                            nargs="*",
-                            help="Unix-like shell-wildcards for files to print")
-        parser.add_argument("-t", "--type",
-                            nargs=1,
-                            type=FileType,
-                            help="""\
-                            Condition on the file type.
-                            "f" for regular file.
-                            "d" for directory.""")
-        parser.add_argument('-s', '--sort',
-                            action='store_const',
-                            const=True,
-                            default=False,
-                            help='Sort names alphabetically')
-        arguments = instruction_argument.split()
+        arguments = shlex.split(instruction_argument)
         if not arguments:
             raise InstructionArgumentParserSyntaxErrorException(["A directory must be given."])
         directory = arguments[0]
-        args = parser.parse_args(arguments[1:])
+
+        args = self._parse(arguments[1:])
         matcher = self._parse_matcher(args.type,
                                       args.patterns)
         return ListSettings(directory,
@@ -1699,6 +1700,39 @@ class InstructionArgumentParserForDirectoryListing(InstructionArgumentParser):
         if not wildcards:
             return constantly_true_matcher()
         return or_matcher([wildcard_matcher(wildcard) for wildcard in wildcards])
+
+    @staticmethod
+    def _construct_argparser(instruction_name_for_help_test: str) -> argparse.ArgumentParser:
+        parser = argparse.ArgumentParser(prog=instruction_name_for_help_test + " DIRECTORY",
+                                         add_help=False,
+                                         description="Prints paths of the files inside a directory.")
+        parser.add_argument("patterns",
+                            metavar="PATTERN",
+                            nargs="*",
+                            help="""\
+                            A Unix like shell-style wildcard.
+                            (E.g. the constructs "*, ?, [abc],[!abc]".)
+                            Each PATTERN is applied to the base-name of the files in the
+                            directory.
+                            If no PATTERN is given, then there is no condition on the
+                            file name.
+                            If PATTERNs are given, then the condition on the file name
+                            is to match at least one of these.
+                            """)
+        parser.add_argument("-t", "--type",
+                            nargs=1,
+                            type=FileType,
+                            help="""\
+                            Condition on the file type.
+                            "f" for regular file.
+                            "d" for directory.""")
+        parser.add_argument('-s', '--sort',
+                            action='store_const',
+                            const=True,
+                            default=False,
+                            help='Makes the output being sorted in alphabetical order.')
+
+        return parser
 
 
 class InstructionArgumentParserForInclude(InstructionArgumentParser):
@@ -2206,7 +2240,43 @@ class InstructionDescriptionExplicit(InstructionDescription):
             return []
 
 
-class InstructionDescriptionForInstructionWithSubCommands(InstructionDescription):
+class ArgparseParserHelpTextMixin:
+    SUB_COMMAND_DETAILS_INDENT = "  "
+
+    @staticmethod
+    def string_as_lines(wrapper: textwrap.TextWrapper,
+                        lines_string: str):
+        return [wrapper.initial_indent + line
+                for line in lines_string.splitlines()]
+
+    @staticmethod
+    def string_as_lines_add_indent_to_non_first_line(wrapper: textwrap.TextWrapper,
+                                                     lines_string: str):
+        lines = lines_string.splitlines()
+        ret_val = []
+        if lines:
+            indent = wrapper.initial_indent
+            ret_val.append(wrapper.initial_indent +
+                           lines[0])
+            indent += InstructionDescriptionForInstructionWithSubCommands.SUB_COMMAND_DETAILS_INDENT
+            ret_val.extend([indent + line
+                            for line in lines[1:]])
+        return ret_val
+
+
+class InstructionDescriptionForInstructionWithArgparseParser(InstructionDescription, ArgparseParserHelpTextMixin):
+
+    def __init__(self,
+                 parser: InstructionWithArgparseArgumentParser):
+        self._parser = parser
+
+    def render_as_lines(self,
+                        wrapper: textwrap.TextWrapper) -> list:
+        return self.string_as_lines(wrapper,
+                                    self._parser.arg_parser().format_help())
+
+
+class InstructionDescriptionForInstructionWithSubCommands(InstructionDescription, ArgparseParserHelpTextMixin):
     """Detailed description of an instruction that has sub commands."""
 
     SUB_COMMAND_DETAILS_INDENT = "  "
@@ -2269,6 +2339,15 @@ class InstructionConfiguration:
                                         InstructionDescriptionForInstructionWithSubCommands(argument_parser),
                                         argument_parser)
 
+    @staticmethod
+    def for_instruction_with_argparser(long_name: str,
+                                          name_aliases: list,
+                                          argument_parser: InstructionWithArgparseArgumentParser):
+        return InstructionConfiguration(long_name,
+                                        name_aliases,
+                                        InstructionDescriptionForInstructionWithArgparseParser(argument_parser),
+                                        argument_parser)
+
     def render_as_lines(self,
                         wrapper: textwrap.TextWrapper) -> list:
         """Renders the description as a list of lines."""
@@ -2297,38 +2376,6 @@ description_of_include = InstructionDescriptionExplicit(
     File paths inside the included file are relative the
     location of that file.
     """
-)
-
-description_of_directory_list = InstructionDescriptionExplicit(
-    "Prints paths of the files inside a directory.",
-    "DIRECTORY [-t | --type TYPE] [-s | --sort] [PATTERN...]",
-    [("DIRECTORY",
-     """\
-     A name relative to the location of the list file.
-     The directory must exist and be readable.
-     """),
-    ("TYPE",
-     """\
-     A condition on the file type that must be satisfied.
-     f: regular file; d: directory.
-     """),
-    ("--sort",
-     """\
-     Makes the output being sorted in alphabetical order.
-     """),
-    ("PATTERN",
-     """\
-     A Unix like shell-style wildcard.
-     (E.g. the constructs "*, ?, [abc],[!abc]".)
-     Each PATTERN is applied to the base-name of the files in the
-     directory.
-     If no PATTERN is given, then there is no condition on the
-     file name.
-     If PATTERNs are given, then the condition on the file name
-     is to match at least one of these.
-     """)
-     ],
-    None
 )
 
 description_of_print = InstructionDescriptionExplicit(
@@ -2428,25 +2475,29 @@ system_line_parsers = [LineParserForIgnoredLine(),
                        LineParserForFile()]
 
 instruction_configurations = [
-    InstructionConfiguration("INCLUDE",
-                             ["I"],
-                             description_of_include,
-                             InstructionArgumentParserForInclude()),
-    InstructionConfiguration("LIST",
-                             ["L", "LS"],
-                             description_of_directory_list,
-                             InstructionArgumentParserForDirectoryListing()),
-    InstructionConfiguration("PRINT",
-                             ["P"],
-                             description_of_print,
-                             InstructionArgumentParserForPrint()),
-    InstructionConfiguration("SHELL",
-                             [],
-                             description_of_shell,
-                             InstructionArgumentParserForShell()),
-    InstructionConfiguration.for_instruction_with_sub_commands("TAGS",
-                                                               ["T"],
-                                                               InstructionArgumentParserForTags("TAGS")),
+    InstructionConfiguration(
+        "INCLUDE",
+        ["I"],
+        description_of_include,
+        InstructionArgumentParserForInclude()),
+    InstructionConfiguration.for_instruction_with_argparser(
+        "LIST",
+        ["L", "LS"],
+        InstructionArgumentParserForDirectoryListing("LIST")),
+    InstructionConfiguration(
+        "PRINT",
+        ["P"],
+        description_of_print,
+        InstructionArgumentParserForPrint()),
+    InstructionConfiguration(
+        "SHELL",
+        [],
+        description_of_shell,
+        InstructionArgumentParserForShell()),
+    InstructionConfiguration.for_instruction_with_sub_commands(
+        "TAGS",
+        ["T"],
+        InstructionArgumentParserForTags("TAGS")),
 ]
 
 

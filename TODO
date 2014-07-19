@@ -10,11 +10,6 @@
      5. Refactor
   3. Write program help
   4. Remove item from this file.
-* Defects
-** Exiting with correct status if invalid options to @list
-I believe this is not tested.
-Use same strategy as for how the argparser is used for sub-commands (those of
-@tags, e.g.).
 * Improvements
 ** Customize the instruction token
    Make it possible to specify the prefix for instruction lines via a command
