@@ -60,6 +60,18 @@ or for debugging.
 A variant of this is to print only INCLUDE instructions, to get
 an overview of all references.
 
+* Check current functionality
+** Tests of import/export of tags
+   May need to have separate test cases for when the included file is in the
+   same directory and when it is in a different directory.
+** Exporting of tags to following command line files
+   Currently, I believe, tags are forwarded to later command line arguments.
+   A consequence is that using a file as a single file argument may be
+   different than using it as a second file argument.
+   This may be good, since it is possible to "configure" later file by a
+   first file.  But it may also be confusing.
+   Perhaps it would be good with an option that makes it possible to both
+   forward and not forward tags to later command line argument files.
 * Build system
 ** Derive path of python3
 ** Support parallell builds
