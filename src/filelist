@@ -283,10 +283,6 @@ class Tags:
     def new_empty():
         return Tags([], [])
 
-    # def __deepcopy__(self):
-    #     return Tags(list(self._as_froze_set),
-    #                 copy.deepcopy(self.tags_stack))
-    #
     def frozen_tags(self) -> frozenset:
         return self._as_froze_set
 
