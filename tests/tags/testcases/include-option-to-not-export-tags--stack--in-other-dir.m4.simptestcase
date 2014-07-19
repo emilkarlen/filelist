@@ -8,12 +8,12 @@
 
 m4_include(common.m4)
 
-name:include-option-to-not-export-tags--stack
+name:include-option-to-not-export-tags--stack--in-other-dir
 home:..
 
 setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--stack.list
+test.run.cmdline:M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--stack--in-other-dir.list
 
 check.exitcode:M4_EXIT_TAGS_ERROR
 check.stdout.empty

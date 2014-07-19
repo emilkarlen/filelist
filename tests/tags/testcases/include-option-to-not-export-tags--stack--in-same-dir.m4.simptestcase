@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+#
+# WHEN the @list is used with the option to not export tags
+# THEN modifications of the tags stack in the included file
+# SHOULD be ignored by the included file.
+#
+
+m4_include(common.m4)
+
+name:include-option-to-not-export-tags--stack--in-same-dir
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--stack--in-same-dir.list
+
+check.exitcode:M4_EXIT_TAGS_ERROR
+check.stdout.empty
