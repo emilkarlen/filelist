@@ -7,7 +7,7 @@ home:..
 
 setup.install:data
 
-M4_RUN_WITH_AB_SET_AND_OPERATOR(`equals')
+M4_RUN_WITH_OPERATOR(`equals')
 
 check.exitcode:0
 check.stdout.file.eq:output/equals.txt

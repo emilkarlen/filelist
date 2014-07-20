@@ -2,12 +2,12 @@
 
 m4_include(common.m4)
 
-name:unequals
+name:equals--negated
 home:..
 
 setup.install:data
 
-M4_RUN_WITH_OPERATOR(`unequals')
+M4_RUN_WITH_NEGATED_OPERATOR(`equals')
 
 check.exitcode:0
 check.stdout.file.eq:output/unequals.txt

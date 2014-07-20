@@ -83,11 +83,13 @@ testcase (file-path/filter-on-tags contains-none-of--alias--none-of)
 testcase (file-path/filter-on-tags proper-subset)
 testcase (file-path/filter-on-tags subset)
 testcase (file-path/filter-on-tags equals)
+testcase (file-path/filter-on-tags equals--negated)
 testcase (file-path/filter-on-tags proper-superset)
 testcase (file-path/filter-on-tags superset)
+testcase (file-path/filter-on-tags superset--negated)
 testcase (file-path/filter-on-tags unequals)
 # testcase (file-path/filter-on-tags command-line-parsing-of-empty-set)
-# THE above test is not included due to limitations of simptest.
+# THE above test is not included due to ugly limitations of simptest.
 testcase (file-path/filter-on-tags default-operator-is-contains-any-of)
 
 testcase (list existing-directory)

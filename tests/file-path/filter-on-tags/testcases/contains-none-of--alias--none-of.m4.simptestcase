@@ -7,7 +7,7 @@ home:..
 
 setup.install:data
 
-M4_RUN_WITH_AB_SET_AND_OPERATOR(`none-of')
+M4_RUN_WITH_OPERATOR(`none-of')
 
 check.exitcode:0
 check.stdout.file.eq:output/contains-none-of.txt

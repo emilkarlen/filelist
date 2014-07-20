@@ -381,6 +381,13 @@ class SetOperatorConfig:
         self.aliases = aliases
         self.operator = operator
 
+    def get_operator(self,
+                     negated: bool):
+        if negated:
+            return lambda l, r: not(self.operator(l, r))
+        else:
+            return self.operator
+
 
 class TagsCondition:
     """
@@ -442,6 +449,17 @@ class TagsConditionSetup:
 
     def lookup(self, operator_name: str) -> SetOperatorConfig:
         return self._lookup_dict[operator_name]
+
+    def condition_for(self,
+                      operator_name: str,
+                      negate_operator: bool,
+                      right_operand: frozenset) -> TagsCondition:
+        return TagsCondition(self._lookup_dict[operator_name].get_operator(negate_operator),
+                             right_operand)
+
+    @staticmethod
+    def for_no_condition():
+        return TagsCondition.new_for_no_condition()
 
 
 class ResultItemsConstructionEnvironment:
@@ -2820,7 +2838,8 @@ class CommandLineParseResult:
 
 def parse_tags_condition(tags_condition_setup: TagsConditionSetup,
                          right_operand_or_empty: list,
-                         operator_name: str) -> TagsCondition:
+                         operator_name: str,
+                         negate_operator: bool) -> TagsCondition:
 
     if right_operand_or_empty:
         operand_string = right_operand_or_empty[0]
@@ -2828,10 +2847,11 @@ def parse_tags_condition(tags_condition_setup: TagsConditionSetup,
             r = frozenset(operand_string.split(","))
         else:
             r = frozenset()
-        return TagsCondition(tags_condition_setup.lookup(operator_name).operator,
-                             r)
+        return tags_condition_setup.condition_for(operator_name,
+                                                  negate_operator,
+                                                  r)
     else:
-        return TagsCondition.new_for_no_condition()
+        return tags_condition_setup.for_no_condition()
 
 
 def format_operator_str(operator_name):
@@ -2851,6 +2871,7 @@ def parse_command_line() -> CommandLineParseResult:
                                      description=program_description())
     filter_tags_long_option = "--filter-tags"
     filter_tags_operator_long_option = "--filter-tags-operator"
+    filter_tags_negate_operator_long_option = "--filter-tags-operator-negate"
     tags_condition_setup = TagsConditionSetup()
     all_filter_operator_names = tags_condition_setup.all_operator_names()
 
@@ -2906,26 +2927,6 @@ def parse_command_line() -> CommandLineParseResult:
                         For each file, print it's tags after it.
                         The tags and the path are separated by \"""" +
                         DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
-    parser.add_argument("-O", filter_tags_operator_long_option,
-                        metavar="SET-OPERATOR",
-                        nargs=1,
-                        choices=all_filter_operator_names,
-                        default=[TagsConditionSetup.DEFAULT_OPERATOR_NAME],
-                        help="""\
-                        The operator that is used by the tags-filter.
-                        It is applied as FILE-TAGS SET-OPERATOR TAGS-FROM-FILTER,
-                        where TAGS-FROM-FILTER is the tags specified by """ +
-                        filter_tags_long_option + """.
-
-                        Note that the tags filter is only applied if """ +
-                        filter_tags_long_option + """
-                        is given.
-                        The default operator is """ +
-                        TagsConditionSetup.DEFAULT_OPERATOR_NAME +
-                        """.
-
-                        Operators are: """ + filter_tags_operators_list_for_help_text() +
-                        """.""")
     parser.add_argument("-F", filter_tags_long_option,
                         metavar="SET-OF-TAGS",
                         nargs=1,
@@ -2936,6 +2937,41 @@ def parse_command_line() -> CommandLineParseResult:
                         a condition with the given set of tags. """ +
                         filter_tags_operator_long_option +
                         """ determines how this set is used in the condition.""")
+    parser.add_argument("-O", filter_tags_operator_long_option,
+                        metavar="SET-OPERATOR",
+                        nargs=1,
+                        choices=all_filter_operator_names,
+                        default=[TagsConditionSetup.DEFAULT_OPERATOR_NAME],
+                        help="""\
+                        The operator that is used by the tags-filter.
+                        It is applied as FILE-TAGS SET-OPERATOR TAGS-FROM-FILTER,
+                        where FILE-TAGS are the tags associated with
+                        the file-path in the list;
+                        and TAGS-FROM-FILTER is the tags specified by """ +
+                        filter_tags_long_option + """.
+
+                        """ + filter_tags_negate_operator_long_option +
+                        """ negates the meaning of the operator.
+
+                        Note that the tags filter is only applied if """ +
+                        filter_tags_long_option + """
+                        is given.
+                        The default operator is """ +
+                        TagsConditionSetup.DEFAULT_OPERATOR_NAME +
+                        """.
+
+                        Operators are: """ + filter_tags_operators_list_for_help_text() +
+                        """.""")
+    parser.add_argument("-N", filter_tags_negate_operator_long_option,
+                        default=False,
+                        action='store_true',
+                        help="""\
+                        Negates the operator given by """ +
+                        filter_tags_operator_long_option +
+                        """. This is useful if the all file-paths needs to be handled,
+                        but the handling depends on weather the file-path satisfies
+                        the filter or not. (Note that the program must be executed two times
+                        for this.)""")
     parser.add_argument("--preprocessor",
                         metavar="PROCESSOR",
                         nargs=1,
@@ -2966,7 +3002,8 @@ def parse_command_line() -> CommandLineParseResult:
     args = parser.parse_args()
     tags_condition = parse_tags_condition(tags_condition_setup,
                                           args.filter_tags,
-                                          args.filter_tags_operator[0])
+                                          args.filter_tags_operator[0],
+                                          args.filter_tags_operator_negate)
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,
