@@ -579,6 +579,22 @@ class ResultItem:
         raise NotImplementedError()
 
 
+class ResultItemForOtherThanFilePath(ResultItem):
+    """
+    A ResultItem that is not a file-path.
+
+    When suppression of non-path-output is turned on,
+    then rendering of the item will produce no output.
+    """
+
+    def render(self,
+               env: RenditionEnvironment) -> str:
+        return None if env.rendition_settings.suppress_non_path_output else self.the_string(env)
+
+    def the_string(self, env):
+        raise NotImplementedError()
+
+
 class ParsingSettings:
     def __init__(self,
                  preprocessor_shell_command_or_none: str,
@@ -1383,7 +1399,7 @@ class ResultItemForTagsPrint(ResultItem):
                         self._suffix])
 
 
-class ResultItemForTagsPrintStack(ResultItem):
+class ResultItemForTagsPrintStack(ResultItemForOtherThanFilePath):
     """
     An result item that prints tags.
     """
@@ -1395,8 +1411,8 @@ class ResultItemForTagsPrintStack(ResultItem):
         self._prefix = prefix
         self._suffix = suffix
 
-    def render(self,
-               env: RenditionEnvironment) -> str:
+    def the_string(self,
+                   env: RenditionEnvironment) -> str:
         return ''.join([self._prefix,
                         str(self._stack),
                         self._suffix])
