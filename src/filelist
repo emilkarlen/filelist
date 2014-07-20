@@ -2792,7 +2792,7 @@ def parse_tags_condition(right_operand_or_empty: list,
                          operator_name: str) -> TagsCondition:
 
     if right_operand_or_empty:
-        return TagsCondition(TagsCondition.OPERATORS[operator_name[0]],
+        return TagsCondition(TagsCondition.OPERATORS[operator_name],
                              frozenset(right_operand_or_empty[0].split(",")))
     else:
         return TagsCondition.new_for_no_condition()
@@ -2860,7 +2860,7 @@ def parse_command_line() -> CommandLineParseResult:
                         metavar="SET-OPERATOR",
                         nargs=1,
                         choices=TagsCondition.OPERATORS.keys(),
-                        default=TagsCondition.DEFAULT_OPERATOR_NAME,
+                        default=[TagsCondition.DEFAULT_OPERATOR_NAME],
                         help="""\
                         The operator that is used by the tags-filter.
                         It is applied as FILE-TAGS SET-OPERATOR TAGS-FROM-FILTER,
@@ -2913,7 +2913,7 @@ def parse_command_line() -> CommandLineParseResult:
                         version='%(prog)s 1.0')
     args = parser.parse_args()
     tags_condition = parse_tags_condition(args.filter_tags,
-                                          args.filter_tags_operator)
+                                          args.filter_tags_operator[0])
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,
