@@ -2870,8 +2870,8 @@ def parse_command_line() -> CommandLineParseResult:
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=program_description())
     filter_tags_long_option = "--filter-tags"
-    filter_tags_operator_long_option = "--filter-tags-operator"
-    filter_tags_negate_operator_long_option = "--filter-tags-operator-negate"
+    filter_tags_operator_long_option = "--operator-for-filter-tags"
+    filter_tags_negate_operator_long_option = "--negate-operator-for-filter-tags"
     tags_condition_setup = TagsConditionSetup()
     all_filter_operator_names = tags_condition_setup.all_operator_names()
 
@@ -2936,6 +2936,7 @@ def parse_command_line() -> CommandLineParseResult:
                         Output only those file paths who's tags satisfy
                         a condition with the given set of tags. """ +
                         filter_tags_operator_long_option +
+                        " and " + filter_tags_negate_operator_long_option +
                         """ determines how this set is used in the condition.""")
     parser.add_argument("-O", filter_tags_operator_long_option,
                         metavar="SET-OPERATOR",
@@ -2944,10 +2945,10 @@ def parse_command_line() -> CommandLineParseResult:
                         default=[TagsConditionSetup.DEFAULT_OPERATOR_NAME],
                         help="""\
                         The operator that is used by the tags-filter.
-                        It is applied as FILE-TAGS SET-OPERATOR TAGS-FROM-FILTER,
-                        where FILE-TAGS are the tags associated with
+                        It is applied as <FILE-TAGS> SET-OPERATOR <TAGS-FROM-FILTER>,
+                        where <FILE-TAGS> are the tags associated with
                         the file-path in the list;
-                        and TAGS-FROM-FILTER is the tags specified by """ +
+                        and <TAGS-FROM-FILTER> is the tags specified by """ +
                         filter_tags_long_option + """.
 
                         """ + filter_tags_negate_operator_long_option +
@@ -3002,8 +3003,8 @@ def parse_command_line() -> CommandLineParseResult:
     args = parser.parse_args()
     tags_condition = parse_tags_condition(tags_condition_setup,
                                           args.filter_tags,
-                                          args.filter_tags_operator[0],
-                                          args.filter_tags_operator_negate)
+                                          args.operator_for_filter_tags[0],
+                                          args.negate_operator_for_filter_tags)
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,
