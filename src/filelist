@@ -374,25 +374,36 @@ class FileReferenceEnvironment:
                          dir_delta))
 
 
+class SetOperatorConfig:
+    def __init__(self,
+                 aliases: list,
+                 operator):
+        self.aliases = aliases
+        self.operator = operator
+
+
 class TagsCondition:
     """
     A condition on the tags associated with a file.
     """
 
-    _contains_any_of_operator = lambda l, r: bool(l.intersection(r))
-    _contains_none_of_operator = lambda l, r: l.isdisjoint(r)
-
     OPERATORS = {
-        "contains-any-of": _contains_any_of_operator,
-        "any-of": _contains_any_of_operator,
-        "contains-none-of": _contains_none_of_operator,
-        "none-of": _contains_none_of_operator,
-        "proper-subset": lambda l, r: l < r,
-        "subset": lambda l, r: l <= r,
-        "equals": lambda l, r: l == r,
-        "proper-superset": lambda l, r: l > r,
-        "superset": lambda l, r: l >= r,
-        "unequals": lambda l, r: l != r,
+        "contains-any-of": SetOperatorConfig(["any-of"],
+                                             lambda l, r: bool(l.intersection(r))),
+        "contains-none-of": SetOperatorConfig(["none-of"],
+                                              lambda l, r: l.isdisjoint(r)),
+        "proper-subset": SetOperatorConfig([],
+                                           lambda l, r: l < r),
+        "subset": SetOperatorConfig([],
+                                    lambda l, r: l <= r),
+        "equals": SetOperatorConfig([],
+                                    lambda l, r: l == r),
+        "proper-superset": SetOperatorConfig([],
+                                             lambda l, r: l > r),
+        "superset": SetOperatorConfig([],
+                                      lambda l, r: l >= r),
+        "unequals": SetOperatorConfig([],
+                                      lambda l, r: l != r),
     }
 
     DEFAULT_OPERATOR_NAME = "contains-any-of"
@@ -2797,10 +2808,18 @@ def parse_tags_condition(right_operand_or_empty: list,
             r = frozenset(operand_string.split(","))
         else:
             r = frozenset()
-        return TagsCondition(TagsCondition.OPERATORS[operator_name],
+        return TagsCondition(TagsCondition.OPERATORS[operator_name].operator,
                              r)
     else:
         return TagsCondition.new_for_no_condition()
+
+
+def format_operator_str(operator_name):
+    return operator_name
+
+
+def filter_tags_operators_list_for_help_text():
+    return ", ".join([format_operator_str(o) for o in sorted(TagsCondition.OPERATORS.keys())])
 
 
 def parse_command_line() -> CommandLineParseResult:
@@ -2808,7 +2827,8 @@ def parse_command_line() -> CommandLineParseResult:
                                      description=program_description())
     filter_tags_long_option = "--filter-tags"
     filter_tags_operator_long_option = "--filter-tags-operator"
-    filter_operators_list = ", ".join(sorted(TagsCondition.OPERATORS.keys()))
+
+    filter_operators_list = filter_tags_operators_list_for_help_text()
 
     parser.add_argument("files",
                         metavar="FILE",
@@ -2880,7 +2900,7 @@ def parse_command_line() -> CommandLineParseResult:
                         TagsCondition.DEFAULT_OPERATOR_NAME +
                         """.
 
-                        Operators are (some of which are synonyms): """ + filter_operators_list +
+                        Operators are: """ + filter_operators_list +
                         """.""")
     parser.add_argument("-F", filter_tags_long_option,
                         metavar="SET-OF-TAGS",
