@@ -83,6 +83,8 @@ testcase (file-path/filter-on-tags equals)
 testcase (file-path/filter-on-tags proper-superset)
 testcase (file-path/filter-on-tags superset)
 testcase (file-path/filter-on-tags unequals)
+# testcase (file-path/filter-on-tags command-line-parsing-of-empty-set)
+# THE above test is not included due to limitations of simptest.
 
 testcase (list existing-directory)
 testcase (list existing-directory-absolute)

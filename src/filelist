@@ -2792,8 +2792,13 @@ def parse_tags_condition(right_operand_or_empty: list,
                          operator_name: str) -> TagsCondition:
 
     if right_operand_or_empty:
+        operand_string = right_operand_or_empty[0]
+        if operand_string and not operand_string.isspace():
+            r = frozenset(operand_string.split(","))
+        else:
+            r = frozenset()
         return TagsCondition(TagsCondition.OPERATORS[operator_name],
-                             frozenset(right_operand_or_empty[0].split(",")))
+                             r)
     else:
         return TagsCondition.new_for_no_condition()
 
