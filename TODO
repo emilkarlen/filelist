@@ -39,6 +39,9 @@ Reason it has not been done is,
    Especially if file-existence is not check.  In that case,
    the comment character could be interpreted later down
    the pipe.
+** Error messages
+*** Surround source text by quotes
+    This makes it easier to spot errors due to trailing space.
 ** Improve layout of pretty-printed tree
 * Features
 ** stdin as FILE argument
