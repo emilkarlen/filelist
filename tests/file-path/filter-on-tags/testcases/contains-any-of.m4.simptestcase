@@ -1,4 +1,4 @@
-# -*- shell-script -*-
+# -*- m4 -*-
 
 m4_include(common.m4)
 
@@ -7,7 +7,7 @@ home:..
 
 setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST --filter-tags a,b data/tagged-files.list
+M4_RUN_WITH_AB_SET_AND_OPERATOR(`contains-any-of')
 
 check.exitcode:0
 check.stdout.file.eq:output/contains-any-of.txt
