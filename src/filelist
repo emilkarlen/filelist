@@ -389,10 +389,10 @@ class TagsCondition:
         "none-of": _contains_none_of_operator,
         "proper-subset": lambda l, r: l < r,
         "subset": lambda l, r: l <= r,
-        "equal": lambda l, r: l == r,
+        "equals": lambda l, r: l == r,
         "proper-superset": lambda l, r: l > r,
         "superset": lambda l, r: l >= r,
-        "unequal": lambda l, r: l != r,
+        "unequals": lambda l, r: l != r,
     }
 
     DEFAULT_OPERATOR_NAME = "contains-any-of"
