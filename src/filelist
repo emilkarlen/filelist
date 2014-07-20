@@ -2792,7 +2792,7 @@ def parse_tags_condition(right_operand_or_empty: list,
                          operator_name: str) -> TagsCondition:
 
     if right_operand_or_empty:
-        return TagsCondition(TagsCondition.OPERATORS[operator_name],
+        return TagsCondition(TagsCondition.OPERATORS[operator_name[0]],
                              frozenset(right_operand_or_empty[0].split(",")))
     else:
         return TagsCondition.new_for_no_condition()

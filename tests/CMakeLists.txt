@@ -76,6 +76,7 @@ testcase (file-path absolute-file-paths-existing)
 testcase (file-path absolute-file-paths-existing-with-output-absolute-name)
 testcase (file-path absolute-file-paths-nonexisting)
 testcase (file-path/filter-on-tags contains-any-of)
+testcase (file-path/filter-on-tags contains-none-of)
 
 testcase (list existing-directory)
 testcase (list existing-directory-absolute)
