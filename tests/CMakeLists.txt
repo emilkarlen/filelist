@@ -75,6 +75,7 @@ testcase (file-path file-non-existing)
 testcase (file-path absolute-file-paths-existing)
 testcase (file-path absolute-file-paths-existing-with-output-absolute-name)
 testcase (file-path absolute-file-paths-nonexisting)
+
 testcase (file-path/filter-on-tags contains-any-of)
 testcase (file-path/filter-on-tags contains-none-of)
 testcase (file-path/filter-on-tags proper-subset)
@@ -85,6 +86,7 @@ testcase (file-path/filter-on-tags superset)
 testcase (file-path/filter-on-tags unequals)
 # testcase (file-path/filter-on-tags command-line-parsing-of-empty-set)
 # THE above test is not included due to limitations of simptest.
+testcase (file-path/filter-on-tags default-operator-is-contains-any-of)
 
 testcase (list existing-directory)
 testcase (list existing-directory-absolute)
