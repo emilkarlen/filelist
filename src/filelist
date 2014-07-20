@@ -637,7 +637,7 @@ class ResultItemsConstructor:
 ###############################################################################
 
 
-class ResultItemForPrint(ResultItem):
+class ResultItemForPrint(ResultItemForOtherThanFilePath):
     """
     An result item that prints a constant string.
     """
@@ -645,12 +645,9 @@ class ResultItemForPrint(ResultItem):
                  string: str):
         self._string = string
 
-    def render(self,
-               env: RenditionEnvironment) -> str:
-        if env.rendition_settings.suppress_non_path_output:
-            return None
-        else:
-            return self._string
+    def the_string(self,
+                   env: RenditionEnvironment) -> str:
+        return self._string
 
 
 class ResultItemForFile(ResultItem):
@@ -838,7 +835,8 @@ class ProcessorForPrint(Processor):
         Processor.__init__(self, source)
         self._string = string
 
-    def result_item_iterable(self, parsing_settings: ParsingSettings,
+    def result_item_iterable(self,
+                             parsing_settings: ParsingSettings,
                              env: ResultItemsConstructionEnvironment):
         return iter([ResultItemForPrint(self._string)])
 
@@ -1380,7 +1378,7 @@ class InstructionApplicationPopEmptyStackException(InstructionApplicationExcepti
                     ])
 
 
-class ResultItemForTagsPrint(ResultItem):
+class ResultItemForTagsPrint(ResultItemForOtherThanFilePath):
     """
     An result item that prints tags.
     """
@@ -1392,8 +1390,8 @@ class ResultItemForTagsPrint(ResultItem):
         self._prefix = prefix
         self._suffix = suffix
 
-    def render(self,
-               env: RenditionEnvironment) -> str:
+    def the_string(self,
+                   env: RenditionEnvironment) -> str:
         return ''.join([self._prefix,
                         env.rendition_settings.tags_settings.render_print_tags(self._tags),
                         self._suffix])
@@ -2835,7 +2833,7 @@ def parse_command_line() -> CommandLineParseResult:
                         default=PrintPathsCommand(),
                         help="""\
                         Prints the file inclusion hierarchy.
-                        The normal output of file paths is suppressed.""")
+                        The normal output is suppressed.""")
     parser.add_argument("-I", "--print-inclusion-hierarchy-pretty",
                         action='store_const',
                         dest='command',
@@ -2843,7 +2841,7 @@ def parse_command_line() -> CommandLineParseResult:
                         help="""\
                         Prints the file inclusion hierarchy,
                         in a pretty layout.
-                        The normal output of file paths is suppressed.""")
+                        The normal output is suppressed.""")
     parser.add_argument('--version',
                         action='version',
                         version='%(prog)s 1.0')
