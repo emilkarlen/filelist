@@ -1798,7 +1798,7 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
     DESCRIPTION = """
     Includes instructions from a given list file.
     File paths inside the included file are relative the
-    location of that file.
+    location of that file (unless options are used to change this).
     """
 
     def __init__(self,
