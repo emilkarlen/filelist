@@ -6,6 +6,9 @@ a
 @tags set a b
 a-b
 
+@tags set a b c
+a-b-c
+
 @tags set b c
 b-c
 
