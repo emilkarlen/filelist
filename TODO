@@ -18,7 +18,7 @@
 *** Filter on tags
 **** conditions
      The condition could be given by a single argument as a string.
-     E.g. "all",  "any", "exactly", "not-all", "not-any", "not-exactly".
+     E.g. "all",  "any", "exact", "not-all", "not-any", "not-exactly".
 ** List
 *** match file-name using reg-ex
 ** Source-file info in PreprocessorException
