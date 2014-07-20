@@ -1,0 +1,6 @@
+@print # Output from the included file
+@include --preserve-current-directory dir/list-with-paths-in-super-directory.list
+
+@print
+@print # Output from the main file
+existing-file.txt

@@ -339,7 +339,11 @@ class FileReferenceEnvironment:
         else:
             return self._new_for_appended_dir(name_of_directory)
 
-    def new_for_included_file(self, file_name_relative_include_file):
+    def for_included_file(self,
+                          file_name_relative_include_file: str,
+                          preserve_current_directory: bool):
+        if preserve_current_directory:
+            return self
         dir_delta = os.path.dirname(file_name_relative_include_file)
         if not dir_delta:  # file is in same directory
             return copy.copy(self)
@@ -391,10 +395,12 @@ class ResultItemsConstructionEnvironment:
 
     def new_for_included_file(self,
                               file_name_relative_include_file: str,
+                              preserve_current_directory: bool,
                               do_not_export_tags: bool,
                               do_not_import_tags: bool):
         return ResultItemsConstructionEnvironment(
-            self.file_ref_env.new_for_included_file(file_name_relative_include_file),
+            self.file_ref_env.for_included_file(file_name_relative_include_file,
+                                                    preserve_current_directory),
             self.filter_tags_or_none,
             self._tags_for_included_file(do_not_export_tags, do_not_import_tags))
 
@@ -1056,10 +1062,12 @@ class ProcessorForInclude(Processor):
     def __init__(self,
                  source: SourceReference,
                  file_name_relative_include_file: str,
+                 preserve_current_directory: bool,
                  do_not_export_tags: bool,
                  do_not_import_tags: bool):
         Processor.__init__(self, source)
         self._file_name_relative_including_file = file_name_relative_include_file
+        self._preserve_current_directory = preserve_current_directory
         self._do_not_export_tags = do_not_export_tags
         self._do_not_import_tags = do_not_import_tags
         self._env_for_file = None
@@ -1093,6 +1101,7 @@ class ProcessorForInclude(Processor):
         Raises an exception if the file cannot be accessed correctly.
         """
         self._env_for_file = current_env.new_for_included_file(self._file_name_relative_including_file,
+                                                               self._preserve_current_directory,
                                                                self._do_not_export_tags,
                                                                self._do_not_import_tags)
         file_path = current_env.file_ref_env.file_name_relative_current_dir_of_process(
@@ -1804,6 +1813,7 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
         args = self._parse_argument(instruction_argument)
         return [ProcessorForInclude(source,
                                     args.file[0],
+                                    args.preserve_current_directory,
                                     args.do_not_export_tags,
                                     args.do_not_import_tags)]
 
@@ -1836,6 +1846,12 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
                             the first processed file.
                             Add the option to not import tag modifications if you want to
                             preserve the tags state in the including file.""")
+        parser.add_argument('-p', '--preserve-current-directory',
+                            action='store_const',
+                            const=True,
+                            default=False,
+                            help="""Let the current directory for the included file
+                            be the same as for the including file.""")
         return parser
 
 

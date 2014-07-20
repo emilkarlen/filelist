@@ -1,0 +1,5 @@
+# Output from the included file
+data/existing-file.txt
+
+# Output from the main file
+data/existing-file.txt

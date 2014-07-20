@@ -95,6 +95,7 @@ testcase (include non-existing)
 testcase (include existing-dir)
 testcase (include inclusion-trace-in-error-messages)
 testcase (include inclusion-trace-in-error-messages-file)
+testcase (include preserve-current-directory)
 
 testcase (print-inclusion-hierarchy in-same-directory)
 testcase (print-inclusion-hierarchy in-sub-directory)
