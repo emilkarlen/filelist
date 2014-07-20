@@ -1,0 +1,10 @@
+untagged
+
+@tags set a
+a
+
+@tags set a b
+a-b
+
+@tags set a b c
+a-b-c

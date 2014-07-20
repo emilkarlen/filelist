@@ -75,3 +75,6 @@ an overview of all references.
    tests/common.m4
    inside the source directory, and it contains a reference to the
    executable, which ideally should be put in the build directory.
+* Config Management
+** Sprid ut tester av taggar till de enskilda instruktionerna
+   test-paketet tags ska föregå andra instruktioner o file-path.
