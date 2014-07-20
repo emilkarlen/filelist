@@ -374,6 +374,46 @@ class FileReferenceEnvironment:
                          dir_delta))
 
 
+class TagsCondition:
+    """
+    A condition on the tags associated with a file.
+    """
+
+    _contains_any_of_operator = lambda l, r: bool(l.intersection(r))
+    _contains_none_of_operator = lambda l, r: l.isdisjoint(r)
+
+    OPERATORS = {
+        "contains-any-of": _contains_any_of_operator,
+        "any-of": _contains_any_of_operator,
+        "contains-none-of": _contains_none_of_operator,
+        "none-of": _contains_none_of_operator,
+        "<": lambda l, r: l < r,
+        "<=": lambda l, r: l <= r,
+        "=": lambda l, r: l == r,
+        ">": lambda l, r: l > r,
+        ">=": lambda l, r: l >= r,
+        "!=": lambda l, r: l != r,
+    }
+
+    DEFAULT_OPERATOR_NAME = "contains-any-of"
+
+    def __init__(self,
+                 operator_function,
+                 right_operand: frozenset):
+        self._operator_function = operator_function
+        self._right_operand = right_operand
+
+    @staticmethod
+    def new_for_no_condition():
+        return TagsCondition(lambda l, r: True,
+                             frozenset())
+
+    def is_satisfied_by(self,
+              tags: frozenset) -> bool:
+        """Tests if the given tags satisfies the condition."""
+        return self._operator_function(tags, self._right_operand)
+
+
 class ResultItemsConstructionEnvironment:
     """
     ResultItemsConstructionEnvironment for executing instructions.
@@ -381,16 +421,16 @@ class ResultItemsConstructionEnvironment:
 
     def __init__(self,
                  dir_env: FileReferenceEnvironment,
-                 filter_tags_or_none: frozenset,
+                 tags_condition: TagsCondition,
                  tags: Tags):
         self.file_ref_env = dir_env
-        self.filter_tags_or_none = filter_tags_or_none
+        self._tags_condition = tags_condition
         self._tags = tags
 
     def new_for_directory(self, name_of_directory):
         return ResultItemsConstructionEnvironment(
             self.file_ref_env.new_for_directory(name_of_directory),
-            self.filter_tags_or_none,
+            self._tags_condition,
             self._tags)
 
     def new_for_included_file(self,
@@ -400,8 +440,8 @@ class ResultItemsConstructionEnvironment:
                               do_not_import_tags: bool):
         return ResultItemsConstructionEnvironment(
             self.file_ref_env.for_included_file(file_name_relative_include_file,
-                                                    preserve_current_directory),
-            self.filter_tags_or_none,
+                                                preserve_current_directory),
+            self._tags_condition,
             self._tags_for_included_file(do_not_export_tags, do_not_import_tags))
 
     def _tags_for_included_file(self,
@@ -421,9 +461,7 @@ class ResultItemsConstructionEnvironment:
 
     def satisfies_tags_filter(self,
                               file_tags: frozenset) -> bool:
-        if self.filter_tags_or_none is None:
-            return True
-        return self.filter_tags_or_none & file_tags
+        return self._tags_condition.is_satisfied_by(file_tags)
 
     def current_tags_satisfies_tags_filter(self) -> bool:
         return self.satisfies_tags_filter(self.tags().frozen_tags())
@@ -518,21 +556,21 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
 
     @staticmethod
     def for_top_level_file(file_name: str,
-                           filter_tags_or_none: frozenset,
+                           tags_condition: TagsCondition,
                            settings: RenditionSettings):
         return RenditionEnvironment(FileReferenceEnvironment.for_top_level_file(file_name),
-                                    filter_tags_or_none,
+                                    tags_condition,
                                     Tags.new_empty(),
                                     settings)
 
     def __init__(self,
                  file_ref_env: FileReferenceEnvironment,
-                 filter_tags_or_none: frozenset,
+                 tags_condition: TagsCondition,
                  tags: Tags,
                  rendition_settings: RenditionSettings):
         ResultItemsConstructionEnvironment.__init__(self,
                                                     file_ref_env,
-                                                    filter_tags_or_none,
+                                                    tags_condition,
                                                     tags)
         self.rendition_settings = rendition_settings
 
@@ -2226,7 +2264,7 @@ class Command:
     """
     def execute(self,
                 file_names: list,
-                filter_tags_or_none: frozenset,
+                tags_condition: TagsCondition,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
         for file_name in file_names:
@@ -2235,7 +2273,7 @@ class Command:
             lines_source = LinesSourceForFileArgument(parsing_settings, file_name)
             file_processor = file_parser.apply(lines_source)
             env = RenditionEnvironment.for_top_level_file(file_name,
-                                                          filter_tags_or_none,
+                                                          tags_condition,
                                                           rendition_settings)
             self.process_file(file_processor, parsing_settings, env)
 
@@ -2246,16 +2284,10 @@ class Command:
         raise NotImplementedError()
 
 
-class PrintPathsCommand(Command):
+class ProgramMainFunctionalityCommand(Command):
     """
-    Command that prints file paths -
-    the task that the program is mainly designed for.
+    Command that implements the main functionality of this program.
     """
-    def __init__(self):
-        self._filter_tags_or_none = None
-        self._rendition_settings = None
-        self._parsing_settings = None
-
     def process_file(self,
                      file_processor: FileProcessor,
                      parsing_settings: ParsingSettings,
@@ -2746,19 +2778,32 @@ class CommandLineParseResult:
     def __init__(self,
                  command: Command,
                  file_names: list,
-                 filter_tags_or_none: frozenset,
+                 tags_condition: TagsCondition,
                  rendition_settings: RenditionSettings,
                  preprocessor_shell_command: str):
         self.command = command
         self.file_names = file_names
-        self.filter_tags_or_none = filter_tags_or_none
+        self.tags_condition = tags_condition
         self.rendition_settings = rendition_settings
         self.preprocessor_shell_command = preprocessor_shell_command
+
+
+def parse_tags_condition(right_operand_or_empty: list,
+                         operator_name: str) -> TagsCondition:
+
+    if right_operand_or_empty:
+        return TagsCondition(TagsCondition.OPERATORS[operator_name],
+                             frozenset(right_operand_or_empty[0].split(",")))
+    else:
+        return TagsCondition.new_for_no_condition()
 
 
 def parse_command_line() -> CommandLineParseResult:
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=program_description())
+    filter_tags_long_option = "--filter-tags"
+    filter_tags_operator_long_option = "--filter-tags-operator"
+
     parser.add_argument("files",
                         metavar="FILE",
                         nargs='*',
@@ -2811,13 +2856,34 @@ def parse_command_line() -> CommandLineParseResult:
                         For each file, print it's tags after it.
                         The tags and the path are separated by \"""" +
                         DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
-    parser.add_argument("-F", "--filter-tags",
-                        metavar="LIST-OF-TAGS",
+    parser.add_argument("-O", filter_tags_operator_long_option,
+                        metavar="SET-OPERATOR",
+                        nargs=1,
+                        choices=TagsCondition.OPERATORS.keys(),
+                        default=TagsCondition.DEFAULT_OPERATOR_NAME,
+                        help="""\
+                        The operator that is used by the tags-filter.
+                        It is applied as FILE-TAGS SET-OPERATOR TAGS-FROM-FILTER,
+                        where TAGS-FROM-FILTER is the tags specified by """ +
+                        filter_tags_long_option + """.
+
+                        Note that the tags filter is only applied if """ +
+                        filter_tags_long_option + """
+                        is given.
+                        The default operator is """ +
+                        TagsCondition.DEFAULT_OPERATOR_NAME +
+                        """.""")
+    parser.add_argument("-F", filter_tags_long_option,
+                        metavar="SET-OF-TAGS",
                         nargs=1,
                         help="""\
-                        Output only those file paths that are tagged
-                        by any of the listed tags.
-                        The argument is a comma-separated list of tags.""")
+                        A comma-separated set of tags.
+
+
+                        Output only those file paths who's tags satisfy
+                        a condition with the given set of tags. """ +
+                        filter_tags_operator_long_option +
+                        """ determines how this set is used.""")
     parser.add_argument("--preprocessor",
                         metavar="PROCESSOR",
                         nargs=1,
@@ -2830,7 +2896,7 @@ def parse_command_line() -> CommandLineParseResult:
                         action='store_const',
                         dest='command',
                         const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter(), False),
-                        default=PrintPathsCommand(),
+                        default=ProgramMainFunctionalityCommand(),
                         help="""\
                         Prints the file inclusion hierarchy.
                         The normal output is suppressed.""")
@@ -2846,9 +2912,8 @@ def parse_command_line() -> CommandLineParseResult:
                         action='version',
                         version='%(prog)s 1.0')
     args = parser.parse_args()
-    filter_tags_or_none = None
-    if args.filter_tags is not None:
-        filter_tags_or_none = frozenset(args.filter_tags[0].split(","))
+    tags_condition = parse_tags_condition(args.filter_tags,
+                                          args.filter_tags_operator)
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            args.normalize_paths,
                                            args.absolute_paths,
@@ -2856,7 +2921,7 @@ def parse_command_line() -> CommandLineParseResult:
                                            args.suppress_non_path_output)
     return CommandLineParseResult(args.command,
                                   args.files,
-                                  filter_tags_or_none,
+                                  tags_condition,
                                   rendition_settings,
                                   args.preprocessor)
 
@@ -2869,7 +2934,7 @@ def main():
     parse_result = parse_command_line()
     try:
         parse_result.command.execute(parse_result.file_names,
-                                     parse_result.filter_tags_or_none,
+                                     parse_result.tags_condition,
                                      parse_result.rendition_settings,
                                      ParsingSettings(parse_result.preprocessor_shell_command,
                                                      system_line_parsers,
