@@ -82,6 +82,7 @@ testcase (file-path/filter-on-tags subset)
 testcase (file-path/filter-on-tags equals)
 testcase (file-path/filter-on-tags proper-superset)
 testcase (file-path/filter-on-tags superset)
+testcase (file-path/filter-on-tags unequals)
 
 testcase (list existing-directory)
 testcase (list existing-directory-absolute)
