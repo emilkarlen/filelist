@@ -2808,6 +2808,7 @@ def parse_command_line() -> CommandLineParseResult:
                                      description=program_description())
     filter_tags_long_option = "--filter-tags"
     filter_tags_operator_long_option = "--filter-tags-operator"
+    filter_operators_list = ", ".join(sorted(TagsCondition.OPERATORS.keys()))
 
     parser.add_argument("files",
                         metavar="FILE",
@@ -2877,6 +2878,9 @@ def parse_command_line() -> CommandLineParseResult:
                         is given.
                         The default operator is """ +
                         TagsCondition.DEFAULT_OPERATOR_NAME +
+                        """.
+
+                        Operators are (some of which are synonyms): """ + filter_operators_list +
                         """.""")
     parser.add_argument("-F", filter_tags_long_option,
                         metavar="SET-OF-TAGS",
@@ -2884,11 +2888,10 @@ def parse_command_line() -> CommandLineParseResult:
                         help="""\
                         A comma-separated set of tags.
 
-
                         Output only those file paths who's tags satisfy
                         a condition with the given set of tags. """ +
                         filter_tags_operator_long_option +
-                        """ determines how this set is used.""")
+                        """ determines how this set is used in the condition.""")
     parser.add_argument("--preprocessor",
                         metavar="PROCESSOR",
                         nargs=1,
