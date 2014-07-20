@@ -1,0 +1,14 @@
+@print # Empty stack
+@tags print-stack --prefix > --suffix <
+
+@print
+@print # Single item stack
+@tags set a b c
+@tags push
+@tags print-stack --prefix > --suffix <
+
+@print
+@print # Multi item stack
+@tags set x y z
+@tags push
+@tags print-stack --prefix > --suffix <

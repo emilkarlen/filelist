@@ -1,0 +1,8 @@
+# Empty stack
+>[]<
+
+# Single item stack
+>[['a', 'b', 'c']]<
+
+# Multi item stack
+>[['x', 'y', 'z'], ['a', 'b', 'c']]<
