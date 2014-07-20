@@ -10,15 +10,12 @@
      5. Refactor
   3. Write program help
   4. Remove item from this file.
+* Defects
+** --prepend-tags, --append-tags are mutualy exlusive
 * Improvements
 ** Customize the instruction token
    Make it possible to specify the prefix for instruction lines via a command
    line switch.
-** Tags
-*** Filter on tags
-**** conditions
-     The condition could be given by a single argument as a string.
-     E.g. "all",  "any", "exact", "not-all", "not-any", "not-exactly".
 ** List
 *** match file-name using reg-ex
 ** Source-file info in PreprocessorException
