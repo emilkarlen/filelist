@@ -1,0 +1,20 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+#
+# WHEN mode for handling non-existing files is "include",
+# and a file-path for a non-existing file is encountered,
+# THEN the program
+# SHOULD include the file in the output.
+#
+
+name:include
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE --non-existing-file include data/list.list
+
+check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
+check.stdout.file.eq:output/include.txt
