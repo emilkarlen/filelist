@@ -473,6 +473,17 @@ class TagsConditionSetup:
         return TagsCondition.new_for_no_condition()
 
 
+class TagsSettingsForInclude:
+    """
+    Settings for how the INCLUDE instruction should handle tags.
+    """
+    def __init__(self,
+                 do_export: bool,
+                 do_import: bool):
+        self.do_export = do_export
+        self.do_import = do_import
+
+
 class ResultItemsConstructionEnvironment:
     """
     ResultItemsConstructionEnvironment for executing instructions.
@@ -495,25 +506,23 @@ class ResultItemsConstructionEnvironment:
     def new_for_included_file(self,
                               file_name_relative_include_file: str,
                               preserve_current_directory: bool,
-                              do_not_export_tags: bool,
-                              do_not_import_tags: bool):
+                              tags_settings: TagsSettingsForInclude):
         return ResultItemsConstructionEnvironment(
             self.file_ref_env.for_included_file(file_name_relative_include_file,
                                                 preserve_current_directory),
             self._tags_condition,
-            self._tags_for_included_file(do_not_export_tags, do_not_import_tags))
+            self._tags_for_included_file(tags_settings))
 
     def _tags_for_included_file(self,
-                                do_not_export_tags: bool,
-                                do_not_import_tags: bool) -> Tags:
-        if do_not_export_tags:
-            if do_not_import_tags:
+                                tags_settings: TagsSettingsForInclude) -> Tags:
+        if not tags_settings.do_export:
+            if not tags_settings.do_import:
                 return Tags.new_empty()
             else:
                 self._tags = Tags.new_empty()
                 return self._tags
         else:
-            return self._tags if not do_not_import_tags else copy.deepcopy(self._tags)
+            return self._tags if tags_settings.do_import else copy.deepcopy(self._tags)
 
     def tags(self) -> Tags:
         return self._tags
@@ -1181,13 +1190,11 @@ class ProcessorForInclude(Processor):
                  source: SourceReference,
                  file_name_relative_include_file: str,
                  preserve_current_directory: bool,
-                 do_not_export_tags: bool,
-                 do_not_import_tags: bool):
+                 tag_include_settings: TagsSettingsForInclude):
         Processor.__init__(self, source)
         self._file_name_relative_including_file = file_name_relative_include_file
         self._preserve_current_directory = preserve_current_directory
-        self._do_not_export_tags = do_not_export_tags
-        self._do_not_import_tags = do_not_import_tags
+        self._tag_include_settings = tag_include_settings
         self._env_for_file = None
         self._file_processor = None
 
@@ -1220,8 +1227,7 @@ class ProcessorForInclude(Processor):
         """
         self._env_for_file = current_env.new_for_included_file(self._file_name_relative_including_file,
                                                                self._preserve_current_directory,
-                                                               self._do_not_export_tags,
-                                                               self._do_not_import_tags)
+                                                               self._tag_include_settings)
         file_path = current_env.file_ref_env.file_name_relative_current_dir_of_process(
             self._file_name_relative_including_file)
         if not os.path.isfile(file_path):
@@ -2017,11 +2023,12 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
               source: SourceReference,
               instruction_argument: str):
         args = self._parse_argument(instruction_argument)
+        tag_include_settings = TagsSettingsForInclude(not args.do_not_export_tags,
+                                                      not args.do_not_import_tags)
         return [ProcessorForInclude(source,
                                     args.file[0],
                                     args.preserve_current_directory,
-                                    args.do_not_export_tags,
-                                    args.do_not_import_tags)]
+                                    tag_include_settings)]
 
     def arg_parser(self) -> argparse.ArgumentParser:
         return self._parser
