@@ -654,10 +654,17 @@ class ResultItem:
     and parses must be done.
     """
 
-    def render(self,
-               env: RenditionEnvironment):
+    def include_in_output(self,
+                          env: RenditionEnvironment) -> bool:
         """
-        Renders the item as a string).
+        Tells if this item should be output.
+        """
+        raise NotImplementedError()
+
+    def rendition(self,
+                  env: RenditionEnvironment) -> str:
+        """
+        The string to output if this item should be output.
 
         Not allowed to raise exceptions (except for implementation issues,
         of course).
@@ -673,12 +680,9 @@ class ResultItemForOtherThanFilePath(ResultItem):
     then rendering of the item will produce no output.
     """
 
-    def render(self,
-               env: RenditionEnvironment) -> str:
-        return None if env.rendition_settings.suppress_non_path_output else self.the_string(env)
-
-    def the_string(self, env):
-        raise NotImplementedError()
+    def include_in_output(self,
+                          env: RenditionEnvironment) -> bool:
+        return not env.rendition_settings.suppress_non_path_output
 
 
 class ParsingSettings:
@@ -731,8 +735,8 @@ class ResultItemForPrint(ResultItemForOtherThanFilePath):
                  string: str):
         self._string = string
 
-    def the_string(self,
-                   env: RenditionEnvironment) -> str:
+    def rendition(self,
+                  env: RenditionEnvironment) -> str:
         return self._string
 
 
@@ -750,8 +754,11 @@ class ResultItemForFile(ResultItem):
         self.file_name = file_name
         self.tags = tags
 
-    def render(self,
-               env: RenditionEnvironment) -> str:
+    def include_in_output(self, env: RenditionEnvironment) -> bool:
+        return True
+
+    def rendition(self,
+                  env: RenditionEnvironment) -> str:
         return env.render_file_path(self.file_name,
                                     self.tags)
 
@@ -1476,8 +1483,8 @@ class ResultItemForTagsPrint(ResultItemForOtherThanFilePath):
         self._prefix = prefix
         self._suffix = suffix
 
-    def the_string(self,
-                   env: RenditionEnvironment) -> str:
+    def rendition(self,
+                  env: RenditionEnvironment) -> str:
         return ''.join([self._prefix,
                         env.rendition_settings.tags_settings.render_print_tags(self._tags),
                         self._suffix])
@@ -1495,8 +1502,8 @@ class ResultItemForTagsPrintStack(ResultItemForOtherThanFilePath):
         self._prefix = prefix
         self._suffix = suffix
 
-    def the_string(self,
-                   env: RenditionEnvironment) -> str:
+    def rendition(self,
+                  env: RenditionEnvironment) -> str:
         return ''.join([self._prefix,
                         str(self._stack),
                         self._suffix])
@@ -2340,11 +2347,10 @@ class ProgramMainFunctionalityCommand(Command):
                      file_processor: FileProcessor,
                      parsing_settings: ParsingSettings,
                      env: RenditionEnvironment):
-        for resultItem in file_processor.result_item_iterable(parsing_settings,
-                                                              env):
-            s = resultItem.render(env)
-            if s is not None:
-                print(s)
+        for result_item in file_processor.result_item_iterable(parsing_settings,
+                                                               env):
+            if result_item.include_in_output(env):
+                print(result_item.rendition(env))
 
 
 class HierarchyPrinter:
