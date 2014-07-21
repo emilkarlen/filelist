@@ -69,42 +69,6 @@ EXIT_TAGS_ERROR = 8 + 2
 ###############################################################################
 
 
-debugEnabled = False
-
-
-def debug(s):
-    if debugEnabled:
-        sys.stderr.write("DEBUG: " + s)
-        sys.stderr.write(os.linesep)
-
-
-def debug_q(s):
-    debug("\"" + s + "\"")
-
-
-def debug_begin(s):
-    debug(s + " BEGIN")
-
-
-def debug_end(s):
-    debug(s + " END")
-
-
-def q(s):
-    return "\"" + s + "\""
-
-
-def cq(s):
-    return " : \"" + s + "\""
-
-
-def debug_cq(header, content):
-    c = content
-    if type(c) != str:
-        c = str(c)
-    debug(header + ":  `" + c + "'")
-
-
 def in_double_quotes(s):
     return "\"" + s + "\""
 
