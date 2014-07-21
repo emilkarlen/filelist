@@ -2408,7 +2408,8 @@ class MissingFileHandlingModeOptionParser:
 
     _MODES = {
         "fail": (MissingFileHandlingSettings.new_fail(),
-                 "A missing file causes the program to fail."),
+                 "A missing file causes the program to fail (with exit status " +
+                 str(EXIT_FILE_DOES_NOT_EXIST) + ")."),
         "ignore": (MissingFileHandlingSettings.new_ignore(),
                    "Missing files are not included in the output."),
         "include": (MissingFileHandlingSettings.new_include(),
@@ -3005,9 +3006,9 @@ def parse_command_line() -> CommandLineParseResult:
                         Determines how file-paths that do not correspond to an existing
                         file are handled.
 
-                        The default option is """ +
+                        The default mode is """ +
                         in_quotes(missing_file_handling_mode_parser.default_key()) +
-                        """. Options: """ +
+                        """. List of modes: """ +
                              missing_file_handling_mode_parser.keys_help_text())
     parser.add_argument("-f", "--relative-file-argument-location",
                         default=False,
