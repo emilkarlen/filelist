@@ -44,7 +44,7 @@ configure_file(
 ###############################################################################
 macro (testcase testPkgDir testFileNameHead)
   add_test (
-    NAME ${testPkgDir}/${testFileNameHead}
+    NAME ${testPkgDir}::${testFileNameHead}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND ${SIMPTESTCASE} --m4 -v ${testPkgDir}/testcases/${testFileNameHead}.m4.simptestcase
     )
