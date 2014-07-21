@@ -27,24 +27,10 @@ It is a minor issue, since the preprocessor is independent of the file
 argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
 ** File
-*** Handling of non-existing files
-Alternativ:
-1. fallera (fail)
-2. ta med (include)
-3. ta inte med (skip)
-*** Options for turning on/off checking the existence of files
-*** Option for ignoring non-existing files
 *** Option for including existence-info for each file-path
     Precede each line with "+ " for existing, and "- " for non-existing
     files, e.g.
 *** Strip ws at both ends of paths
-*** Allow comments at end of line for lines with file
-Reason it has not been done is,
-1. lack of time
-2. it could be useful to allow all form of names of files.
-   Especially if file-existence is not check.  In that case,
-   the comment character could be interpreted later down
-   the pipe.
 ** Error messages
 *** Surround source text by quotes
     This makes it easier to spot errors due to trailing space.
