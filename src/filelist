@@ -93,7 +93,6 @@ def debug_end(s):
 def q(s):
     return "\"" + s + "\""
 
-
 def cq(s):
     return " : \"" + s + "\""
 
@@ -103,6 +102,10 @@ def debug_cq(header, content):
     if type(c) != str:
         c = str(c)
     debug(header + ":  `" + c + "'")
+
+
+def in_quotes(s):
+    return "\"" + s + "\""
 
 
 def write_lines(o_stream, lines):
@@ -491,15 +494,18 @@ class ResultItemsConstructionEnvironment:
 
     def __init__(self,
                  dir_env: FileReferenceEnvironment,
+                 fail_on_non_existing_file: bool,
                  tags_condition: TagsCondition,
                  tags: Tags):
         self.file_ref_env = dir_env
+        self.fail_on_non_existing_file = fail_on_non_existing_file
         self._tags_condition = tags_condition
         self._tags = tags
 
     def new_for_directory(self, name_of_directory):
         return ResultItemsConstructionEnvironment(
             self.file_ref_env.new_for_directory(name_of_directory),
+            self.fail_on_non_existing_file,
             self._tags_condition,
             self._tags)
 
@@ -510,6 +516,7 @@ class ResultItemsConstructionEnvironment:
         return ResultItemsConstructionEnvironment(
             self.file_ref_env.for_included_file(file_name_relative_include_file,
                                                 preserve_current_directory),
+            self.fail_on_non_existing_file,
             self._tags_condition,
             self._tags_for_included_file(tags_settings))
 
@@ -601,6 +608,7 @@ class RenditionSettings:
     """
     def __init__(self,
                  file_names_are_relative_file_argument_location: bool,
+                 include_missing_files: bool,
                  normalize_paths: bool,
                  absolute_paths: bool,
                  tags_settings: TagsRenditionSettings,
@@ -609,6 +617,7 @@ class RenditionSettings:
         :rtype : RenditionSettings
         """
         self.file_names_are_relative_file_argument_location = file_names_are_relative_file_argument_location
+        self.include_missing_files = include_missing_files
         self.normalize_paths = normalize_paths
         self.absolute_paths = absolute_paths
         self.tags_settings = tags_settings
@@ -625,20 +634,24 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
 
     @staticmethod
     def for_top_level_file(file_name: str,
+                           program_should_fail_on_missing_file: bool,
                            tags_condition: TagsCondition,
                            settings: RenditionSettings):
         return RenditionEnvironment(FileReferenceEnvironment.for_top_level_file(file_name),
+                                    program_should_fail_on_missing_file,
                                     tags_condition,
                                     Tags.new_empty(),
                                     settings)
 
     def __init__(self,
                  file_ref_env: FileReferenceEnvironment,
+                 program_should_fail_on_missing_file: bool,
                  tags_condition: TagsCondition,
                  tags: Tags,
                  rendition_settings: RenditionSettings):
         ResultItemsConstructionEnvironment.__init__(self,
                                                     file_ref_env,
+                                                    program_should_fail_on_missing_file,
                                                     tags_condition,
                                                     tags)
         self.rendition_settings = rendition_settings
@@ -761,9 +774,9 @@ class ResultItemForPrint(ResultItemForOtherThanFilePath):
         return self._string
 
 
-class ResultItemForFilePath(ResultItem):
+class ResultItemForFilePathExisting(ResultItem):
     """
-    An result item that is a file path.
+    An result item that is a file path who's corresponding file exists.
     """
     def __init__(self,
                  file_name: str,
@@ -777,6 +790,29 @@ class ResultItemForFilePath(ResultItem):
 
     def include_in_output(self, env: RenditionEnvironment) -> bool:
         return True
+
+    def rendition(self,
+                  env: RenditionEnvironment) -> str:
+        return env.render_file_path(self.file_name,
+                                    self.tags)
+
+
+class ResultItemForFilePathNonExisting(ResultItem):
+    """
+    An result item that is a file path who's corresponding file does not exists.
+    """
+    def __init__(self,
+                 file_name: str,
+                 tags: frozenset):
+        """
+        file_name : the name of the file as specified in the source file -
+        i.e. it is relative the source file.
+        """
+        self.file_name = file_name
+        self.tags = tags
+
+    def include_in_output(self, env: RenditionEnvironment) -> bool:
+        return env.rendition_settings.include_missing_files
 
     def rendition(self,
                   env: RenditionEnvironment) -> str:
@@ -1047,11 +1083,18 @@ class ResultItemIteratorForFilesFromFilePaths:
     def __next__(self):
         file_name = self._file_names_rel_list_file.__next__()
         file_path = self._env.file_ref_env.file_name_relative_current_dir_of_process(file_name)
-        if not os.path.exists(file_path):
-            raise ResultItemConstructionForMissingFileException(self._source, file_path)
-        result_item = ResultItemForFilePath(self._env.file_ref_env.file_name_relative_top_level_source_file(file_name),
-                                            self._tags)
-        return result_item
+        path_exists = os.path.exists(file_path)
+        if path_exists:
+            return ResultItemForFilePathExisting(
+                self._env.file_ref_env.file_name_relative_top_level_source_file(file_name),
+                self._tags)
+        else:
+            if self._env.fail_on_non_existing_file:
+                raise ResultItemConstructionForMissingFileException(self._source, file_path)
+            else:
+                return ResultItemForFilePathNonExisting(
+                    self._env.file_ref_env.file_name_relative_top_level_source_file(file_name),
+                    self._tags)
 
 
 class ProcessorForFilePath(Processor):
@@ -1172,9 +1215,10 @@ class ProcessorForDirectoryListing(Processor):
 
     def _new_file_result(self,
                          base_name: str,
-                         env: ResultItemsConstructionEnvironment) -> ResultItemForFilePath:
-        return ResultItemForFilePath(self.env_for_dir.file_ref_env.file_name_relative_top_level_source_file(base_name),
-                                     env.tags().frozen_tags())
+                         env: ResultItemsConstructionEnvironment) -> ResultItemForFilePathExisting:
+        return ResultItemForFilePathExisting(
+            self.env_for_dir.file_ref_env.file_name_relative_top_level_source_file(base_name),
+            env.tags().frozen_tags())
 
 
 ###############################################################################
@@ -2336,6 +2380,56 @@ class LinesSourceForIncludedFile(LinesSourceForFileBase):
             raise ResultItemConstructionForMissingFileException(self._source, file_name)
 
 
+class MissingFileHandlingSettings:
+
+    def __init__(self,
+                 program_should_fail: bool,
+                 include_in_output: bool):
+        self.program_should_fail = program_should_fail
+        self.include_in_output = include_in_output
+
+    @staticmethod
+    def new_fail():
+        return MissingFileHandlingSettings(True, False)
+
+    @staticmethod
+    def new_ignore():
+        return MissingFileHandlingSettings(False, False)
+
+    @staticmethod
+    def new_include():
+        return MissingFileHandlingSettings(False, True)
+
+
+class MissingFileHandlingModeOptionParser:
+    """Parses the Command Line Option for handling of missing files."""
+
+    _DEFAULT_KEY = "fail"
+
+    _MODES = {
+        "fail": (MissingFileHandlingSettings.new_fail(),
+                 "A missing file causes the program to fail."),
+        "ignore": (MissingFileHandlingSettings.new_ignore(),
+                   "Missing files are not included in the output."),
+        "include": (MissingFileHandlingSettings.new_include(),
+                    "Missing files are included in the output just as existing files."),
+    }
+
+    def mode_keys(self) -> list:
+        return self._MODES.keys()
+
+    def default_key(self) -> str:
+        return self._DEFAULT_KEY
+
+    def keys_help_text(self) -> str:
+        return " ".join([in_quotes(key) + ": " + val[1]
+                         for key, val in self._MODES.items()])
+
+    def lookup(self,
+               valid_key: str) -> MissingFileHandlingSettings:
+        return self._MODES[valid_key][0]
+
+
 class Command:
     """
     Abstract The top-level representation of what the program should do.
@@ -2344,6 +2438,7 @@ class Command:
     """
     def execute(self,
                 file_names: list,
+                program_should_fail_on_missing_file: bool,
                 tags_condition: TagsCondition,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
@@ -2353,6 +2448,7 @@ class Command:
             lines_source = LinesSourceForFileArgument(parsing_settings, file_name)
             file_processor = file_parser.apply(lines_source)
             env = RenditionEnvironment.for_top_level_file(file_name,
+                                                          program_should_fail_on_missing_file,
                                                           tags_condition,
                                                           rendition_settings)
             self.process_list_file(file_processor, parsing_settings, env)
@@ -2844,10 +2940,12 @@ class CommandLineParseResult:
                  command: Command,
                  file_names: list,
                  tags_condition: TagsCondition,
+                 missing_file_handling_settings: MissingFileHandlingSettings,
                  rendition_settings: RenditionSettings,
                  preprocessor_shell_command: str):
         self.command = command
         self.file_names = file_names
+        self.missing_file_handling_settings = missing_file_handling_settings
         self.tags_condition = tags_condition
         self.rendition_settings = rendition_settings
         self.preprocessor_shell_command = preprocessor_shell_command
@@ -2892,10 +2990,25 @@ def parse_command_line() -> CommandLineParseResult:
     tags_condition_setup = TagsConditionSetup()
     all_filter_operator_names = tags_condition_setup.all_operator_names()
 
+    missing_file_handling_mode_parser = MissingFileHandlingModeOptionParser()
+
     parser.add_argument("files",
                         metavar="FILE",
                         nargs="*",
                         help="List file.")
+    parser.add_argument("-m", "--missing-file-handling",
+                        metavar="MODE",
+                        nargs=1,
+                        choices=missing_file_handling_mode_parser.keys_help_text(),
+                        default=[missing_file_handling_mode_parser.default_key()],
+                        help="""\
+                        Determines how file-paths that do not correspond to an existing
+                        file are handled.
+
+                        The default option is """ +
+                        in_quotes(missing_file_handling_mode_parser.default_key()) +
+                        """. Options: """ +
+                             missing_file_handling_mode_parser.keys_help_text())
     parser.add_argument("-f", "--relative-file-argument-location",
                         default=False,
                         action="store_true",
@@ -3024,7 +3137,9 @@ def parse_command_line() -> CommandLineParseResult:
                                           args.filter_tags,
                                           args.operator_for_filter_tags[0],
                                           args.negate_operator_for_filter_tags)
+    missing_file_handling_settings = missing_file_handling_mode_parser.lookup(args.missing_file_handling[0])
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
+                                           missing_file_handling_settings.include_in_output,
                                            args.normalize_paths,
                                            args.absolute_paths,
                                            args.tags_settings,
@@ -3032,6 +3147,7 @@ def parse_command_line() -> CommandLineParseResult:
     return CommandLineParseResult(args.command,
                                   args.files,
                                   tags_condition,
+                                  missing_file_handling_settings,
                                   rendition_settings,
                                   args.preprocessor)
 
@@ -3044,6 +3160,7 @@ def main():
     parse_result = parse_command_line()
     try:
         parse_result.command.execute(parse_result.file_names,
+                                     parse_result.missing_file_handling_settings.program_should_fail,
                                      parse_result.tags_condition,
                                      parse_result.rendition_settings,
                                      ParsingSettings(parse_result.preprocessor_shell_command,

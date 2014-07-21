@@ -3,7 +3,7 @@
 m4_include(common.m4)
 
 #
-# WHEN mode for handling non-existing files not specified
+# WHEN mode for handling missing files not specified
 # THEN the mode
 # SHOULD default to "fail".
 #

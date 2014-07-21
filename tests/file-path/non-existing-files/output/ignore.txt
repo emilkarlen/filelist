@@ -1,1 +1,2 @@
 data/existing-file-1
+data/existing-file-2

@@ -3,8 +3,8 @@
 m4_include(common.m4)
 
 #
-# WHEN mode for handling non-existing files is "include",
-# and a file-path for a non-existing file is encountered,
+# WHEN mode for handling missing files is "include",
+# and a file-path for a missing file is encountered,
 # THEN the program
 # SHOULD include the file in the output.
 #
@@ -14,7 +14,7 @@ home:..
 
 setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE --non-existing-file include data/list.list
+test.run.cmdline:M4_EXECUTABLE --missing-file-handling include data/list.list
 
-check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
+check.exitcode:0
 check.stdout.file.eq:output/include.txt

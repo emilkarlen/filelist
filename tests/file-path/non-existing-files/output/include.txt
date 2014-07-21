@@ -1,1 +1,3 @@
 data/existing-file-1
+data/non-existing-file
+data/existing-file-2
