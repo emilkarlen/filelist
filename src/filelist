@@ -2667,20 +2667,6 @@ class InstructionConfiguration:
         return wrapper.wrap(self.long_name + " " + str(self.name_aliases))
 
 
-description_of_include = InstructionDescriptionExplicit(
-    "Includes instructions from a file.",
-    "FILE",
-    [("FILE",
-     """\
-     A readable file, who's name is relative the including file.
-     """)
-     ],
-    """\
-    File paths inside the included file are relative the
-    location of that file.
-    """
-)
-
 description_of_print = InstructionDescriptionExplicit(
     "Outputs the argument.",
     "[STRING]",
