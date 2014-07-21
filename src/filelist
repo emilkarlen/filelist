@@ -1923,14 +1923,18 @@ class FileType:
     suitable for us by an ArgumentParser.
     """
 
+    _TYPES = {
+        "f": stat.S_ISREG,
+        "d": stat.S_ISDIR,
+    }
+
     def __init__(self, s: str):
-        if s == "f":
-            self.mode_predicate = stat.S_ISREG
-        elif s == "d":
-            self.mode_predicate = stat.S_ISDIR
-        else:
+        try:
+            self.mode_predicate = self._TYPES[s]
+        except KeyError:
+            valid_types = ", ".join(self._TYPES.keys())
             raise InstructionArgumentParserSyntaxErrorException(["Invalid file type: " + in_source_quotes(s),
-                                                                 "Valid types are f,d."])
+                                                                 "Valid types are " + valid_types + "."])
 
     def new_matcher(self):
         return file_type_matcher(self)
