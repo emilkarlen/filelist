@@ -7,7 +7,7 @@ home:..
 
 setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE data/file-non-existing.list
+test.run.cmdline:M4_EXECUTABLE data/non-existing.list
 
 check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
 check.stdout.empty

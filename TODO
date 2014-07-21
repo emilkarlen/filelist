@@ -27,6 +27,11 @@ It is a minor issue, since the preprocessor is independent of the file
 argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
 ** File
+*** Handling of non-existing files
+Alternativ:
+1. fallera (fail)
+2. ta med (include)
+3. ta inte med (skip)
 *** Options for turning on/off checking the existence of files
 *** Option for ignoring non-existing files
 *** Option for including existence-info for each file-path
