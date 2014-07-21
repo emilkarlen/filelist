@@ -104,8 +104,12 @@ def debug_cq(header, content):
     debug(header + ":  `" + c + "'")
 
 
-def in_quotes(s):
+def in_double_quotes(s):
     return "\"" + s + "\""
+
+
+def in_source_quotes(s):
+    return "`" + s + "'"
 
 
 def write_lines(o_stream, lines):
@@ -234,7 +238,7 @@ class SourceLineInFile:
                          str(self.line.number)])
 
     def err_msg_line_contents(self):
-        return ERROR_MESSAGE_INDENT_STRING + self.line.contents
+        return ERROR_MESSAGE_INDENT_STRING + in_source_quotes(self.line.contents)
 
     def err_msg_file_ref_with_source_line(self):
         return os.linesep.join([self.err_msg_file_ref(),
@@ -966,7 +970,7 @@ class ResultItemConstructionForMissingFileException(ResultItemConstructionExcept
         write_lines(o_stream,
                     [
                         "File does not exist: " +
-                        self.file_name_relative_current_dir_of_process
+                        in_source_quotes(self.file_name_relative_current_dir_of_process)
                     ])
 
 
@@ -1320,7 +1324,7 @@ class InstructionNameSyntaxErrorException(InstructionSyntaxErrorException):
     def __init__(self,
                  source: SourceReference,
                  instruction_name: str):
-        description = "Invalid instruction name `" + instruction_name + "'"
+        description = "Invalid instruction name " + in_source_quotes(instruction_name)
         InstructionSyntaxErrorException.__init__(self,
                                                  source,
                                                  description)
@@ -1927,7 +1931,7 @@ def wildcard_matcher(wildcard: str):
         regex_string = fnmatch.translate(wildcard)
         regex = re.compile(regex_string)
     except:
-        raise InstructionArgumentParserSyntaxErrorException(["Invalid wildcard: `" + wildcard + "'"])
+        raise InstructionArgumentParserSyntaxErrorException(["Invalid wildcard: " + in_source_quotes(wildcard)])
 
     def f(file: FileMatchInfo) -> bool:
         return regex.match(file.base_name())
@@ -1947,7 +1951,7 @@ class FileType:
         elif s == "d":
             self.mode_predicate = stat.S_ISDIR
         else:
-            raise InstructionArgumentParserSyntaxErrorException(["Invalid file type `" + s + "'",
+            raise InstructionArgumentParserSyntaxErrorException(["Invalid file type: " + in_source_quotes(s),
                                                                  "Valid types are f,d."])
 
     def new_matcher(self):
@@ -2423,7 +2427,7 @@ class MissingFileHandlingModeOptionParser:
         return self._DEFAULT_KEY
 
     def keys_help_text(self) -> str:
-        return " ".join([in_quotes(key) + ": " + val[1]
+        return " ".join([in_double_quotes(key) + ": " + val[1]
                          for key, val in self._MODES.items()])
 
     def lookup(self,
@@ -3007,7 +3011,7 @@ def parse_command_line() -> CommandLineParseResult:
                         file are handled.
 
                         The default mode is """ +
-                        in_quotes(missing_file_handling_mode_parser.default_key()) +
+                        in_double_quotes(missing_file_handling_mode_parser.default_key()) +
                         """. List of modes: """ +
                              missing_file_handling_mode_parser.keys_help_text())
     parser.add_argument("-f", "--relative-file-argument-location",

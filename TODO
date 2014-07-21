@@ -30,7 +30,6 @@ But it would be nice to have the same trace as with other errors.
 *** Option for including existence-info for each file-path
     Precede each line with "+ " for existing, and "- " for non-existing
     files, e.g.
-*** Strip ws at both ends of paths
 ** Error messages
 *** Surround source text by quotes
     This makes it easier to spot errors due to trailing space.
