@@ -2826,7 +2826,8 @@ def program_description():
 
 def instruction_identifier_to_parser_dict() -> dict:
     """
-    Gives a dictionary with mappings for all valid instruction identifiers.
+    Gives a dictionary with mappings for all valid instruction identifiers -
+    long names and aliases.
 
     Returns a dict : INSTRUCTION-IDENTIFIER -> InstructionArgumentParser
     """
