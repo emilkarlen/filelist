@@ -342,7 +342,7 @@ class FileReferenceEnvironment:
         if prefix:
             prefix = prefix + os.sep
         return FileReferenceEnvironment(prefix,
-                                        '')
+                                        "")
 
     def new_for_directory(self, name_of_directory):
         if name_of_directory == ".":
@@ -575,7 +575,7 @@ class TagsRenditionSettings:
 
     @staticmethod
     def _render_tags_string(tags: frozenset) -> str:
-        return ' '.join(sorted(tags))
+        return " ".join(sorted(tags))
 
     def _concatenate(self,
                      tags_string: str,
@@ -1496,7 +1496,7 @@ class ResultItemForTagsPrint(ResultItemForOtherThanFilePath):
 
     def rendition(self,
                   env: RenditionEnvironment) -> str:
-        return ''.join([self._prefix,
+        return "".join([self._prefix,
                         env.rendition_settings.tags_settings.render_print_tags(self._tags),
                         self._suffix])
 
@@ -1515,7 +1515,7 @@ class ResultItemForTagsPrintStack(ResultItemForOtherThanFilePath):
 
     def rendition(self,
                   env: RenditionEnvironment) -> str:
-        return ''.join([self._prefix,
+        return "".join([self._prefix,
                         str(self._stack),
                         self._suffix])
 
@@ -1664,7 +1664,8 @@ class TagsSubCommandForListOfTagsArgumentsBase(InstructionSubCommand):
 
     def add_arguments(self,
                       parser: argparse.ArgumentParser):
-        parser.add_argument('tags', nargs='*',
+        parser.add_argument("tags",
+                            nargs="*",
                             metavar="TAG")
 
     def execute(self,
@@ -1699,13 +1700,13 @@ class TagsSubCommandForPrint(InstructionSubCommand):
         parser.add_argument("-p", "--prefix",
                             metavar="STRING",
                             nargs=1,
-                            default=[''],
+                            default=[""],
                             help="""\
                             Print the given string before the tags. (Use quotes to include space.)""")
         parser.add_argument("-s", "--suffix",
                             metavar="STRING",
                             nargs=1,
-                            default=[''],
+                            default=[""],
                             help="""\
                             Print the given string after the tags. (Use quotes to include space.)""")
 
@@ -1738,13 +1739,13 @@ class TagsSubCommandForPrintStack(InstructionSubCommand):
         parser.add_argument("-p", "--prefix",
                             metavar="STRING",
                             nargs=1,
-                            default=[''],
+                            default=[""],
                             help="""\
                             Print the given string before the stack. (Use quotes to include space.)""")
         parser.add_argument("-s", "--suffix",
                             metavar="STRING",
                             nargs=1,
-                            default=[''],
+                            default=[""],
                             help="""\
                             Print the given string after the stack. (Use quotes to include space.)""")
 
@@ -1990,11 +1991,11 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                             Condition on the file type.
                             "f" for regular file.
                             "d" for directory.""")
-        parser.add_argument('-s', '--sort',
-                            action='store_const',
+        parser.add_argument("-s", "--sort",
+                            action="store_const",
                             const=True,
                             default=False,
-                            help='Makes the output being sorted in alphabetical order.')
+                            help="Makes the output being sorted in alphabetical order.")
         return parser
 
 
@@ -2037,13 +2038,13 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
                             metavar="FILE",
                             nargs=1,
                             help="A readable file, who's name is relative the including file.")
-        parser.add_argument('-I', '--do-not-import-tags',
-                            action='store_const',
+        parser.add_argument("-I", "--do-not-import-tags",
+                            action="store_const",
                             const=True,
                             default=False,
-                            help='Do not import any modifications of the tags state from the included file.')
-        parser.add_argument('-E', '--do-not-export-tags',
-                            action='store_const',
+                            help="Do not import any modifications of the tags state from the included file.")
+        parser.add_argument("-E", "--do-not-export-tags",
+                            action="store_const",
                             const=True,
                             default=False,
                             help="""Do not export the tags state to the included file.
@@ -2051,8 +2052,8 @@ class InstructionArgumentParserForInclude(InstructionWithArgparseArgumentParser)
                             the first processed file.
                             Add the option to not import tag modifications if you want to
                             preserve the tags state in the including file.""")
-        parser.add_argument('-p', '--preserve-current-directory',
-                            action='store_const',
+        parser.add_argument("-p", "--preserve-current-directory",
+                            action="store_const",
                             const=True,
                             default=False,
                             help="""Let the current directory for the included file
@@ -2286,7 +2287,7 @@ class LinesSourceForFileBase(LinesSource):
     def _from_raw_lines(raw_lines: list):
         lines = []
         for lineWithPossibleNewLine in raw_lines:
-            lines.append(lineWithPossibleNewLine.strip('\n').rstrip())
+            lines.append(lineWithPossibleNewLine.strip("\n").rstrip())
         return iter(lines)
 
 
@@ -2302,7 +2303,7 @@ class LinesSourceForFileArgument(LinesSourceForFileBase):
     def _open(self, file_name: str):
         try:
             return open(file_name,
-                        mode='r')
+                        mode="r")
         except OSError:
             msg = error_header_line("Cannot open file: \"" + file_name + "\"")
             write_lines(sys.stderr,
@@ -2323,7 +2324,7 @@ class LinesSourceForIncludedFile(LinesSourceForFileBase):
 
     def _open(self, file_name: str):
         try:
-            return open(file_name, mode='r')
+            return open(file_name, mode="r")
         except OSError:
             raise ResultItemConstructionForMissingFileException(self._source, file_name)
 
@@ -2596,7 +2597,7 @@ class InstructionDescriptionForInstructionWithSubCommands(InstructionDescription
         ret_val = self.string_as_lines(wrapper,
                                      self._parser.arg_parser().format_help())
         for sub_command in sorted(self._parser.sub_command_parsers().keys()):
-            ret_val.extend([''])
+            ret_val.extend([""])
             arg_parser = self._parser.sub_command_parsers()[sub_command]
             ret_val.extend(self.string_as_lines_add_indent_to_non_first_line(wrapper, arg_parser.format_help()))
 
@@ -2661,7 +2662,7 @@ class InstructionConfiguration:
         wrapper.initial_indent = wrapper.subsequent_indent
         ret_val += self.description.render_as_lines(wrapper)
         wrapper.initial_indent = saved_initial_indent
-        ret_val += ['']
+        ret_val += [""]
         return ret_val
 
     def _render_name_line(self, wrapper):
@@ -2886,11 +2887,11 @@ def parse_command_line() -> CommandLineParseResult:
 
     parser.add_argument("files",
                         metavar="FILE",
-                        nargs='*',
+                        nargs="*",
                         help="List file.")
     parser.add_argument("-f", "--relative-file-argument-location",
                         default=False,
-                        action='store_true',
+                        action="store_true",
                         help="""\
                         File paths are relative the location of the FILE argument.
                         Without this option, file names are relative
@@ -2898,7 +2899,7 @@ def parse_command_line() -> CommandLineParseResult:
                         """)
     parser.add_argument("-n", "--normalize-paths",
                         default=False,
-                        action='store_true',
+                        action="store_true",
                         help="""\
                         Normalizes paths.
                         E.g.: A//B, A/B/, A/./B and A/foo/../B all become A/B.
@@ -2907,30 +2908,30 @@ def parse_command_line() -> CommandLineParseResult:
                         """)
     parser.add_argument("-a", "--absolute-paths",
                         default=False,
-                        action='store_true',
+                        action="store_true",
                         help="""\
                         Make paths absolute = non-relative.
                         Paths start with a "/".
                         """)
     parser.add_argument("-S", "--suppress-non-path-output",
                         default=False,
-                        action='store_true',
+                        action="store_true",
                         help="""\
                         Suppresses all output other than file paths.
                         E.g., PRINT instructions will have no effect.
                         """)
     parser.add_argument("-t", "--prepend-tags",
-                        dest='tags_settings',
+                        dest="tags_settings",
                         default=TagsRenditionSettings.new_without_output(),
-                        action='store_const',
+                        action="store_const",
                         const=TagsRenditionSettings.new_prepend(),
                         help="""\
                         For each file, print it's tags before it.
                         The tags and the path are separated by \"""" +
                         TagsRenditionSettings.DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
     parser.add_argument("-T", "--append-tags",
-                        dest='tags_settings',
-                        action='store_const',
+                        dest="tags_settings",
+                        action="store_const",
                         const=TagsRenditionSettings.new_append(),
                         help="""\
                         For each file, print it's tags after it.
@@ -2976,7 +2977,7 @@ def parse_command_line() -> CommandLineParseResult:
                         """.""")
     parser.add_argument("-N", filter_tags_negate_operator_long_option,
                         default=False,
-                        action='store_true',
+                        action="store_true",
                         help="""\
                         Negates the operator given by """ +
                         filter_tags_operator_long_option +
@@ -2993,24 +2994,24 @@ def parse_command_line() -> CommandLineParseResult:
                         The processor is given the list-file via stdin, and must output it's result
                         on stdout.""")
     parser.add_argument("-i", "--print-inclusion-hierarchy",
-                        action='store_const',
-                        dest='command',
+                        action="store_const",
+                        dest="command",
                         const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter(), False),
                         default=ProgramMainFunctionalityCommand(),
                         help="""\
                         Prints the file inclusion hierarchy.
                         The normal output is suppressed.""")
     parser.add_argument("-I", "--print-inclusion-hierarchy-pretty",
-                        action='store_const',
-                        dest='command',
+                        action="store_const",
+                        dest="command",
                         const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter(), True),
                         help="""\
                         Prints the file inclusion hierarchy,
                         in a pretty layout.
                         The normal output is suppressed.""")
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s 1.0')
+    parser.add_argument("--version",
+                        action="version",
+                        version="%(prog)s 1.0")
     args = parser.parse_args()
     tags_condition = parse_tags_condition(tags_condition_setup,
                                           args.filter_tags,
