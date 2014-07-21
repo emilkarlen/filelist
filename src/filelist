@@ -2546,6 +2546,7 @@ class InstructionDescriptionExplicit(InstructionDescription):
 
 
 class ArgparseParserHelpTextMixin:
+
     SUB_COMMAND_DETAILS_INDENT = "  "
 
     @staticmethod
@@ -2583,8 +2584,6 @@ class InstructionDescriptionForInstructionWithArgparseParser(InstructionDescript
 
 class InstructionDescriptionForInstructionWithSubCommands(InstructionDescription, ArgparseParserHelpTextMixin):
     """Detailed description of an instruction that has sub commands."""
-
-    SUB_COMMAND_DETAILS_INDENT = "  "
 
     def __init__(self,
                  parser: InstructionWithSubCommandsArgumentParser):
