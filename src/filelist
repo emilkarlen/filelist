@@ -156,6 +156,16 @@ def constantly_true_matcher():
 
 
 ###############################################################################
+# - parsing utils -
+###############################################################################
+
+
+def parse_tags_list(string: str) -> list:
+    return list(filter(lambda s: bool(s),
+                       re.split(r"[\s,]+", string)))
+
+
+###############################################################################
 # - argparse -
 ###############################################################################
 
@@ -1660,7 +1670,12 @@ class TagsSubCommandForListOfTagsArgumentsBase(InstructionSubCommand):
                 parsing_settings: ParsingSettings,
                 source: SourceReference,
                 args: argparse.Namespace) -> list:
-        return [self.processor_class(source, args.tags)]
+        return [self.processor_class(source,
+                                     self.parse_tags_list(args.tags))]
+
+    @staticmethod
+    def parse_tags_list(list_split_on_white_space: list) -> list:
+        return parse_tags_list(" ".join(list_split_on_white_space))
 
 
 class TagsSubCommandForPrint(InstructionSubCommand):
@@ -2850,7 +2865,7 @@ def parse_tags_condition(tags_condition_setup: TagsConditionSetup,
     if right_operand_or_empty:
         operand_string = right_operand_or_empty[0]
         if operand_string and not operand_string.isspace():
-            r = frozenset(operand_string.split(","))
+            r = frozenset(parse_tags_list(operand_string))
         else:
             r = frozenset()
         return tags_condition_setup.condition_for(operator_name,
@@ -2937,7 +2952,9 @@ def parse_command_line() -> CommandLineParseResult:
                         metavar="SET-OF-TAGS",
                         nargs=1,
                         help="""\
-                        A comma-separated set of tags.
+                        A set of tags.
+                        Tags are separated by white space and commas.
+                        Empty tags are ignored.
 
                         Output only those file paths who's tags satisfy
                         a condition with the given set of tags. """ +

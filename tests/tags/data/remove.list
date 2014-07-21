@@ -1,27 +1,33 @@
-@print * Removing tags from the empty set of tags should have no effect
+@print # Removing tags from the empty set of tags should have no effect
 @tags remove tag1 tag2
 existing-file-1.txt
 
 @print
-@print * Remove a single tag
+@print # Remove a single tag
 @tags set    tag1 tag2
 @tags remove tag1
 existing-file-2.txt
 
 @print
-@print * Remove multiple tags
+@print # Remove multiple tags
 @tags set    tag1 tag2 tag3
 @tags remove      tag2 tag3 tag4
 existing-file-3.txt
 
 @print
-@print * Remove without arguments should remove all tags
+@print # Remove without arguments should remove all tags
 @tags set tag1 tag2
 @tags remove
 existing-file-4.txt
 
 @print
-@print * Alias rm should work the same as the full name
+@print # Alias rm should work the same as the full name
 @tags set tag1 tag2
 @tags rm tag1
 existing-file-5.txt
+
+@print
+@print # Flexible parsing of tags list
+@tags set unremoved a b c d e f
+@tags remove ,a,b,,c  d , e, ,f ,
+@tags print

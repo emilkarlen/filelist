@@ -10,6 +10,8 @@
      5. Refactor
   3. Write program help
   4. Remove item from this file.
+* Cleanup
+** Remove debug-functions
 * Defects
 ** --prepend-tags, --append-tags are mutualy exlusive
 * Improvements

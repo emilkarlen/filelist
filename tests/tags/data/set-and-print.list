@@ -5,3 +5,13 @@
 @print # Non-empty set of tags
 @tags set tag1 tag2
 @tags print
+
+@print
+@print # Set empty set of tags
+@tags set
+@tags print
+
+@print
+@print # Flexible parsing of tags list
+@tags set ,a,b,,c  d , e, ,f ,
+@tags print

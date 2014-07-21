@@ -1,18 +1,24 @@
-@print * Add a single tag
+@print # Add a single tag
 @tags add tag1
 existing-file-1.txt
 
 @print
-@print * Add multiple tags
+@print # Add multiple tags
 @tags add tag2 tag3
 existing-file-2.txt
 
 @print
-@print * Adding the same tag twice should make no difference
+@print # Adding the same tag twice should make no difference
 @tags add tag2
 existing-file-3.txt
 
 @print
-@print * Add without any tags should have no effect
+@print # Add without any tags should have no effect
 @tags add
 existing-file-4.txt
+
+@print
+@print # Flexible parsing of tags list
+@tags set
+@tags add ,a,b,,c  d , e, ,f ,
+@tags print

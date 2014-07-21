@@ -3,3 +3,9 @@
 
 # Non-empty set of tags
 tag1 tag2
+
+# Set empty set of tags
+
+
+# Flexible parsing of tags list
+a b c d e f

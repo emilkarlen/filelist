@@ -1,14 +1,17 @@
-* Removing tags from the empty set of tags should have no effect
+# Removing tags from the empty set of tags should have no effect
 :data/existing-file-1.txt
 
-* Remove a single tag
+# Remove a single tag
 tag2:data/existing-file-2.txt
 
-* Remove multiple tags
+# Remove multiple tags
 tag1:data/existing-file-3.txt
 
-* Remove without arguments should remove all tags
+# Remove without arguments should remove all tags
 :data/existing-file-4.txt
 
-* Alias rm should work the same as the full name
+# Alias rm should work the same as the full name
 tag2:data/existing-file-5.txt
+
+# Flexible parsing of tags list
+unremoved

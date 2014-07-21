@@ -1,11 +1,14 @@
-* Add a single tag
+# Add a single tag
 tag1:data/existing-file-1.txt
 
-* Add multiple tags
+# Add multiple tags
 tag1 tag2 tag3:data/existing-file-2.txt
 
-* Adding the same tag twice should make no difference
+# Adding the same tag twice should make no difference
 tag1 tag2 tag3:data/existing-file-3.txt
 
-* Add without any tags should have no effect
+# Add without any tags should have no effect
 tag1 tag2 tag3:data/existing-file-4.txt
+
+# Flexible parsing of tags list
+a b c d e f
