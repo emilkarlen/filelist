@@ -2,7 +2,7 @@
 
 m4_include(common.m4)
 
-name:multiple-file_arguments
+name:multiple-file-arguments
 home:..
 
 setup.install:data
