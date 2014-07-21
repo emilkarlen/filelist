@@ -1,0 +1,2 @@
+dir/a-file.a
+dir/b-file.b

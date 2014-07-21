@@ -1,0 +1,1 @@
+@LIST dir -r 'f.*\.a' -r ^b -t f

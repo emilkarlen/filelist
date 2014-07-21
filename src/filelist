@@ -69,11 +69,11 @@ EXIT_TAGS_ERROR = 8 + 2
 ###############################################################################
 
 
-def in_double_quotes(s):
+def in_double_quotes(s: str):
     return "\"" + s + "\""
 
 
-def in_source_quotes(s):
+def in_source_quotes(s: str):
     return "`" + s + "'"
 
 
@@ -1903,6 +1903,19 @@ def wildcard_matcher(wildcard: str):
     return f
 
 
+def reg_ex_matcher(regex_string: str):
+    """A mather that matches on Regular Expressions."""
+    try:
+        regex = re.compile(regex_string)
+    except:
+        raise InstructionArgumentParserSyntaxErrorException(["Invalid regular expression: " +
+                                                             in_source_quotes(regex_string)])
+
+    def f(file: FileMatchInfo) -> bool:
+        return regex.search(file.base_name()) is not None
+    return f
+
+
 class FileType:
     """
     Specifies a condition on the type of a file.
@@ -1937,6 +1950,8 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
 
     DIRECTORY is the directory to list files in.
     Use . for the directory of the list file.
+
+    Arguments uses shell-style syntax for quoting, etc.
     """
 
     def __init__(self,
@@ -1964,21 +1979,32 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
 
         args = self._parse(arguments[1:])
         matcher = self._parse_matcher(args.type,
-                                      args.patterns)
+                                      args.patterns,
+                                      [l[0] for l in args.reg_ex_list])
         return ListSettings(directory,
                             matcher,
                             args.sort)
 
     @staticmethod
     def _parse_matcher(file_type: list,
-                       wildcards: list):
+                       wildcards: list,
+                       reg_ex_list: list):
         and_list = []
         if file_type:
             and_list.append(file_type[0].new_matcher())
-        if wildcards:
-            and_list.append(or_matcher([wildcard_matcher(wildcard) for wildcard in wildcards]))
+        and_list.extend(InstructionArgumentParserForDirectoryListing._parse_name_matchers(wildcards,
+                                                                                          reg_ex_list))
 
         return and_matcher(and_list)
+
+    @staticmethod
+    def _parse_name_matchers(wildcards: list,
+                             reg_ex_list: list) -> list:
+        or_list = []
+        or_list.extend([wildcard_matcher(wildcard) for wildcard in wildcards])
+        or_list.extend([reg_ex_matcher(reg_ex) for reg_ex in reg_ex_list])
+
+        return [or_matcher(or_list)] if or_list else []
 
     @staticmethod
     def _parse_wildcard_matcher(wildcards: list):
@@ -1994,7 +2020,9 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                             metavar="PATTERN",
                             nargs="*",
                             help="""\
-                            A Unix like shell-style wildcard.
+                            A condition of the files in the directory to include,
+                            in terms of a Unix like shell-style wildcard.
+
                             (E.g. the constructs "*, ?, [abc],[!abc]".)
                             Each PATTERN is applied to the base-name of the files in the
                             directory.
@@ -2002,6 +2030,27 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                             file name.
                             If PATTERNs are given, then the condition on the file name
                             is to match at least one of these.
+                            """)
+        parser.add_argument("-r", "--reg-ex",
+                            metavar="REG-EX",
+                            nargs=1,
+                            dest="reg_ex_list",
+                            action="append",
+                            default=[],
+                            help="""\
+                            A condition of the files in the directory to include,
+                            in terms of a regular expression.
+
+                            This option can be used multiple times. Each file that matches
+                            ANY of the REG-EX will be included.
+
+                            Each REG-EX is applied to the base-name of the files in the
+                            directory.
+
+                            The REG-EX is considered to match a file name if it matches
+                            any part of the file-name.
+                            To limit matches to file-names who's whole name matches the REG-EX,
+                            begin and end REG-EX with '^' and '$', respectively.
                             """)
         parser.add_argument("-t", "--type",
                             nargs=1,
