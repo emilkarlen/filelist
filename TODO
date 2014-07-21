@@ -44,14 +44,6 @@ Reason it has not been done is,
 *** Surround source text by quotes
     This makes it easier to spot errors due to trailing space.
 ** Improve layout of pretty-printed tree
-** Tag
-*** Parsning av tag-listor ska tillåta både mellanrum o komma som sepa
-    Både mellanrum och komma ska funka som separator,
-    och tomma taggar ska ignoreras.
-    Båda separatorerna ska vara tillgängliga i alla fall där en lista av
-    taggar anges - både i filer och som kommandoradsargument.
-    Detta försäkrar att mellanrum eller komma inte kan förekomma i taggar och
-    gör angivelsen av tag-listor enhetlig.
 * Features
 ** Tags
 *** filter: output all files, preceeded by info about filter-match
