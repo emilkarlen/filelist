@@ -94,7 +94,6 @@ ERROR_MESSAGE_INDENT_STRING = "  "
 
 DEFAULT_INSTRUCTION_PREFIX = "@"
 
-COMMENT_CHARACTER = "#"
 
 ###############################################################################
 # - matcher utils -
@@ -2161,8 +2160,12 @@ class LineParser:
 
 class LineParserForIgnoredLine(LineParser):
 
-    ignored_line_re_string = "\s*(" + COMMENT_CHARACTER + ".*)?$"
+    ignored_line_re_string = "\s*(#.*)?$"
     ignored_line_re = re.compile(ignored_line_re_string)
+
+    @staticmethod
+    def is_comment_line(line: str) -> bool:
+        return bool(LineParserForIgnoredLine.ignored_line_re.match(line))
 
     def parse(self,
               parsing_settings: ParsingSettings,
@@ -2980,6 +2983,7 @@ def exit_usage(msg: str):
 
 
 class CommandLineParseResult:
+
     def __init__(self,
                  command: Command,
                  instruction_prefix: str,
@@ -3002,10 +3006,11 @@ class CommandLineParseResult:
         and exits if an error is found.
         """
 
-        if not self.instruction_prefix:
-            exit_usage("The instruction prefix may not be empty.")
-        if self.instruction_prefix[0] == COMMENT_CHARACTER:
-            exit_usage("The instruction prefix may not begin with the comment-character.")
+        self.check_instruction_prefix()
+
+    def check_instruction_prefix(self):
+        if LineParserForIgnoredLine.is_comment_line(self.instruction_prefix):
+            exit_usage("The instruction prefix may not match as a comment line.")
 
 
 def parse_tags_condition(tags_condition_setup: TagsConditionSetup,
