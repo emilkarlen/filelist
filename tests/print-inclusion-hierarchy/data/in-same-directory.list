@@ -1,2 +1,2 @@
-@include sub-1.list
-@include sub-2.list
+@include 1.list
+@include 2.list
