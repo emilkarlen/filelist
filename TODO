@@ -19,14 +19,6 @@ Currently, no source-info is included in case of error of preprocessor.
 It is a minor issue, since the preprocessor is independent of the file
 argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
-** Improve layout of pretty-printed tree
-*** TODO (eventuellt) Pass CommandLineParseResult to Command
-    På så vis kan de normala växlarna för formatering av filnamn göras (dvs
-    relativt aktuell katalog/list-filen).
-
-    Ev löser det ändå inte alla problem - träd-utskriften behöver separata
-    växlar, och kanske är det enklast att skicka dem direkt till
-    Command-konstruktorn.
 * Features
 ** File
 *** Option for including existence-info for each file-path
@@ -69,3 +61,8 @@ File
      lstat.
 **** Complex expressions à la find
      Not, parenthasis, etc.
+** Print inclusion-hierarchy
+*** "Listen to" RenditionEnvironment: rendition of paths
+- absolute paths
+- normalise paths
+Do this for non-pretty output.
