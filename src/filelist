@@ -92,6 +92,9 @@ def write_lines(o_stream, lines):
 # TODO Move this info to some kind of printer / settings.
 ERROR_MESSAGE_INDENT_STRING = "  "
 
+DEFAULT_INSTRUCTION_PREFIX = "@"
+
+COMMENT_CHARACTER = "#"
 
 ###############################################################################
 # - matcher utils -
@@ -2158,7 +2161,7 @@ class LineParser:
 
 class LineParserForIgnoredLine(LineParser):
 
-    ignored_line_re_string = "\s*(#.*)?$"
+    ignored_line_re_string = "\s*(" + COMMENT_CHARACTER + ".*)?$"
     ignored_line_re = re.compile(ignored_line_re_string)
 
     def parse(self,
@@ -2173,8 +2176,13 @@ class LineParserForIgnoredLine(LineParser):
 
 class LineParserForInstruction(LineParser):
 
-    name_and_argument_groups_re_string = "@(\w+)\s*(.*)"
-    name_and_argument_groups_re = re.compile(name_and_argument_groups_re_string)
+    _name_and_argument_except_prefix_groups_re_string = "(\w+)\s*(.*)"
+
+    def __init__(self,
+                 instruction_prefix: str):
+        self.name_and_argument_groups_re_string = instruction_prefix +\
+            self._name_and_argument_except_prefix_groups_re_string
+        self.name_and_argument_groups_re = re.compile(self.name_and_argument_groups_re_string)
 
     def parse(self,
               parsing_settings: ParsingSettings,
@@ -2887,9 +2895,12 @@ description_header_of_program_paragraphs = [
     """
 ]
 
-system_line_parsers = [LineParserForIgnoredLine(),
-                       LineParserForInstruction(),
-                       LineParserForFilePath()]
+
+def system_line_parsers(instruction_prefix: str):
+    return [LineParserForIgnoredLine(),
+            LineParserForInstruction(instruction_prefix),
+            LineParserForFilePath()]
+
 
 instruction_configurations = [
     InstructionConfiguration.for_instruction_with_argparser(
@@ -2958,20 +2969,43 @@ def instruction_identifier_to_parser_dict() -> dict:
 ###############################################################################
 
 
+def program_error_message(msg: str):
+    return os.path.basename(sys.argv[0]) + ": " + msg
+
+
+def exit_usage(msg: str):
+    write_lines(sys.stderr,
+                [program_error_message(msg)])
+    sys.exit(EXIT_USAGE)
+
+
 class CommandLineParseResult:
     def __init__(self,
                  command: Command,
+                 instruction_prefix: str,
                  file_names: list,
                  tags_condition: TagsCondition,
                  missing_file_handling_settings: MissingFileHandlingSettings,
                  rendition_settings: RenditionSettings,
                  preprocessor_shell_command: str):
         self.command = command
+        self.instruction_prefix = instruction_prefix
         self.file_names = file_names
         self.missing_file_handling_settings = missing_file_handling_settings
         self.tags_condition = tags_condition
         self.rendition_settings = rendition_settings
         self.preprocessor_shell_command = preprocessor_shell_command
+
+    def exit_if_invalid(self):
+        """
+        Performs some (rather arbitrary) checks of values,
+        and exits if an error is found.
+        """
+
+        if not self.instruction_prefix:
+            exit_usage("The instruction prefix may not be empty.")
+        if self.instruction_prefix[0] == COMMENT_CHARACTER:
+            exit_usage("The instruction prefix may not begin with the comment-character.")
 
 
 def parse_tags_condition(tags_condition_setup: TagsConditionSetup,
@@ -3019,6 +3053,14 @@ def parse_command_line() -> CommandLineParseResult:
                         metavar="FILE",
                         nargs="*",
                         help="List file.")
+    parser.add_argument("--instruction-prefix",
+                        nargs=1,
+                        default=[DEFAULT_INSTRUCTION_PREFIX],
+                        help="""\
+                        Sets the prefix for lines that contain an instruction
+                        (as opposed to file-paths).
+
+                        The default is """ + DEFAULT_INSTRUCTION_PREFIX + ".")
     parser.add_argument("-m", "--missing-file-handling",
                         metavar="MODE",
                         nargs=1,
@@ -3168,6 +3210,7 @@ def parse_command_line() -> CommandLineParseResult:
                                            args.tags_settings,
                                            args.suppress_non_path_output)
     return CommandLineParseResult(args.command,
+                                  args.instruction_prefix[0],
                                   args.files,
                                   tags_condition,
                                   missing_file_handling_settings,
@@ -3181,13 +3224,14 @@ def error_header_line(s: str):
 
 def main():
     parse_result = parse_command_line()
+    parse_result.exit_if_invalid()
     try:
         parse_result.command.execute(parse_result.file_names,
                                      parse_result.missing_file_handling_settings.program_should_fail,
                                      parse_result.tags_condition,
                                      parse_result.rendition_settings,
                                      ParsingSettings(parse_result.preprocessor_shell_command,
-                                                     system_line_parsers,
+                                                     system_line_parsers(parse_result.instruction_prefix),
                                                      instruction_identifier_to_parser_dict()))
     except InstructionSyntaxErrorException as ex:
         ex.render(sys.stderr)

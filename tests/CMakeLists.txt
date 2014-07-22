@@ -66,6 +66,7 @@ testcase (basic simple-print)
 testcase (basic print--suppress-non-path-output)
 testcase (basic instruction-name-variants)
 testcase (basic multiple-file-arguments)
+testcase (basic custom-instruction-prefix)
 
 testcase (file-path multiple-file-arguments)
 testcase (file-path existing)
