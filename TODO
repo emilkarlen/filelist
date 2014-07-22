@@ -10,8 +10,6 @@
      5. Refactor
   3. Write program help
   4. Remove item from this file.
-* Cleanup
-** Remove debug-functions
 * Defects
 ** --prepend-tags, --append-tags are mutualy exlusive
 * Improvements
@@ -21,13 +19,12 @@ Currently, no source-info is included in case of error of preprocessor.
 It is a minor issue, since the preprocessor is independent of the file
 argument (the input file is accessed via stdin).
 But it would be nice to have the same trace as with other errors.
+** Improve layout of pretty-printed tree
+* Features
 ** File
 *** Option for including existence-info for each file-path
     Precede each line with "+ " for existing, and "- " for non-existing
     files, e.g.
-** Improve layout of pretty-printed tree
-* Features
-** Tags
 *** filter: output all files, preceeded by info about filter-match
     Preceede each file with, e.g. "+ " for files that satisfy the filter
     condition, and "- " for files that don't.
@@ -35,20 +32,8 @@ But it would be nice to have the same trace as with other errors.
     depending on filter satisfaction.
 ** stdin as FILE argument
 File
-** Flatten file
-Generate an input file that is equivalent to the given argument
-(regarding output from running the program in normal mode, on it)
-but that consists of a single "flat" file - a file that contains
-no INCLUDE instructions.
-
-This could be usefull for getting an overview of file references,
-or for debugging.
-
-A variant of this is to print only INCLUDE instructions, to get
-an overview of all references.
-
 * Check current functionality
-** Exporting of tags to following command line files
+** Exporting of tags to following files on the command line
    Currently, I believe, tags are forwarded to later command line arguments.
    A consequence is that using a file as a single file argument may be
    different than using it as a second file argument.
