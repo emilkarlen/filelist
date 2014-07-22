@@ -15,9 +15,6 @@
 * Defects
 ** --prepend-tags, --append-tags are mutualy exlusive
 * Improvements
-** Customize the instruction token
-   Make it possible to specify the prefix for instruction lines via a command
-   line switch.
 ** Source-file info in PreprocessorException
 Currently, no source-info is included in case of error of preprocessor.
 
