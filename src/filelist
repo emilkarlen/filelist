@@ -2512,24 +2512,6 @@ class ProgramMainFunctionalityCommand(Command):
                 print(result_item.rendition(env))
 
 
-class HierarchyPrinter:
-    """
-    Base class for printers that prints a hierarchy of nodes
-    in an indented layout.
-    """
-    def begin_hierarchy(self,
-                        root_node: str):
-        """
-        Begins a hierarchy.
-        Every node begins a hierarchy, and this hierarchy must be
-        ended using end_hierarchy.
-        """
-        raise NotImplementedError()
-
-    def end_hierarchy(self):
-        raise NotImplementedError()
-
-
 class Node:
     """
     Type for trees used for printing the inclusion hierarchy.
@@ -2545,9 +2527,6 @@ class Node:
 
     def sub_nodes(self):
         return self._sub_nodes
-
-    def is_leaf(self):
-        return bool(self._sub_nodes)
 
 
 class TreePrinter:
@@ -2621,70 +2600,6 @@ class TreePrinterForPrettyLayout(TreePrinter):
         print("".join(self._higher_levels_indents) + prefix + name)
 
 
-class SimpleHierarchyPrinter(HierarchyPrinter):
-    """
-    Prints a hierarchy of nodes in an simple layout,
-    suitable for parsing by programs.
-    """
-    def __init__(self):
-        self._indent = 0
-        self._indent_string = " "
-
-    def begin_hierarchy(self,
-                        root_node: str):
-        self._print(root_node)
-        self._indent += 1
-
-    def end_hierarchy(self):
-        self._indent -= 1
-
-    def _print(self,
-               node: str):
-        print(" " * self._indent + node)
-
-
-class PrintInclusionHierarchyCommand_OLD(Command):
-
-    def __init__(self,
-                 printer: HierarchyPrinter,
-                 print_file_names_relative_including_file: bool):
-        self._printer = printer
-        self._print_file_names_relative_including_file = print_file_names_relative_including_file
-
-    def process_list_file(self, file_number, file_processor: ProcessorForListFile, parsing_settings: ParsingSettings,
-                          env: RenditionEnvironment):
-        self._printer.begin_hierarchy(self.file_name_for(file_processor))
-        for processor in file_processor.processors():
-            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(parsing_settings,
-                                                                                                 env)
-            if file_processor_and_env is not None:
-                self.process_list_file(1, file_processor_and_env[0], parsing_settings, file_processor_and_env[1])
-        self._printer.end_hierarchy()
-
-    def tree_for_file(self,
-                      file_processor: ProcessorForListFile,
-                      parsing_settings: ParsingSettings,
-                      env: RenditionEnvironment) -> Node:
-        sub_nodes = []
-        for processor in file_processor.processors():
-            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(parsing_settings,
-                                                                                                 env)
-            if file_processor_and_env is not None:
-                sub_node = self.tree_for_file(file_processor_and_env[0],
-                                              parsing_settings,
-                                              file_processor_and_env[1])
-                sub_nodes.append(sub_node)
-        return Node(self.file_name_for(file_processor),
-                    sub_nodes)
-
-    def file_name_for(self,
-                      file_processor: ProcessorForListFile):
-        if self._print_file_names_relative_including_file:
-            return file_processor.file_name_relative_including_file()
-        else:
-            return file_processor.file_name()
-
-
 class PrintInclusionHierarchyCommand(Command):
 
     def __init__(self,
@@ -2729,50 +2644,6 @@ class PrintInclusionHierarchyCommand(Command):
             return file_processor.file_name_relative_including_file()
         else:
             return file_processor.file_name()
-
-
-class PrettyHierarchyPrinter(HierarchyPrinter):
-    """
-    Prints a hierarchy of nodes in an indented layout.
-    """
-    def __init__(self):
-        self._vertical_space_before_next_node_per_level = []
-
-    def begin_hierarchy(self,
-                        node: str):
-        if not self._vertical_space_before_next_node_per_level:
-            self._handle_root_node(node)
-        else:
-            self._handle_non_root_node(node)
-
-    def end_hierarchy(self):
-        self._vertical_space_before_next_node_per_level = self._vertical_space_before_next_node_per_level[:-1]
-
-    def _handle_root_node(self,
-                          node: str):
-        print(node)
-        self._vertical_space_before_next_node_per_level = [True]
-
-    def _handle_non_root_node(self,
-                              node: str):
-        if self._vertical_space_before_next_node_per_level[-1]:
-            self._print_empty_line()
-        self._set_vertical_space_before_next_node_on_all_but_last_level()
-        self._print_node(node)
-        self._vertical_space_before_next_node_per_level = self._vertical_space_before_next_node_per_level + [True]
-
-    def _set_vertical_space_before_next_node_on_all_but_last_level(self):
-        num_levels = len(self._vertical_space_before_next_node_per_level)
-        self._vertical_space_before_next_node_per_level = ([True] * (num_levels-1)) + [False]
-
-    def _print_empty_line(self):
-        print(self._bars_indent_string())
-
-    def _print_node(self, node):
-        print(self._bars_indent_string() + "--" + node)
-
-    def _bars_indent_string(self):
-        return "  ".join("|" * len(self._vertical_space_before_next_node_per_level))
 
 
 ###############################################################################
@@ -2889,7 +2760,8 @@ class InstructionDescriptionForInstructionWithSubCommands(InstructionDescription
         for sub_command in sorted(self._parser.sub_command_parsers().keys()):
             ret_val.extend([""])
             arg_parser = self._parser.sub_command_parsers()[sub_command]
-            ret_val.extend(self.string_as_lines_add_indent_to_non_first_line(wrapper, arg_parser.format_help()))
+            ret_val.extend(self.string_as_lines_add_indent_to_non_first_line(wrapper,
+                                                                             arg_parser.format_help()))
 
         return ret_val
 
@@ -3193,7 +3065,8 @@ def format_operator_str(operator_name):
 
 
 def filter_tags_operators_list_for_help_text():
-    return ", ".join([format_operator_str(o) for o in sorted(TagsConditionSetup.OPERATORS.keys())])
+    return ", ".join([format_operator_str(o)
+                      for o in sorted(TagsConditionSetup.OPERATORS.keys())])
 
 
 def parse_command_line() -> CommandLineParseResult:
