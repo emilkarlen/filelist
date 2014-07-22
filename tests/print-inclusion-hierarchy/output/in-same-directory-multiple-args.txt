@@ -3,8 +3,14 @@ data/in-same-directory.list
   data/1-1.list
   data/1-2.list
  data/2.list
+ data/1.list
+  data/1-1.list
+  data/1-2.list
 data/in-same-directory.list
  data/1.list
   data/1-1.list
   data/1-2.list
  data/2.list
+ data/1.list
+  data/1-1.list
+  data/1-2.list

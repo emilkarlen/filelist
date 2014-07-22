@@ -126,6 +126,7 @@ testcase (print-inclusion-hierarchy in-sub-directory)
 testcase (print-inclusion-hierarchy in-same-directory-pretty)
 testcase (print-inclusion-hierarchy in-sub-directory-pretty)
 testcase (print-inclusion-hierarchy in-same-directory-multiple-args)
+testcase (print-inclusion-hierarchy in-same-directory-multiple-args-pretty)
 
 testcase (tags set-and-print)
 testcase (tags set-and-prepend)

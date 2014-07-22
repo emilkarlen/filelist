@@ -2476,6 +2476,7 @@ class Command:
                 tags_condition: TagsCondition,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
+        file_number = 1
         for file_name in file_names:
             file_parser = ListFileParser.for_top_level(parsing_settings,
                                                        file_name)
@@ -2485,9 +2486,11 @@ class Command:
                                                           program_should_fail_on_missing_file,
                                                           tags_condition,
                                                           rendition_settings)
-            self.process_list_file(file_processor, parsing_settings, env)
+            self.process_list_file(file_number, file_processor, parsing_settings, env)
+            file_number += 1
 
     def process_list_file(self,
+                          file_number: int,
                           file_processor: ProcessorForListFile,
                           parsing_settings: ParsingSettings,
                           env: RenditionEnvironment):
@@ -2499,6 +2502,7 @@ class ProgramMainFunctionalityCommand(Command):
     Command that implements the main functionality of this program.
     """
     def process_list_file(self,
+                          file_number: int,
                           file_processor: ProcessorForListFile,
                           parsing_settings: ParsingSettings,
                           env: RenditionEnvironment):
@@ -2526,34 +2530,95 @@ class HierarchyPrinter:
         raise NotImplementedError()
 
 
-class PrintInclusionHierarchyCommand(Command):
-
+class Node:
+    """
+    Type for trees used for printing the inclusion hierarchy.
+    """
     def __init__(self,
-                 printer: HierarchyPrinter,
-                 print_file_names_relative_including_file: bool):
-        self._printer = printer
-        self._print_file_names_relative_including_file = print_file_names_relative_including_file
+                 name: str,
+                 sub_nodes: list):
+        self._name = name
+        self._sub_nodes = sub_nodes
 
-    def process_list_file(self,
-                          file_processor: ProcessorForListFile,
-                          parsing_settings: ParsingSettings,
-                          env: RenditionEnvironment):
-        self._printer.begin_hierarchy(self.file_name_for(file_processor))
-        for processor in file_processor.processors():
-            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(parsing_settings,
-                                                                                                 env)
-            if file_processor_and_env is not None:
-                self.process_list_file(file_processor_and_env[0],
-                                       parsing_settings,
-                                       file_processor_and_env[1])
-        self._printer.end_hierarchy()
+    def name(self):
+        return self._name
 
-    def file_name_for(self,
-                      file_processor: ProcessorForListFile):
-        if self._print_file_names_relative_including_file:
-            return file_processor.file_name_relative_including_file()
-        else:
-            return file_processor.file_name()
+    def sub_nodes(self):
+        return self._sub_nodes
+
+    def is_leaf(self):
+        return bool(self._sub_nodes)
+
+
+class TreePrinter:
+    """
+    Base class for printers that prints a hierarchy of nodes
+    in an indented layout.
+
+    Prints the tree directly on a given output.
+    """
+
+    def print(self,
+              tree: Node):
+        raise NotImplementedError()
+
+
+class TreePrinterForSimpleLayout(TreePrinter):
+
+    def __init__(self):
+        self._indent = 0
+        self._indent_string = " "
+
+    def print(self,
+              tree: Node):
+        self._print_name(tree.name())
+        self._indent += 1
+        for node in tree.sub_nodes():
+            self.print(node)
+        self._indent -= 1
+
+    def _print_name(self,
+                    name: str):
+        print(self._indent_string * self._indent + name)
+
+
+class TreePrinterForPrettyLayout(TreePrinter):
+
+    INVISIBLE_INDENT = "    "
+    I = "│   "
+    T = "├── "
+    L = "└── "
+
+    def __init__(self):
+        self._higher_levels_indents = []
+
+    def print(self,
+              tree: Node):
+        self._print_name("", tree.name())
+        self._print_sub_nodes_of(tree)
+
+    def _print_sub_nodes_of(self, node: Node):
+        remaining_sub_nodes = copy.copy(node.sub_nodes())
+        while remaining_sub_nodes:
+            sub_node = remaining_sub_nodes.pop(0)
+            self._print_tree(not bool(remaining_sub_nodes),
+                             sub_node)
+
+    def _print_tree(self,
+                    is_last_sibling: bool,
+                    tree: Node):
+        parent_connector = self.L if is_last_sibling else self.T
+        self._print_name(parent_connector, tree.name())
+
+        parent_indent = self.INVISIBLE_INDENT if is_last_sibling else self.I
+        self._higher_levels_indents.append(parent_indent)
+        self._print_sub_nodes_of(tree)
+        del self._higher_levels_indents[-1]
+
+    def _print_name(self,
+                    prefix: str,
+                    name: str):
+        print("".join(self._higher_levels_indents) + prefix + name)
 
 
 class SimpleHierarchyPrinter(HierarchyPrinter):
@@ -2576,6 +2641,94 @@ class SimpleHierarchyPrinter(HierarchyPrinter):
     def _print(self,
                node: str):
         print(" " * self._indent + node)
+
+
+class PrintInclusionHierarchyCommand_OLD(Command):
+
+    def __init__(self,
+                 printer: HierarchyPrinter,
+                 print_file_names_relative_including_file: bool):
+        self._printer = printer
+        self._print_file_names_relative_including_file = print_file_names_relative_including_file
+
+    def process_list_file(self, file_number, file_processor: ProcessorForListFile, parsing_settings: ParsingSettings,
+                          env: RenditionEnvironment):
+        self._printer.begin_hierarchy(self.file_name_for(file_processor))
+        for processor in file_processor.processors():
+            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(parsing_settings,
+                                                                                                 env)
+            if file_processor_and_env is not None:
+                self.process_list_file(1, file_processor_and_env[0], parsing_settings, file_processor_and_env[1])
+        self._printer.end_hierarchy()
+
+    def tree_for_file(self,
+                      file_processor: ProcessorForListFile,
+                      parsing_settings: ParsingSettings,
+                      env: RenditionEnvironment) -> Node:
+        sub_nodes = []
+        for processor in file_processor.processors():
+            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(parsing_settings,
+                                                                                                 env)
+            if file_processor_and_env is not None:
+                sub_node = self.tree_for_file(file_processor_and_env[0],
+                                              parsing_settings,
+                                              file_processor_and_env[1])
+                sub_nodes.append(sub_node)
+        return Node(self.file_name_for(file_processor),
+                    sub_nodes)
+
+    def file_name_for(self,
+                      file_processor: ProcessorForListFile):
+        if self._print_file_names_relative_including_file:
+            return file_processor.file_name_relative_including_file()
+        else:
+            return file_processor.file_name()
+
+
+class PrintInclusionHierarchyCommand(Command):
+
+    def __init__(self,
+                 printer: TreePrinter,
+                 print_file_names_relative_including_file: bool,
+                 separate_file_trees_by_empty_line: bool):
+        self._printer = printer
+        self._print_file_names_relative_including_file = print_file_names_relative_including_file
+        self._separate_file_trees_by_empty_line = separate_file_trees_by_empty_line
+
+    def process_list_file(self,
+                          file_number: int,
+                          file_processor: ProcessorForListFile,
+                          parsing_settings: ParsingSettings,
+                          env: RenditionEnvironment):
+        if self._separate_file_trees_by_empty_line and file_number != 1:
+            print()
+        tree = self.tree_for_file(file_processor,
+                                  parsing_settings,
+                                  env)
+        self._printer.print(tree)
+
+    def tree_for_file(self,
+                      file_processor: ProcessorForListFile,
+                      parsing_settings: ParsingSettings,
+                      env: RenditionEnvironment) -> Node:
+        sub_nodes = []
+        for processor in file_processor.processors():
+            file_processor_and_env = processor.file_processor_if_this_is_a_processor_for_include(parsing_settings,
+                                                                                                 env)
+            if file_processor_and_env is not None:
+                sub_node = self.tree_for_file(file_processor_and_env[0],
+                                              parsing_settings,
+                                              file_processor_and_env[1])
+                sub_nodes.append(sub_node)
+        return Node(self.file_name_for(file_processor),
+                    sub_nodes)
+
+    def file_name_for(self,
+                      file_processor: ProcessorForListFile):
+        if self._print_file_names_relative_including_file:
+            return file_processor.file_name_relative_including_file()
+        else:
+            return file_processor.file_name()
 
 
 class PrettyHierarchyPrinter(HierarchyPrinter):
@@ -2972,13 +3125,13 @@ def instruction_identifier_to_parser_dict() -> dict:
 ###############################################################################
 
 
-def program_error_message(msg: str):
-    return os.path.basename(sys.argv[0]) + ": " + msg
+def error_header_line(s: str):
+    return os.path.basename(__file__) + ": " + s
 
 
 def exit_usage(msg: str):
     write_lines(sys.stderr,
-                [program_error_message(msg)])
+                [error_header_line(msg)])
     sys.exit(EXIT_USAGE)
 
 
@@ -3186,7 +3339,7 @@ def parse_command_line() -> CommandLineParseResult:
     parser.add_argument("-i", "--print-inclusion-hierarchy",
                         action="store_const",
                         dest="command",
-                        const=PrintInclusionHierarchyCommand(SimpleHierarchyPrinter(), False),
+                        const=PrintInclusionHierarchyCommand(TreePrinterForSimpleLayout(), False, False),
                         default=ProgramMainFunctionalityCommand(),
                         help="""\
                         Prints the file inclusion hierarchy.
@@ -3194,7 +3347,7 @@ def parse_command_line() -> CommandLineParseResult:
     parser.add_argument("-I", "--print-inclusion-hierarchy-pretty",
                         action="store_const",
                         dest="command",
-                        const=PrintInclusionHierarchyCommand(PrettyHierarchyPrinter(), True),
+                        const=PrintInclusionHierarchyCommand(TreePrinterForPrettyLayout(), True, True),
                         help="""\
                         Prints the file inclusion hierarchy,
                         in a pretty layout.
@@ -3221,10 +3374,6 @@ def parse_command_line() -> CommandLineParseResult:
                                   missing_file_handling_settings,
                                   rendition_settings,
                                   args.preprocessor)
-
-
-def error_header_line(s: str):
-    return os.path.basename(__file__) + ": " + s
 
 
 def main():

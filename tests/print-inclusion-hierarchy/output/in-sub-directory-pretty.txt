@@ -1,5 +1,3 @@
 data/in-sub-directory.list
-|
-|--sub-dir/main-in-subdir.list
-|  |
-|  |--included-in-subdir.list
+└── sub-dir/main-in-subdir.list
+    └── included-in-subdir.list
