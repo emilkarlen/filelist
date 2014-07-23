@@ -94,6 +94,8 @@ ERROR_MESSAGE_INDENT_STRING = "  "
 
 DEFAULT_INSTRUCTION_PREFIX = "@"
 
+COMMAND_LINE_ARGUMENT_FOR_STDIN = "-"
+
 
 ###############################################################################
 # - matcher utils -
@@ -2237,6 +2239,11 @@ class LinesSource:
         raise NotImplementedError()
 
 
+class LinesSourceForStdin(LinesSource):
+    def __iter__(self):
+        raise NotImplementedError()
+
+
 class ListFileParser:
     """
     Parses a source list file into a ProcessorForListFile object.
@@ -2332,7 +2339,6 @@ class LinesSourceForFileBase(LinesSource):
                  parsing_settings: ParsingSettings,
                  file_name: str):
         self._parsing_settings = parsing_settings
-        self._file_name = file_name
 
     def _open(self, file_name: str):
         raise NotImplementedError()
@@ -2348,14 +2354,60 @@ class LinesSourceForFileBase(LinesSource):
         # Read all lines from the file so that we can close it before
         # opening any included files.
         # This prevents exhausting the number of open files.
-        open_file = self._open(self._file_name)
+        open_file = self._open_file()
         raw_lines = open_file.readlines()
         open_file.close()
         return raw_lines
 
     def _raw_lines_from_processed_file(self,
                                        preprocessor_shell_command: str):
-        open_file = self._open(self._file_name)
+        open_file = self._open_file()
+        try:
+            output = subprocess.check_output(preprocessor_shell_command,
+                                             shell=True,
+                                             universal_newlines=True,
+                                             stdin=open_file)
+        except subprocess.CalledProcessError as ex:
+            raise PreprocessorException(ex)
+        open_file.close()
+        raw_lines = output.splitlines()
+        return raw_lines
+
+    @staticmethod
+    def _from_raw_lines(raw_lines: list):
+        lines = []
+        for lineWithPossibleNewLine in raw_lines:
+            lines.append(lineWithPossibleNewLine.strip("\n").rstrip())
+        return iter(lines)
+
+
+class LinesSourceForFileBase(LinesSource):
+    def __init__(self,
+                 parsing_settings: ParsingSettings):
+        self._parsing_settings = parsing_settings
+
+    def _open_file(self):
+        raise NotImplementedError()
+
+    def __iter__(self):
+        if self._parsing_settings.preprocessor_shell_command_or_none:
+            raw_lines = self._raw_lines_from_processed_file(self._parsing_settings.preprocessor_shell_command_or_none)
+        else:
+            raw_lines = self._raw_lines_directly_from_file()
+        return self._from_raw_lines(raw_lines)
+
+    def _raw_lines_directly_from_file(self):
+        # Read all lines from the file so that we can close it before
+        # opening any included files.
+        # This prevents exhausting the number of open files.
+        open_file = self._open_file()
+        raw_lines = open_file.readlines()
+        open_file.close()
+        return raw_lines
+
+    def _raw_lines_from_processed_file(self,
+                                       preprocessor_shell_command: str):
+        open_file = self._open_file()
         try:
             output = subprocess.check_output(preprocessor_shell_command,
                                              shell=True,
@@ -2382,20 +2434,48 @@ class LinesSourceForFileArgument(LinesSourceForFileBase):
     def __init__(self,
                  parsing_settings: ParsingSettings,
                  file_name: str):
-        LinesSourceForFileBase.__init__(self, parsing_settings, file_name)
+        LinesSourceForFileBase.__init__(self, parsing_settings)
+        self._file_name = file_name
 
-    def _open(self, file_name: str):
+    def _open_file(self):
         try:
-            return open(file_name,
+            return open(self._file_name,
                         mode="r")
         except OSError:
-            msg = error_header_line("Cannot open file: \"" + file_name + "\"")
+            msg = error_header_line("Cannot open file: " +
+                                    in_double_quotes(self._file_name))
             write_lines(sys.stderr,
                         [msg])
             sys.exit(EXIT_INVALID_ARGUMENTS)
 
 
-class LinesSourceForIncludedFile(LinesSourceForFileBase):
+class LinesSourceForStdin(LinesSourceForFileBase):
+    """
+    A LinesSource for file arguments on the command line.
+    """
+    def __init__(self,
+                 parsing_settings: ParsingSettings):
+        LinesSourceForFileBase.__init__(self, parsing_settings)
+
+    def _open_file(self):
+        return sys.stdin
+
+
+class LinesSourceForNamedFileBase(LinesSourceForFileBase):
+    def __init__(self,
+                 parsing_settings: ParsingSettings,
+                 file_name: str):
+        LinesSourceForFileBase.__init__(self, parsing_settings)
+        self._file_name = file_name
+
+    def _open_file(self):
+        return self._open(self._file_name)
+
+    def _open(self, file_name: str):
+        raise NotImplementedError()
+
+
+class LinesSourceForIncludedFile(LinesSourceForNamedFileBase):
     """
     A LinesSource for files used by the include instruction.
     """
@@ -2403,7 +2483,7 @@ class LinesSourceForIncludedFile(LinesSourceForFileBase):
                  parsing_settings: ParsingSettings,
                  file_name: str,
                  source: SourceReference):
-        LinesSourceForFileBase.__init__(self, parsing_settings, file_name)
+        LinesSourceForNamedFileBase.__init__(self, parsing_settings, file_name)
         self._source = source
 
     def _open(self, file_name: str):
@@ -2480,7 +2560,7 @@ class Command:
         for file_name in file_names:
             file_parser = ListFileParser.for_top_level(parsing_settings,
                                                        file_name)
-            lines_source = LinesSourceForFileArgument(parsing_settings, file_name)
+            lines_source = self._line_source_for(parsing_settings, file_name)
             file_processor = file_parser.apply(lines_source)
             env = RenditionEnvironment.for_top_level_file(file_name,
                                                           program_should_fail_on_missing_file,
@@ -2488,6 +2568,14 @@ class Command:
                                                           rendition_settings)
             self.process_list_file(file_number, file_processor, parsing_settings, env)
             file_number += 1
+
+    @staticmethod
+    def _line_source_for(parsing_settings: ParsingSettings,
+                         file_name: str):
+        if file_name == COMMAND_LINE_ARGUMENT_FOR_STDIN:
+            return LinesSourceForStdin(parsing_settings)
+        else:
+            return LinesSourceForFileArgument(parsing_settings, file_name)
 
     def process_list_file(self,
                           file_number: int,

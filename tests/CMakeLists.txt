@@ -168,6 +168,12 @@ testcase (preprocessor only-top-level-file)
 testcase (preprocessor included-file)
 testcase (preprocessor preprocessor-failure)
 
+testcase (stdin-as-file-argument just-print)
+#testcase (stdin-as-file-argument allowed-at-most-once)
+#testcase (stdin-as-file-argument file-paths-should-be-relative-cwd)
+#testcase (stdin-as-file-argument preprocess)
+
+
 testcase (other normalize-paths)
 testcase (other normalize-paths-relative-file-argument)
 testcase (other output-absolute-paths)
