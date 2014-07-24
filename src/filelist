@@ -3310,12 +3310,15 @@ def parse_command_line() -> CommandLineParseResult:
                         Operators are: """ + filter_tags_operators_list_for_help_text() +
                         """.""")
     parser.add_argument("-N", filter_tags_negate_operator_long_option,
-                        default=False,
-                        action="store_true",
+                        default=[],
+                        const=None,
+                        action="append_const",
                         help="""\
-                        Negates the operator given by """ +
-                        filter_tags_operator_long_option +
-                        """. This is useful if the all file-paths needs to be handled,
+                        Negates the filter tags condition.
+
+                        May be used multiple times.
+
+                        This is useful if the all file-paths needs to be handled,
                         but the handling depends on weather the file-path satisfies
                         the filter or not. (Note that the program must be executed two times
                         for this.)""")
@@ -3350,7 +3353,7 @@ def parse_command_line() -> CommandLineParseResult:
     tags_condition = parse_tags_condition(tags_condition_setup,
                                           args.filter_tags,
                                           args.operator_for_filter_tags[0],
-                                          args.negate_operator_for_filter_tags)
+                                          (len(args.negate_operator_for_filter_tags) % 2) == 1)
     missing_file_handling_settings = missing_file_handling_mode_parser.lookup(args.missing_file_handling[0])
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            missing_file_handling_settings.include_in_output,

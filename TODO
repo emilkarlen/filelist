@@ -75,9 +75,3 @@ Do this for non-pretty output.
     condition, and "- " for files that don't.
     Useful when all files must be processed somehow, but processing differes
     depending on filter satisfaction.
-** Source-file info in PreprocessorException
-Currently, no source-info is included in case of error of preprocessor.
-
-It is a minor issue, since the preprocessor is independent of the file
-argument (the input file is accessed via stdin).
-But it would be nice to have the same trace as with other errors
