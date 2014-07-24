@@ -25,6 +25,7 @@ m4_define(`M4_EXECUTABLE_REL_LIST',`M4_EXECUTABLE --relative-file-argument-locat
 m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`M4_EXECUTABLE --prepend-tags')
 
 m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
+m4_define(`M4_COMMON_SCRIPTS_DIR',`M4_TEST_DIR/scripts')
 
 # Exit codes
 m4_define(`M4_EXIT_USAGE',2)
