@@ -35,5 +35,3 @@ m4_define(`M4_EXIT_PRE_PROCESSING',5)
 m4_define(`M4_EXIT_FILE_DOES_NOT_EXIST',m4_eval(8 + 0))
 m4_define(`M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR',m4_eval(8 + 1))
 m4_define(`M4_EXIT_TAGS_ERROR',m4_eval(8 + 2))
-
-

@@ -12,7 +12,7 @@ home:..
 
 setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE --preprocessor ${SIMPTEST_HOME}/scripts/not-a-program data/single-file.list
+test.run.cmdline:M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/not-a-program data/single-file.list
 
 check.exitcode:M4_EXIT_PRE_PROCESSING
 check.stdout.empty

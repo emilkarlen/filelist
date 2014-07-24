@@ -15,7 +15,7 @@ setup.install:data
 
 test.stdin:input/preprocess.list
 
-test.run.cmdline:M4_EXECUTABLE --preprocessor ${SIMPTEST_HOME}/../preprocessor/scripts/add-txt-suffix-to-file-paths -- -
+test.run.cmdline:M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths -- -
 
 check.exitcode:0
 check.stdout.file.eq:output/preprocess.txt
