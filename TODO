@@ -12,6 +12,11 @@
   4. Remove item from this file.
 * Defects
 ** --prepend-tags, --append-tags are mutualy exlusive
+** testcase command-line-parsing-of-empty-set may be impl in python
+   This test cannot be implemented (or is difficult to implement) in
+   simptest.
+   But it should be possible to implement it purely in Python, using Python's
+   test framework.
 * Improvements
 ** Source-file info in PreprocessorException
 Currently, no source-info is included in case of error of preprocessor.
