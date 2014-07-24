@@ -1,0 +1,13 @@
+# -*- m4 -*-
+
+m4_include(common.m4)
+
+name:equals--negated-2-times
+home:..
+
+setup.install:data
+
+M4_RUN_WITH_OPERATOR_EQUALS(`-NN')
+
+check.exitcode:0
+check.stdout.file.eq:output/equals.txt
