@@ -2239,11 +2239,6 @@ class LinesSource:
         raise NotImplementedError()
 
 
-class LinesSourceForStdin(LinesSource):
-    def __iter__(self):
-        raise NotImplementedError()
-
-
 class ListFileParser:
     """
     Parses a source list file into a ProcessorForListFile object.

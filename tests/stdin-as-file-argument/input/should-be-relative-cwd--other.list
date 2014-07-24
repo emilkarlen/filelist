@@ -1,0 +1,10 @@
+@print # List
+@list data existing-file-1.txt
+
+@print
+@print # Include
+@include data/listfile.list
+
+@print
+@print # Shell
+@shell ls data/*.txt

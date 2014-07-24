@@ -1,0 +1,6 @@
+@print ## File-path
+existing-file-1.txt
+
+@print ## Shell
+@shell ls existing-file-1.txt
+
