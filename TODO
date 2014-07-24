@@ -34,7 +34,6 @@ But it would be nice to have the same trace as with other errors.
     condition, and "- " for files that don't.
     Useful when all files must be processed somehow, but processing differes
     depending on filter satisfaction.
-** stdin as FILE argument
 * Check current functionality
 ** Exporting of tags to following files on the command line
    Currently, I believe, tags are forwarded to later command line arguments.
