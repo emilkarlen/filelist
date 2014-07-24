@@ -17,33 +17,18 @@
    simptest.
    But it should be possible to implement it purely in Python, using Python's
    test framework.
-* Improvements
-** Source-file info in PreprocessorException
-Currently, no source-info is included in case of error of preprocessor.
-
-It is a minor issue, since the preprocessor is independent of the file
-argument (the input file is accessed via stdin).
-But it would be nice to have the same trace as with other errors.
-* List
-** Utesluta filer som matchar mönster
+* Features
+** List
+*** Utesluta filer som matchar mönster
 Behövs för att kunna hantera t ex filstrukturer som hateras cvs/svn.
 Villkoret ska kombineras de "positiva" filnamns-mönstren med OCH.
-*** Utesluta med shell-pattern --exclude, -e
-*** Utesluta med reg-ex: --exclude-regex, -E
-* Features
+**** Utesluta med shell-pattern --exclude, -e
+**** Utesluta med reg-ex: --exclude-regex, -E
 ** File
 *** Filter: not-operatorn ska arbeta på fulla uttr, o kunna ges flera gånger
     Motivation: Detta gör att den kan alltid kan anges för att växla
     uttrycket, dvs man kan använda not i det "ursprungliga" uttrycket och
     sedan garranterat "vända" på det genom att lägga till not.
-*** Option for including existence-info for each file-path
-    Precede each line with "+ " for existing, and "- " for non-existing
-    files, e.g.
-*** filter: output all files, preceeded by info about filter-match
-    Preceede each file with, e.g. "+ " for files that satisfy the filter
-    condition, and "- " for files that don't.
-    Useful when all files must be processed somehow, but processing differes
-    depending on filter satisfaction.
 * Check current functionality
 ** Exporting of tags to following files on the command line
    Currently, I believe, tags are forwarded to later command line arguments.
@@ -81,3 +66,18 @@ Villkoret ska kombineras de "positiva" filnamns-mönstren med OCH.
 - absolute paths
 - normalise paths
 Do this for non-pretty output.
+** File
+*** Option for including existence-info for each file-path
+    Precede each line with "+ " for existing, and "- " for non-existing
+    files, e.g.
+*** filter: output all files, preceeded by info about filter-match
+    Preceede each file with, e.g. "+ " for files that satisfy the filter
+    condition, and "- " for files that don't.
+    Useful when all files must be processed somehow, but processing differes
+    depending on filter satisfaction.
+** Source-file info in PreprocessorException
+Currently, no source-info is included in case of error of preprocessor.
+
+It is a minor issue, since the preprocessor is independent of the file
+argument (the input file is accessed via stdin).
+But it would be nice to have the same trace as with other errors
