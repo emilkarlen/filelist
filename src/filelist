@@ -3119,7 +3119,16 @@ class CommandLineParseResult:
         and exits if an error is found.
         """
 
+        self.check_stdin_is_given_at_most_once()
         self.check_instruction_prefix()
+
+    def check_stdin_is_given_at_most_once(self):
+        stdin_list = list(filter(lambda x: x == COMMAND_LINE_ARGUMENT_FOR_STDIN,
+                                 self.file_names))
+        if len(stdin_list) > 1:
+            exit_usage("stdin ('" +
+                       COMMAND_LINE_ARGUMENT_FOR_STDIN +
+                       "') as file argument can be given at most once.")
 
     def check_instruction_prefix(self):
         if LineParserForIgnoredLine.is_comment_line(self.instruction_prefix):
@@ -3171,7 +3180,10 @@ def parse_command_line() -> CommandLineParseResult:
     parser.add_argument("files",
                         metavar="FILE",
                         nargs="*",
-                        help="List file.")
+                        help="""A list file.
+                        '-' means stdin. '-' can be used at most once.
+                        File-paths from stdin are assumed to be relative the current working directory.
+                        """)
     parser.add_argument("--instruction-prefix",
                         nargs=1,
                         default=[DEFAULT_INSTRUCTION_PREFIX],

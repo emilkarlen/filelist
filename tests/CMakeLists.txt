@@ -68,6 +68,11 @@ testcase (basic instruction-name-variants)
 testcase (basic multiple-file-arguments)
 testcase (basic custom-instruction-prefix)
 
+testcase (stdin-as-file-argument just-print)
+testcase (stdin-as-file-argument allowed-at-most-once-on-command-line)
+#testcase (stdin-as-file-argument file-paths-should-be-relative-cwd)
+#testcase (stdin-as-file-argument preprocess)
+
 testcase (file-path multiple-file-arguments)
 testcase (file-path existing)
 testcase (file-path existing-relative-file-argument)
@@ -167,12 +172,6 @@ testcase (shell tags-filter-excluded)
 testcase (preprocessor only-top-level-file)
 testcase (preprocessor included-file)
 testcase (preprocessor preprocessor-failure)
-
-testcase (stdin-as-file-argument just-print)
-#testcase (stdin-as-file-argument allowed-at-most-once)
-#testcase (stdin-as-file-argument file-paths-should-be-relative-cwd)
-#testcase (stdin-as-file-argument preprocess)
-
 
 testcase (other normalize-paths)
 testcase (other normalize-paths-relative-file-argument)
