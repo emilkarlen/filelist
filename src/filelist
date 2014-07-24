@@ -2547,17 +2547,20 @@ class Command:
     """
     def execute(self,
                 file_names: list,
+                stdin_paths_are_relative_empty: list,
                 program_should_fail_on_missing_file: bool,
                 tags_condition: TagsCondition,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
         file_number = 1
         for file_name in file_names:
-            file_parser = ListFileParser.for_top_level(parsing_settings,
-                                                       file_name)
             lines_source = self._line_source_for(parsing_settings, file_name)
+            parsing_and_rendition_file_name = self._parsing_and_rendition_file_name(stdin_paths_are_relative_empty,
+                                                                                    file_name)
+            file_parser = ListFileParser.for_top_level(parsing_settings,
+                                                       parsing_and_rendition_file_name)
             file_processor = file_parser.apply(lines_source)
-            env = RenditionEnvironment.for_top_level_file(file_name,
+            env = RenditionEnvironment.for_top_level_file(parsing_and_rendition_file_name,
                                                           program_should_fail_on_missing_file,
                                                           tags_condition,
                                                           rendition_settings)
@@ -2578,6 +2581,16 @@ class Command:
                           parsing_settings: ParsingSettings,
                           env: RenditionEnvironment):
         raise NotImplementedError()
+
+    @staticmethod
+    def _parsing_and_rendition_file_name(stdin_paths_are_relative_empty: list,
+                                         file_name):
+        if file_name == COMMAND_LINE_ARGUMENT_FOR_STDIN and stdin_paths_are_relative_empty:
+            return os.path.join(stdin_paths_are_relative_empty[0],
+                                COMMAND_LINE_ARGUMENT_FOR_STDIN)
+        else:
+            return file_name
+
 
 
 class ProgramMainFunctionalityCommand(Command):
@@ -3096,6 +3109,7 @@ class CommandLineParseResult:
                  command: Command,
                  instruction_prefix: str,
                  file_names: list,
+                 stdin_paths_are_relative_or_empty: list,
                  tags_condition: TagsCondition,
                  missing_file_handling_settings: MissingFileHandlingSettings,
                  rendition_settings: RenditionSettings,
@@ -3103,6 +3117,7 @@ class CommandLineParseResult:
         self.command = command
         self.instruction_prefix = instruction_prefix
         self.file_names = file_names
+        self.stdin_paths_are_relative_or_empty = stdin_paths_are_relative_or_empty
         self.missing_file_handling_settings = missing_file_handling_settings
         self.tags_condition = tags_condition
         self.rendition_settings = rendition_settings
@@ -3224,6 +3239,14 @@ def parse_command_line() -> CommandLineParseResult:
                         Make paths absolute = non-relative.
                         Paths start with a "/".
                         """)
+    parser.add_argument("--stdin-paths-are-relative",
+                        metavar='DIR',
+                        nargs=1,
+                        help="""\
+                        Specifies the directory which paths read from stdin should be relative to.
+
+                        The default is the current working directory.
+                        """)
     parser.add_argument("-S", "--suppress-non-path-output",
                         default=False,
                         action="store_true",
@@ -3338,6 +3361,7 @@ def parse_command_line() -> CommandLineParseResult:
     return CommandLineParseResult(args.command,
                                   args.instruction_prefix[0],
                                   args.files,
+                                  args.stdin_paths_are_relative,
                                   tags_condition,
                                   missing_file_handling_settings,
                                   rendition_settings,
@@ -3349,6 +3373,7 @@ def main():
     parse_result.exit_if_invalid()
     try:
         parse_result.command.execute(parse_result.file_names,
+                                     parse_result.stdin_paths_are_relative_or_empty,
                                      parse_result.missing_file_handling_settings.program_should_fail,
                                      parse_result.tags_condition,
                                      parse_result.rendition_settings,

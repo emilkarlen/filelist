@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+#
+# WHEN stdin is used together with the option that specifies
+# the directory which paths from stdin should be relative,
+# THEN paths used by instructions
+# SHOULD be relative the given custom directory
+#
+
+m4_include(common.m4)
+
+name:paths-relative-custom-dir
+home:..
+
+setup.install:data/empty-directory:data-root-dir
+setup.install:data:data-root-dir
+
+test.stdin:input/should-be-relative-cwd--other.list
+
+test.run.cmdline:M4_EXECUTABLE --stdin-paths-are-relative data-root-dir  -- -
+
+check.exitcode:0
+#check.stdout.file.eq:output/paths-relative-custom-dir.txt
