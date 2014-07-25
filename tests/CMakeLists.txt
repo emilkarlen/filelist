@@ -85,6 +85,7 @@ testcase (file-path/path-output-variants output-absolute-paths)
 testcase (file-path/non-existing-files fail)
 testcase (file-path/non-existing-files ignore)
 testcase (file-path/non-existing-files include)
+testcase (file-path/non-existing-files only)
 testcase (file-path/non-existing-files default-should-be-fail)
 
 testcase (file-path/filter-on-tags contains-any-of)

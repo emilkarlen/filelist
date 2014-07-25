@@ -598,7 +598,8 @@ class RenditionSettings:
     """
     def __init__(self,
                  file_names_are_relative_file_argument_location: bool,
-                 include_missing_files: bool,
+                 include_existing_files: bool,
+                 include_non_existing_files: bool,
                  normalize_paths: bool,
                  absolute_paths: bool,
                  tags_settings: TagsRenditionSettings,
@@ -607,7 +608,8 @@ class RenditionSettings:
         :rtype : RenditionSettings
         """
         self.file_names_are_relative_file_argument_location = file_names_are_relative_file_argument_location
-        self.include_missing_files = include_missing_files
+        self.include_existing_in_output = include_existing_files
+        self.include_non_existing_files = include_non_existing_files
         self.normalize_paths = normalize_paths
         self.absolute_paths = absolute_paths
         self.tags_settings = tags_settings
@@ -779,7 +781,7 @@ class ResultItemForFilePathExisting(ResultItem):
         self.tags = tags
 
     def include_in_output(self, env: RenditionEnvironment) -> bool:
-        return True
+        return env.rendition_settings.include_existing_in_output
 
     def rendition(self,
                   env: RenditionEnvironment) -> str:
@@ -802,7 +804,7 @@ class ResultItemForFilePathNonExisting(ResultItem):
         self.tags = tags
 
     def include_in_output(self, env: RenditionEnvironment) -> bool:
-        return env.rendition_settings.include_missing_files
+        return env.rendition_settings.include_non_existing_files
 
     def rendition(self,
                   env: RenditionEnvironment) -> str:
@@ -2533,40 +2535,48 @@ class LinesSourceForIncludedFile(LinesSourceForNamedFileBase):
             raise ResultItemConstructionForMissingFileException(self._source, file_name)
 
 
-class MissingFileHandlingSettings:
+class FileExistenceHandlingSettings:
 
     def __init__(self,
-                 program_should_fail: bool,
-                 include_in_output: bool):
-        self.program_should_fail = program_should_fail
-        self.include_in_output = include_in_output
+                 include_existing_in_output: bool,
+                 program_should_fail_on_non_existing: bool,
+                 include_non_existing_in_output: bool):
+        self.include_existing_in_output = include_existing_in_output
+        self.program_should_fail_on_non_existing = program_should_fail_on_non_existing
+        self.include_non_existing_in_output = include_non_existing_in_output
 
     @staticmethod
-    def new_fail():
-        return MissingFileHandlingSettings(True, False)
+    def new_fail_on_non_existing():
+        return FileExistenceHandlingSettings(True, True, False)
 
     @staticmethod
-    def new_ignore():
-        return MissingFileHandlingSettings(False, False)
+    def new_ignore_non_existing():
+        return FileExistenceHandlingSettings(True, False, False)
 
     @staticmethod
-    def new_include():
-        return MissingFileHandlingSettings(False, True)
+    def new_include_non_existing():
+        return FileExistenceHandlingSettings(True, False, True)
+
+    @staticmethod
+    def new_only_non_existing():
+        return FileExistenceHandlingSettings(False, False, True)
 
 
-class MissingFileHandlingModeOptionParser:
-    """Parses the Command Line Option for handling of missing files."""
+class FileExistenceHandlingModeOptionParser:
+    """Parses the Command Line Option for handling of files depending on existence."""
 
     _DEFAULT_KEY = "fail"
 
     _MODES = {
-        "fail": (MissingFileHandlingSettings.new_fail(),
+        "fail": (FileExistenceHandlingSettings.new_fail_on_non_existing(),
                  "A missing file causes the program to fail (with exit status " +
                  str(EXIT_FILE_DOES_NOT_EXIST) + ")."),
-        "ignore": (MissingFileHandlingSettings.new_ignore(),
+        "ignore": (FileExistenceHandlingSettings.new_ignore_non_existing(),
                    "Missing files are not included in the output."),
-        "include": (MissingFileHandlingSettings.new_include(),
+        "include": (FileExistenceHandlingSettings.new_include_non_existing(),
                     "Missing files are included in the output just as existing files."),
+        "only": (FileExistenceHandlingSettings.new_only_non_existing(),
+                 "Output only missing files."),
     }
 
     def mode_keys(self) -> list:
@@ -2580,7 +2590,7 @@ class MissingFileHandlingModeOptionParser:
                          for key, val in self._MODES.items()])
 
     def lookup(self,
-               valid_key: str) -> MissingFileHandlingSettings:
+               valid_key: str) -> FileExistenceHandlingSettings:
         return self._MODES[valid_key][0]
 
 
@@ -2635,7 +2645,6 @@ class Command:
                                 COMMAND_LINE_ARGUMENT_FOR_STDIN)
         else:
             return file_name
-
 
 
 class ProgramMainFunctionalityCommand(Command):
@@ -3156,7 +3165,7 @@ class CommandLineParseResult:
                  file_names: list,
                  stdin_paths_are_relative_or_empty: list,
                  tags_condition: TagsCondition,
-                 missing_file_handling_settings: MissingFileHandlingSettings,
+                 missing_file_handling_settings: FileExistenceHandlingSettings,
                  rendition_settings: RenditionSettings,
                  preprocessor_shell_command: str):
         self.command = command
@@ -3230,7 +3239,7 @@ def parse_command_line() -> CommandLineParseResult:
     tags_condition_setup = TagsConditionSetup()
     all_filter_operator_names = tags_condition_setup.all_operator_names()
 
-    missing_file_handling_mode_parser = MissingFileHandlingModeOptionParser()
+    missing_file_handling_mode_parser = FileExistenceHandlingModeOptionParser()
 
     parser.add_argument("files",
                         metavar="FILE",
@@ -3250,7 +3259,7 @@ def parse_command_line() -> CommandLineParseResult:
     parser.add_argument("-m", "--missing-file-handling",
                         metavar="MODE",
                         nargs=1,
-                        choices=missing_file_handling_mode_parser.keys_help_text(),
+                        choices=missing_file_handling_mode_parser.mode_keys(),
                         default=[missing_file_handling_mode_parser.default_key()],
                         help="""\
                         Determines how file-paths that do not correspond to an existing
@@ -3396,9 +3405,10 @@ def parse_command_line() -> CommandLineParseResult:
                                           args.filter_tags,
                                           args.operator_for_filter_tags[0],
                                           (len(args.negate_operator_for_filter_tags) % 2) == 1)
-    missing_file_handling_settings = missing_file_handling_mode_parser.lookup(args.missing_file_handling[0])
+    file_existence_handling_settings = missing_file_handling_mode_parser.lookup(args.missing_file_handling[0])
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
-                                           missing_file_handling_settings.include_in_output,
+                                           file_existence_handling_settings.include_existing_in_output,
+                                           file_existence_handling_settings.include_non_existing_in_output,
                                            args.normalize_paths,
                                            args.absolute_paths,
                                            TagsRenditionSettings(args.prepend_tags,
@@ -3409,7 +3419,7 @@ def parse_command_line() -> CommandLineParseResult:
                                   args.files,
                                   args.stdin_paths_are_relative,
                                   tags_condition,
-                                  missing_file_handling_settings,
+                                  file_existence_handling_settings,
                                   rendition_settings,
                                   args.preprocessor)
 
@@ -3420,7 +3430,7 @@ def main():
     try:
         parse_result.command.execute(parse_result.file_names,
                                      parse_result.stdin_paths_are_relative_or_empty,
-                                     parse_result.missing_file_handling_settings.program_should_fail,
+                                     parse_result.missing_file_handling_settings.program_should_fail_on_non_existing,
                                      parse_result.tags_condition,
                                      parse_result.rendition_settings,
                                      ParsingSettings(parse_result.preprocessor_shell_command,
