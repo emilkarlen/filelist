@@ -1,0 +1,13 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+name:type--combined-with-namepattern
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE_REL_LIST data/type--combined-with-namepattern.list | sort
+
+check.exitcode:0
+check.stdout.file.eq:output/type--combined-with-namepattern.txt

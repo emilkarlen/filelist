@@ -1,0 +1,13 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+name:type--file
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE_REL_LIST data/type--file.list | sort
+
+check.exitcode:0
+check.stdout.file.eq:output/type--file.txt
