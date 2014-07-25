@@ -48,6 +48,8 @@ Villkoret ska kombineras de "positiva" filnamns-mönstren med OCH.
 ** Sprid ut tester av taggar till de enskilda instruktionerna
    test-paketet tags ska föregå andra instruktioner o file-path.
 
+** Flytta listfiler till input/
+   Och installera m ha M4_SETUP_INSTALL_DATA_AND_INPUT.
 * After v 1.0
 ** List
 *** Improve match-expression
