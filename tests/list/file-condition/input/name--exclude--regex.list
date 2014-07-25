@@ -1,0 +1,6 @@
+@print # Long options
+@list dir --sort --exclude-regex ^a.* --exclude-regex ^b.*
+
+@print
+@print # Short options
+@list dir --sort -E ^a.* -E ^b.*

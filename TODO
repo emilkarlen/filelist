@@ -17,6 +17,8 @@
    simptest.
    But it should be possible to implement it purely in Python, using Python's
    test framework.
+* Improvments
+** "reg-ex" should be replaced with "regex"
 * Features
 ** List
 *** Utesluta filer som matchar mönster

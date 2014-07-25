@@ -1970,10 +1970,13 @@ def list__parse_include_name_matchers_new_new(list_args: argparse.Namespace) -> 
 
 
 def list__parse_excludes(list_args: argparse.Namespace) -> list:
-    excluded_file_name_matchers = [wildcard_matcher(wildcard[0])
-                                   for wildcard in list_args.exclude_pattern_list]
-    return [not_matcher(or_matcher(excluded_file_name_matchers))]\
-        if excluded_file_name_matchers\
+    name_matchers = []
+    name_matchers.extend([wildcard_matcher(wildcard[0])
+                          for wildcard in list_args.exclude_pattern_list])
+    name_matchers.extend([reg_ex_matcher(regex[0])
+                          for regex in list_args.exclude_regex_list])
+    return [not_matcher(or_matcher(name_matchers))]\
+        if name_matchers\
         else []
 
 
@@ -2077,6 +2080,14 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                             default=[],
                             help="""\
                             Excludes all files who's name matching the given pattern.""")
+        parser.add_argument("-E", "--exclude-regex",
+                            metavar="REG-EX",
+                            nargs=1,
+                            dest="exclude_regex_list",
+                            action="append",
+                            default=[],
+                            help="""\
+                            Excludes all files who's name matching the given regular expression.""")
         parser.add_argument("-t", "--type",
                             nargs=1,
                             default=[],

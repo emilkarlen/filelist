@@ -1,0 +1,7 @@
+# Long options
+dir/c-file.c
+dir/c-subdir
+
+# Short options
+dir/c-file.c
+dir/c-subdir
