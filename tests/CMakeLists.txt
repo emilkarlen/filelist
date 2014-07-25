@@ -77,9 +77,9 @@ testcase (file-path absolute-file-paths-existing)
 testcase (file-path absolute-file-paths-existing-with-output-absolute-name)
 testcase (file-path absolute-file-paths-nonexisting)
 
-testcase (other normalize-paths)
-testcase (other normalize-paths-relative-file-argument)
-testcase (other output-absolute-paths)
+testcase (file-path/path-output-variants normalize-paths)
+testcase (file-path/path-output-variants normalize-paths-relative-file-argument)
+testcase (file-path/path-output-variants output-absolute-paths)
 
 
 testcase (file-path/non-existing-files fail)
