@@ -12,11 +12,6 @@
   4. Remove item from this file.
 * Defects
 ** --prepend-tags, --append-tags are mutualy exlusive
-** testcase command-line-parsing-of-empty-set may be impl in python
-   This test cannot be implemented (or is difficult to implement) in
-   simptest.
-   But it should be possible to implement it purely in Python, using Python's
-   test framework.
 * Check current functionality
 ** Exporting of tags to following files on the command line
    Currently, I believe, tags are forwarded to later command line arguments.
@@ -26,6 +21,16 @@
    first file.  But it may also be confusing.
    Perhaps it would be good with an option that makes it possible to both
    forward and not forward tags to later command line argument files.
+* Tests
+** testcase command-line-parsing-of-empty-set may be impl in python
+   This test cannot be implemented (or is difficult to implement) in
+   simptest.
+   But it should be possible to implement it purely in Python, using Python's
+   test framework.
+** Flytta listfiler till input/
+   Och installera m ha M4_SETUP_INSTALL_DATA_AND_INPUT.
+** Sprid ut tester av taggar till de enskilda instruktionerna
+   test-paketet tags ska föregå andra instruktioner o file-path.
 * Build system
 ** Derive path of python3
 ** Support parallell builds
@@ -38,11 +43,7 @@
 * Config Management
 ** Se till att alla filer inkluderas i git-repot
 ... även de tomma kataloger som används av tester. 
-** Sprid ut tester av taggar till de enskilda instruktionerna
-   test-paketet tags ska föregå andra instruktioner o file-path.
 
-** Flytta listfiler till input/
-   Och installera m ha M4_SETUP_INSTALL_DATA_AND_INPUT.
 * After v 1.0
 ** List
 *** Improve match-expression
