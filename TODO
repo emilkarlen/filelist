@@ -52,6 +52,7 @@
 **** Support more file-types (today only f,d)
      May need to decide whether to follow sym-links or not - use stat or
      lstat.
+**** Include/exclude condition on mode/perms
 **** Complex expressions à la find
      Not, parenthasis, etc.
 ** Print inclusion-hierarchy
