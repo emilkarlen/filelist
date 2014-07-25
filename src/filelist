@@ -626,24 +626,24 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
 
     @staticmethod
     def for_top_level_file(file_name: str,
-                           program_should_fail_on_missing_file: bool,
+                           program_should_fail_on_non_existing_file: bool,
                            tags_condition: TagsCondition,
                            settings: RenditionSettings):
         return RenditionEnvironment(FileReferenceEnvironment.for_top_level_file(file_name),
-                                    program_should_fail_on_missing_file,
+                                    program_should_fail_on_non_existing_file,
                                     tags_condition,
                                     Tags.new_empty(),
                                     settings)
 
     def __init__(self,
                  file_ref_env: FileReferenceEnvironment,
-                 program_should_fail_on_missing_file: bool,
+                 program_should_fail_on_non_existing_file: bool,
                  tags_condition: TagsCondition,
                  tags: Tags,
                  rendition_settings: RenditionSettings):
         ResultItemsConstructionEnvironment.__init__(self,
                                                     file_ref_env,
-                                                    program_should_fail_on_missing_file,
+                                                    program_should_fail_on_non_existing_file,
                                                     tags_condition,
                                                     tags)
         self.rendition_settings = rendition_settings
@@ -2603,7 +2603,7 @@ class Command:
     def execute(self,
                 file_names: list,
                 stdin_paths_are_relative_empty: list,
-                program_should_fail_on_missing_file: bool,
+                program_should_fail_on_non_existing_file: bool,
                 tags_condition: TagsCondition,
                 rendition_settings: RenditionSettings,
                 parsing_settings: ParsingSettings):
@@ -2616,7 +2616,7 @@ class Command:
                                                        parsing_and_rendition_file_name)
             file_processor = file_parser.apply(lines_source)
             env = RenditionEnvironment.for_top_level_file(parsing_and_rendition_file_name,
-                                                          program_should_fail_on_missing_file,
+                                                          program_should_fail_on_non_existing_file,
                                                           tags_condition,
                                                           rendition_settings)
             self.process_list_file(file_number, file_processor, parsing_settings, env)
@@ -3165,14 +3165,14 @@ class CommandLineParseResult:
                  file_names: list,
                  stdin_paths_are_relative_or_empty: list,
                  tags_condition: TagsCondition,
-                 missing_file_handling_settings: FileExistenceHandlingSettings,
+                 file_existence_handling_settings: FileExistenceHandlingSettings,
                  rendition_settings: RenditionSettings,
                  preprocessor_shell_command: str):
         self.command = command
         self.instruction_prefix = instruction_prefix
         self.file_names = file_names
         self.stdin_paths_are_relative_or_empty = stdin_paths_are_relative_or_empty
-        self.missing_file_handling_settings = missing_file_handling_settings
+        self.file_existence_handling_settings = file_existence_handling_settings
         self.tags_condition = tags_condition
         self.rendition_settings = rendition_settings
         self.preprocessor_shell_command = preprocessor_shell_command
@@ -3239,7 +3239,7 @@ def parse_command_line() -> CommandLineParseResult:
     tags_condition_setup = TagsConditionSetup()
     all_filter_operator_names = tags_condition_setup.all_operator_names()
 
-    missing_file_handling_mode_parser = FileExistenceHandlingModeOptionParser()
+    file_existence_handling_mode_parser = FileExistenceHandlingModeOptionParser()
 
     parser.add_argument("files",
                         metavar="FILE",
@@ -3258,17 +3258,18 @@ def parse_command_line() -> CommandLineParseResult:
                         The default is """ + DEFAULT_INSTRUCTION_PREFIX + ".")
     parser.add_argument("-m", "--missing-file-handling",
                         metavar="MODE",
+                        dest="file_existence_mode",
                         nargs=1,
-                        choices=missing_file_handling_mode_parser.mode_keys(),
-                        default=[missing_file_handling_mode_parser.default_key()],
+                        choices=file_existence_handling_mode_parser.mode_keys(),
+                        default=[file_existence_handling_mode_parser.default_key()],
                         help="""\
                         Determines how file-paths that do not correspond to an existing
                         file are handled.
 
                         The default mode is """ +
-                        in_double_quotes(missing_file_handling_mode_parser.default_key()) +
+                        in_double_quotes(file_existence_handling_mode_parser.default_key()) +
                         """. List of modes: """ +
-                             missing_file_handling_mode_parser.keys_help_text())
+                             file_existence_handling_mode_parser.keys_help_text())
     parser.add_argument("-f", "--relative-file-argument-location",
                         default=False,
                         action="store_true",
@@ -3405,7 +3406,7 @@ def parse_command_line() -> CommandLineParseResult:
                                           args.filter_tags,
                                           args.operator_for_filter_tags[0],
                                           (len(args.negate_operator_for_filter_tags) % 2) == 1)
-    file_existence_handling_settings = missing_file_handling_mode_parser.lookup(args.missing_file_handling[0])
+    file_existence_handling_settings = file_existence_handling_mode_parser.lookup(args.file_existence_mode[0])
     rendition_settings = RenditionSettings(args.relative_file_argument_location,
                                            file_existence_handling_settings.include_existing_in_output,
                                            file_existence_handling_settings.include_non_existing_in_output,
@@ -3430,7 +3431,7 @@ def main():
     try:
         parse_result.command.execute(parse_result.file_names,
                                      parse_result.stdin_paths_are_relative_or_empty,
-                                     parse_result.missing_file_handling_settings.program_should_fail_on_non_existing,
+                                     parse_result.file_existence_handling_settings.program_should_fail_on_non_existing,
                                      parse_result.tags_condition,
                                      parse_result.rendition_settings,
                                      ParsingSettings(parse_result.preprocessor_shell_command,

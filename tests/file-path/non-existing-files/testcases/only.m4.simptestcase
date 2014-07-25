@@ -2,9 +2,8 @@
 
 #
 # WHEN mode for handling missing files is "only",
-# and a file-path for a missing file is encountered,
 # THEN the program
-# SHOULD only the file in the output.
+# SHOULD output only the non-existing files.
 #
 
 m4_include(common.m4)
