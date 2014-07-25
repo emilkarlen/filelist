@@ -17,8 +17,6 @@
    simptest.
    But it should be possible to implement it purely in Python, using Python's
    test framework.
-* Improvments
-** "reg-ex" should be replaced with "regex"
 * Check current functionality
 ** Exporting of tags to following files on the command line
    Currently, I believe, tags are forwarded to later command line arguments.

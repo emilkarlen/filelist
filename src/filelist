@@ -1914,7 +1914,7 @@ def wildcard_matcher(wildcard: str):
     return f
 
 
-def reg_ex_matcher(regex_string: str):
+def regex_matcher(regex_string: str):
     """A mather that matches on Regular Expressions."""
     try:
         regex = re.compile(regex_string)
@@ -1965,8 +1965,8 @@ def list__parse_file_type_matcher(list_args: argparse.Namespace) -> list:
 
 def list__parse_include_name_matchers_new_new(list_args: argparse.Namespace) -> list:
     or_list = []
-    or_list.extend([wildcard_matcher(wildcard) for wildcard in list_args.patterns])
-    or_list.extend([reg_ex_matcher(reg_ex[0]) for reg_ex in list_args.reg_ex_list])
+    or_list.extend([wildcard_matcher(shell_pattern) for shell_pattern in list_args.patterns])
+    or_list.extend([regex_matcher(regex[0]) for regex in list_args.regex_list])
 
     return [or_matcher(or_list)] if or_list else []
 
@@ -1975,7 +1975,7 @@ def list__parse_excludes(list_args: argparse.Namespace) -> list:
     name_matchers = []
     name_matchers.extend([wildcard_matcher(wildcard[0])
                           for wildcard in list_args.exclude_pattern_list])
-    name_matchers.extend([reg_ex_matcher(regex[0])
+    name_matchers.extend([regex_matcher(regex[0])
                           for regex in list_args.exclude_regex_list])
     return [not_matcher(or_matcher(name_matchers))]\
         if name_matchers\
@@ -2053,10 +2053,10 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                             If PATTERNs are given, then the condition on the file name
                             is to match at least one of these.
                             """)
-        parser.add_argument("-r", "--reg-ex",
+        parser.add_argument("-r", "--regex",
                             metavar="REG-EX",
                             nargs=1,
-                            dest="reg_ex_list",
+                            dest="regex_list",
                             action="append",
                             default=[],
                             help="""\
