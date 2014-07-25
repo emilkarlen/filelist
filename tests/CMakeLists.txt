@@ -107,7 +107,7 @@ testcase (list directory-argument-missing)
 testcase (list list-home-dir)
 testcase (list sort)
 
-testcase (list/file-condition wildcards)
+testcase (list/file-condition name--include--shell-pattern)
 testcase (list/file-condition name--include--reg-ex)
 testcase (list/file-condition name--include--wildcard-and-reg-ex)
 testcase (list/file-condition name--exclude--shell-pattern)
