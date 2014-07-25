@@ -1,0 +1,8 @@
+# Precedence over inclusion pattern
+dir/b-file.b
+
+# Precedence over inclusion regex
+dir/b-file.b
+
+# Precedence over inclusion file-type
+dir/b-file.b

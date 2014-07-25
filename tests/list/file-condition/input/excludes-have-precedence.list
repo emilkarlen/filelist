@@ -1,0 +1,10 @@
+@print # Precedence over inclusion pattern
+@LIST dir --sort --exclude *.a *.a *.b
+
+@print
+@print # Precedence over inclusion regex
+@LIST dir --sort --exclude-regex ^a.* -r ^a.* *.b
+
+@print
+@print # Precedence over inclusion file-type
+@LIST dir --sort --exclude-regex ^a.*a$ --type f a* b*
