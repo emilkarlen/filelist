@@ -8,9 +8,9 @@ m4_include(common.m4)
 name:file-name-condition-with-wildcard-and-reg-ex
 home:..
 
-setup.install:data/pattern-and-types
+setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-and-types/file-name-condition-with-wildcard-and-reg-ex.list | sort
+test.run.cmdline:M4_EXECUTABLE_REL_LIST data/file-name-condition-with-wildcard-and-reg-ex.list | sort
 
 check.exitcode:0
 check.stdout.file.eq:output/file-name-condition-with-wildcard-and-reg-ex.txt

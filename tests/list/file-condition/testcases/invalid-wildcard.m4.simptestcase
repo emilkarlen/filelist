@@ -5,9 +5,9 @@ m4_include(common.m4)
 name:invalid-wildcard
 home:..
 
-setup.install:data/pattern-and-types
+setup.install:data
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST pattern-and-types/invalid-wildcard.list
+test.run.cmdline:M4_EXECUTABLE_REL_LIST data/invalid-wildcard.list
 
 check.exitcode:M4_EXIT_SYNTAX
 check.stdout.empty
