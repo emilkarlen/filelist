@@ -11,7 +11,7 @@ m4_include(common.m4)
 name:name--exclude--shell-pattern
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(name--exclude--shell-pattern.list)
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST data/name--exclude--shell-pattern.list | sort
 

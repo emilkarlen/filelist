@@ -5,9 +5,9 @@ m4_include(common.m4)
 name:name--include--shell-pattern--invalid
 home:..
 
-setup.install:data
+setup.install:input/name--include--shell-pattern--invalid.list
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST data/name--include--shell-pattern--invalid.list
+test.run.cmdline:M4_EXECUTABLE_REL_LIST name--include--shell-pattern--invalid.list
 
 check.exitcode:M4_EXIT_SYNTAX
 check.stdout.empty

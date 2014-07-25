@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:type--file
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(type--file.list)
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST data/type--file.list | sort
 

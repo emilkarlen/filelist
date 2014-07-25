@@ -8,7 +8,7 @@ m4_include(common.m4)
 name:name--include--wildcard-and-reg-ex
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(name--include--wildcard-and-reg-ex.list)
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST data/name--include--wildcard-and-reg-ex.list | sort
 

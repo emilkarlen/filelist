@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:combined--type-and-name
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(combined--type-and-name.list)
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST data/combined--type-and-name.list | sort
 
