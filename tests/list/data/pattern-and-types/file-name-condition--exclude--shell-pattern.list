@@ -1,0 +1,1 @@
+@LIST dir --exclude a*.? --exclude b*.?

@@ -1,0 +1,4 @@
+dir/a-subdir
+dir/b-subdir
+dir/c-file.c
+dir/c-subdir

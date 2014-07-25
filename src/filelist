@@ -126,6 +126,13 @@ def and_matcher(matchers: list):
     return f
 
 
+def not_matcher(matcher):
+    """
+    A matcher that negates a matcher.
+    """
+    return lambda x: not(matcher(x))
+
+
 def constantly_true_matcher():
     def f(x) -> bool:
         return True
@@ -1950,6 +1957,26 @@ def file_type_matcher(expected_type: FileType):
     return f
 
 
+def list__parse_file_type_matcher(list_args: argparse.Namespace) -> list:
+    return [] if not list_args.type else [list_args.type[0].new_matcher()]
+
+
+def list__parse_include_name_matchers_new_new(list_args: argparse.Namespace) -> list:
+    or_list = []
+    or_list.extend([wildcard_matcher(wildcard) for wildcard in list_args.patterns])
+    or_list.extend([reg_ex_matcher(reg_ex[0]) for reg_ex in list_args.reg_ex_list])
+
+    return [or_matcher(or_list)] if or_list else []
+
+
+def list__parse_excludes(list_args: argparse.Namespace) -> list:
+    excluded_file_name_matchers = [wildcard_matcher(wildcard[0])
+                                   for wildcard in list_args.exclude_pattern_list]
+    return [not_matcher(or_matcher(excluded_file_name_matchers))]\
+        if excluded_file_name_matchers\
+        else []
+
+
 class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgumentParser):
     """Parser for the contents of a directory."""
 
@@ -1981,44 +2008,26 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                         instruction_argument: str) -> ListSettings:
         arguments = shlex.split(instruction_argument)
         if not arguments:
-            msg = "A directory must be given (use . for current directory)."
+            msg = "A directory must be given (use '.' for current directory)."
             raise InstructionArgumentParserSyntaxErrorException([msg])
         directory = arguments[0]
 
         args = self._parse(arguments[1:])
-        matcher = self._parse_matcher(args.type,
-                                      args.patterns,
-                                      [l[0] for l in args.reg_ex_list])
+        matcher = self._parse_matcher(args)
         return ListSettings(directory,
                             matcher,
                             args.sort)
 
-    @staticmethod
-    def _parse_matcher(file_type: list,
-                       wildcards: list,
-                       reg_ex_list: list):
+    _TOP_LEVEL_ANDS = [list__parse_file_type_matcher,
+                       list__parse_include_name_matchers_new_new,
+                       list__parse_excludes]
+
+    def _parse_matcher(self,
+                       args: argparse.Namespace):
         and_list = []
-        if file_type:
-            and_list.append(file_type[0].new_matcher())
-        and_list.extend(InstructionArgumentParserForDirectoryListing._parse_name_matchers(wildcards,
-                                                                                          reg_ex_list))
-
+        for constructor in self._TOP_LEVEL_ANDS:
+            and_list.extend(constructor(args))
         return and_matcher(and_list)
-
-    @staticmethod
-    def _parse_name_matchers(wildcards: list,
-                             reg_ex_list: list) -> list:
-        or_list = []
-        or_list.extend([wildcard_matcher(wildcard) for wildcard in wildcards])
-        or_list.extend([reg_ex_matcher(reg_ex) for reg_ex in reg_ex_list])
-
-        return [or_matcher(or_list)] if or_list else []
-
-    @staticmethod
-    def _parse_wildcard_matcher(wildcards: list):
-        if not wildcards:
-            return constantly_true_matcher()
-        return or_matcher([wildcard_matcher(wildcard) for wildcard in wildcards])
 
     def _construct_argparser(self, instruction_name_for_help_text: str) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(prog=instruction_name_for_help_text + " DIRECTORY",
@@ -2060,8 +2069,17 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                             To limit matches to file-names who's whole name matches the REG-EX,
                             begin and end REG-EX with '^' and '$', respectively.
                             """)
+        parser.add_argument("-e", "--exclude",
+                            metavar="PATTERN",
+                            nargs=1,
+                            dest="exclude_pattern_list",
+                            action="append",
+                            default=[],
+                            help="""\
+                            Excludes all files who's name matching the given pattern.""")
         parser.add_argument("-t", "--type",
                             nargs=1,
+                            default=[],
                             type=FileType,
                             help="""\
                             Condition on the file type.
