@@ -301,8 +301,7 @@ class Tags:
         self.tags_stack = [self.frozen_tags()] + self.tags_stack
 
     def pop(self):
-        self.set_frozen_set(self.tags_stack[0])
-        del self.tags_stack[0]
+        self.set_frozen_set(self.tags_stack.pop(0))
 
     def set(self,
             tags: list):
@@ -927,9 +926,9 @@ class ResultItemIterableForFile:
             if self.curr_result_item_iterable is None:
                 if not self.instructions:
                     raise StopIteration
-                self.curr_result_item_iterable = self.instructions[0].result_item_iterable(self.parsing_settings,
-                                                                                           self.env)
-                del self.instructions[0]
+                instruction = self.instructions.pop(0)
+                self.curr_result_item_iterable = instruction.result_item_iterable(self.parsing_settings,
+                                                                                  self.env)
             try:
                 return self.curr_result_item_iterable.__next__()
             except StopIteration:
