@@ -19,6 +19,8 @@
    first file.  But it may also be confusing.
    Perhaps it would be good with an option that makes it possible to both
    forward and not forward tags to later command line argument files.
+* Improvment
+** Handling of missing files: mode to output only missing files
 * Tests
 ** testcase command-line-parsing-of-empty-set may be impl in python
    This test cannot be implemented (or is difficult to implement) in
