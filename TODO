@@ -44,6 +44,9 @@
 ** Se till att alla filer inkluderas i git-repot
 ... även de tomma kataloger som används av tester. 
 
+** simptestcase ska inkluderas i distributionen
+   Dvs Testerna ska inte vara beroende av att korrekt version av simptest är
+   installerad i systemet - distributionen ska vara oberoende av simptest.
 * After v 1.0
 ** List
 *** Improve match-expression
