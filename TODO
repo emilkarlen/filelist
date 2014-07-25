@@ -19,13 +19,6 @@
    test framework.
 * Improvments
 ** "reg-ex" should be replaced with "regex"
-* Features
-** List
-*** Utesluta filer som matchar mönster
-Behövs för att kunna hantera t ex filstrukturer som hateras cvs/svn.
-Villkoret ska kombineras de "positiva" filnamns-mönstren med OCH.
-**** Utesluta med shell-pattern --exclude, -e
-**** Utesluta med reg-ex: --exclude-regex, -E
 * Check current functionality
 ** Exporting of tags to following files on the command line
    Currently, I believe, tags are forwarded to later command line arguments.
