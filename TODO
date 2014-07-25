@@ -47,6 +47,7 @@
    installerad i systemet - distributionen ska vara oberoende av simptest.
    Ta bort beroendena från CMakeLists.txt.
 * After v 1.0
+** Read stdin lazily
 ** List
 *** Improve match-expression
 **** Support more file-types (today only f,d)
