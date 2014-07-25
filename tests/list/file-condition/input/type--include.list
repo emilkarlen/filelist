@@ -1,0 +1,10 @@
+@print # Files
+@LIST dir --sort --type f
+
+@print
+@print # Directories
+@LIST dir --sort --type d
+
+@print
+@print # Files and directories
+@LIST dir --sort --type f --type d

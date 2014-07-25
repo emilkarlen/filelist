@@ -1,3 +1,0 @@
-dir/a-file.a
-dir/b-file.b
-dir/c-file.c

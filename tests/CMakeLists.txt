@@ -113,8 +113,8 @@ testcase (list/file-condition name--include--regex)
 testcase (list/file-condition name--include--shell-pattern-and-regex)
 testcase (list/file-condition name--exclude--shell-pattern)
 testcase (list/file-condition name--exclude--regex)
-testcase (list/file-condition type--file)
-# testcase (list/file-condition combined--???) eller vad som nu ska göras??
+testcase (list/file-condition type--include)
+# testcase (list/file-condition excludes-have-precedence)
 testcase (list/file-condition combined--type-and-name)
 
 testcase (include existing--relative-file-argument)

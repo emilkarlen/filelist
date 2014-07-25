@@ -4,9 +4,9 @@
 
 ###############################################################################
 # Copyright 2014 Emil Karlén.
-# 
+#
 # This file is part of filelist.
-# 
+#
 # filelist is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with filelist.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
@@ -236,7 +236,7 @@ class IncludeFileChain:
         new_files = self._files.copy()
         new_files.append(source_line)
         return IncludeFileChain(new_files)
-        
+
     def from_top_to_bottom(self):
         return self._files
 
@@ -1085,7 +1085,7 @@ class ProcessorForFilePath(Processor):
                  source: SourceReference,
                  file_name: str):
         Processor.__init__(self, source)
-        self.file_name = file_name 
+        self.file_name = file_name
 
     def result_item_iterable(self,
                              parsing_settings: ParsingSettings,
@@ -1276,7 +1276,7 @@ class InstructionSyntaxErrorException(WithSourceReferenceMixin, Exception):
                  description):
         WithSourceReferenceMixin.__init__(self, source)
         self.description = description
-    
+
     def render(self, o_stream):
         self.render_source_line_chain(o_stream)
         write_lines(o_stream,
@@ -1323,7 +1323,7 @@ class InstructionArgumentParserSyntaxErrorException(Exception):
 
     This exception is internal to the File Parser and
     Option Parsers.
-    
+
     This exception is raised by Argument Parsers, and handled by
     the parser, which re-raises it in the form of a
     InstructionSyntaxErrorException.
@@ -1934,16 +1934,16 @@ class FileType:
     suitable for us by an ArgumentParser.
     """
 
-    _TYPES = {
+    TYPES = {
         "f": stat.S_ISREG,
         "d": stat.S_ISDIR,
     }
 
     def __init__(self, s: str):
         try:
-            self.mode_predicate = self._TYPES[s]
+            self.mode_predicate = self.TYPES[s]
         except KeyError:
-            valid_types = ", ".join(self._TYPES.keys())
+            valid_types = ", ".join(self.TYPES.keys())
             raise InstructionArgumentParserSyntaxErrorException(["Invalid file type: " + in_source_quotes(s),
                                                                  "Valid types are " + valid_types + "."])
 
@@ -1958,7 +1958,9 @@ def file_type_matcher(expected_type: FileType):
 
 
 def list__parse_file_type_matcher(list_args: argparse.Namespace) -> list:
-    return [] if not list_args.type else [list_args.type[0].new_matcher()]
+    matchers = [file_type[0].new_matcher()
+                for file_type in list_args.type]
+    return [or_matcher(matchers)] if matchers else []
 
 
 def list__parse_include_name_matchers_new_new(list_args: argparse.Namespace) -> list:
@@ -2090,12 +2092,16 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
                             Excludes all files who's name matching the given regular expression.""")
         parser.add_argument("-t", "--type",
                             nargs=1,
+                            metavar="TYPE",
                             default=[],
+                            action="append",
                             type=FileType,
                             help="""\
-                            Condition on the file type.
+                            Include only files who's type is the given.
                             "f" for regular file.
-                            "d" for directory.""")
+                            "d" for directory.
+
+                            If used more than once, they are OR:ed.""")
         parser.add_argument("-s", "--sort",
                             action="store_const",
                             const=True,

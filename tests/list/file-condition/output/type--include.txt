@@ -1,0 +1,17 @@
+# Files
+dir/a-file.a
+dir/b-file.b
+dir/c-file.c
+
+# Directories
+dir/a-subdir
+dir/b-subdir
+dir/c-subdir
+
+# Files and directories
+dir/a-file.a
+dir/a-subdir
+dir/b-file.b
+dir/b-subdir
+dir/c-file.c
+dir/c-subdir

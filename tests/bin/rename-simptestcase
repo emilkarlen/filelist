@@ -15,7 +15,6 @@ function exit_error # MESSAGE ...
 
 function check_name # TEST-NAME
 {
-    echo "'$1'"
     if [[ "$1" =~ [/.:] ]]; then
 	exit_error "Test name cannot include any of '/.: ': \`$1'"
     fi
