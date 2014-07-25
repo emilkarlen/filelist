@@ -102,15 +102,28 @@ COMMAND_LINE_ARGUMENT_FOR_STDIN = "-"
 ###############################################################################
 
 
+def constantly_matcher(result: bool):
+    def f(x) -> bool:
+        return result
+    return f
+
+
 def or_matcher(matchers: list):
     """
     A matcher that must match one of a given list of matchers.
     """
+    num_matchers = len(matchers)
+    if num_matchers == 0:
+        return constantly_matcher(False)
+    elif num_matchers == 1:
+        return matchers[0]
+
     def f(x) -> bool:
         for matcher in matchers:
             if matcher(x):
                 return True
         return False
+
     return f
 
 
@@ -118,11 +131,18 @@ def and_matcher(matchers: list):
     """
     A matcher that must match every one of a given list of matchers.
     """
+    num_matchers = len(matchers)
+    if num_matchers == 0:
+        return constantly_matcher(True)
+    elif num_matchers == 1:
+        return matchers[0]
+
     def f(x) -> bool:
         for matcher in matchers:
             if not matcher(x):
                 return False
         return True
+
     return f
 
 
@@ -131,12 +151,6 @@ def not_matcher(matcher):
     A matcher that negates a matcher.
     """
     return lambda x: not(matcher(x))
-
-
-def constantly_true_matcher():
-    def f(x) -> bool:
-        return True
-    return f
 
 
 ###############################################################################
