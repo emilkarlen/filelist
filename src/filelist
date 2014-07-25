@@ -546,26 +546,20 @@ class TagsRenditionSettings:
     DEFAULT_TAGS_AND_PATH_SEPARATOR = ":"
 
     def __init__(self,
-                 is_prepend: bool):
-        self.is_prepend = is_prepend
+                 is_prepend: bool,
+                 is_append: bool):
+        self._is_prepend = is_prepend
+        self._is_append = is_append
 
     @staticmethod
     def new_without_output():
         return TagsRenditionSettings(None)
 
-    @staticmethod
-    def new_prepend():
-        return TagsRenditionSettings(True)
-
-    @staticmethod
-    def new_append():
-        return TagsRenditionSettings(False)
-
     def is_output_tags(self) -> bool:
-        return self.is_prepend is not None
+        return self._is_prepend or self._is_append
 
     def is_prepend(self) -> bool:
-        return self.is_prepend
+        return self._is_prepend
 
     def tags_and_path_separator(self) -> str:
         return self.DEFAULT_TAGS_AND_PATH_SEPARATOR
@@ -589,10 +583,13 @@ class TagsRenditionSettings:
     def _concatenate(self,
                      tags_string: str,
                      path: str):
-        if self.is_prepend:
-            return tags_string + self.tags_and_path_separator() + path
-        else:
-            return path + self.tags_and_path_separator() + tags_string
+        components = []
+        if self._is_prepend:
+            components.append(tags_string)
+        components.append(path)
+        if self._is_append:
+            components.append(tags_string)
+        return self.tags_and_path_separator().join(components)
 
 
 class RenditionSettings:
@@ -3303,18 +3300,15 @@ def parse_command_line() -> CommandLineParseResult:
                         E.g., PRINT instructions will have no effect.
                         """)
     parser.add_argument("-t", "--prepend-tags",
-                        dest="tags_settings",
-                        default=TagsRenditionSettings.new_without_output(),
-                        action="store_const",
-                        const=TagsRenditionSettings.new_prepend(),
+                        default=False,
+                        action="store_true",
                         help="""\
                         For each file, print it's tags before it.
                         The tags and the path are separated by \"""" +
                         TagsRenditionSettings.DEFAULT_TAGS_AND_PATH_SEPARATOR + "\"")
     parser.add_argument("-T", "--append-tags",
-                        dest="tags_settings",
-                        action="store_const",
-                        const=TagsRenditionSettings.new_append(),
+                        default=False,
+                        action="store_true",
                         help="""\
                         For each file, print it's tags after it.
                         The tags and the path are separated by \"""" +
@@ -3407,7 +3401,8 @@ def parse_command_line() -> CommandLineParseResult:
                                            missing_file_handling_settings.include_in_output,
                                            args.normalize_paths,
                                            args.absolute_paths,
-                                           args.tags_settings,
+                                           TagsRenditionSettings(args.prepend_tags,
+                                                                 args.append_tags),
                                            args.suppress_non_path_output)
     return CommandLineParseResult(args.command,
                                   args.instruction_prefix[0],

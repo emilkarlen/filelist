@@ -10,8 +10,6 @@
      5. Refactor
   3. Write program help
   4. Remove item from this file.
-* Defects
-** --prepend-tags, --append-tags are mutualy exlusive
 * Check current functionality
 ** Exporting of tags to following files on the command line
    Currently, I believe, tags are forwarded to later command line arguments.
@@ -47,6 +45,7 @@
 ** simptestcase ska inkluderas i distributionen
    Dvs Testerna ska inte vara beroende av att korrekt version av simptest är
    installerad i systemet - distributionen ska vara oberoende av simptest.
+   Ta bort beroendena från CMakeLists.txt.
 * After v 1.0
 ** List
 *** Improve match-expression

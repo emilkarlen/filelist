@@ -68,6 +68,7 @@ testcase (basic instruction-name-variants)
 testcase (basic multiple-file-arguments)
 testcase (basic custom-instruction-prefix)
 
+
 testcase (file-path multiple-file-arguments)
 testcase (file-path existing)
 testcase (file-path existing-relative-file-argument)
@@ -75,6 +76,11 @@ testcase (file-path existing-with-suppress-non-path-output)
 testcase (file-path absolute-file-paths-existing)
 testcase (file-path absolute-file-paths-existing-with-output-absolute-name)
 testcase (file-path absolute-file-paths-nonexisting)
+
+testcase (other normalize-paths)
+testcase (other normalize-paths-relative-file-argument)
+testcase (other output-absolute-paths)
+
 
 testcase (file-path/non-existing-files fail)
 testcase (file-path/non-existing-files ignore)
@@ -100,6 +106,7 @@ testcase (file-path/filter-on-tags unequals)
 testcase (file-path/filter-on-tags default-operator-is-contains-any-of)
 testcase (file-path/filter-on-tags flexible-parsing-of-tag-list)
 
+
 testcase (list existing-directory)
 testcase (list existing-directory-absolute)
 testcase (list existing-directory-relative-file-argument)
@@ -117,6 +124,7 @@ testcase (list/file-condition type--include)
 testcase (list/file-condition excludes-have-precedence)
 testcase (list/file-condition combined--type-and-name)
 
+
 testcase (include existing--relative-file-argument)
 testcase (include existing-in-same-dir)
 testcase (include existing-in-same-dir-absolute-filename)
@@ -127,6 +135,7 @@ testcase (include inclusion-trace-in-error-messages)
 testcase (include inclusion-trace-in-error-messages-file)
 testcase (include preserve-current-directory)
 
+
 testcase (print-inclusion-hierarchy in-same-directory)
 testcase (print-inclusion-hierarchy in-sub-directory)
 testcase (print-inclusion-hierarchy in-same-directory-pretty)
@@ -134,9 +143,11 @@ testcase (print-inclusion-hierarchy in-sub-directory-pretty)
 testcase (print-inclusion-hierarchy in-same-directory-multiple-args)
 testcase (print-inclusion-hierarchy in-same-directory-multiple-args-pretty)
 
+
 testcase (tags set-and-print)
 testcase (tags set-and-prepend)
 testcase (tags set-and-append)
+testcase (tags set-and-prepend-append)
 testcase (tags set-and-append-list)
 testcase (tags include-export--in-same-dir)
 testcase (tags include-export--in-other-dir)
@@ -162,6 +173,7 @@ testcase (tags stack-push-pop)
 testcase (tags print-stack)
 testcase (tags print-stack--suppress-non-path-output)
 
+
 testcase (shell successful-command-in-same-dir-with-valid-output)
 testcase (shell successful-command-in-same-dir-with-invalid-output)
 testcase (shell unsuccessful-exit-command)
@@ -170,13 +182,11 @@ testcase (shell tags-should-be-set)
 testcase (shell tags-filter-included)
 testcase (shell tags-filter-excluded)
 
+
 testcase (preprocessor only-top-level-file)
 testcase (preprocessor included-file)
 testcase (preprocessor preprocessor-failure)
 
-testcase (other normalize-paths)
-testcase (other normalize-paths-relative-file-argument)
-testcase (other output-absolute-paths)
 
 testcase (stdin-as-file-argument just-print)
 testcase (stdin-as-file-argument allowed-at-most-once-on-command-line)
