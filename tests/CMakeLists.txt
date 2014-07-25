@@ -113,9 +113,9 @@ testcase (list/file-condition name--include--reg-ex)
 testcase (list/file-condition name--include--wildcard-and-reg-ex)
 testcase (list/file-condition name--exclude--shell-pattern)
 testcase (list/file-condition type--file)
-testcase (list/file-condition type--combined-with-namepattern)
 # testcase (list/file-condition name--exclude--reg-ex)
-# testcase (list/file-condition name--composition) eller vad som nu ska göras??
+# testcase (list/file-condition combined--???) eller vad som nu ska göras??
+testcase (list/file-condition combined--type-and-name)
 
 testcase (include existing--relative-file-argument)
 testcase (include existing-in-same-dir)

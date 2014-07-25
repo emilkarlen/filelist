@@ -1,0 +1,13 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+name:combined--type-and-name
+home:..
+
+setup.install:data
+
+test.run.cmdline:M4_EXECUTABLE_REL_LIST data/combined--type-and-name.list | sort
+
+check.exitcode:0
+check.stdout.file.eq:output/combined--type-and-name.txt
