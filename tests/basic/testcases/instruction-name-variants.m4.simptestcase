@@ -9,7 +9,7 @@ m4_include(common.m4)
 name:instruction-name-variants
 home:..
 
-setup.install:data/instruction-name-variants.list
+setup.install:input/instruction-name-variants.list
 
 test.run.cmdline:M4_EXECUTABLE instruction-name-variants.list
 

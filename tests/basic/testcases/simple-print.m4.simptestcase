@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:simple-print
 home:..
 
-setup.install:data/simple-print.list
+setup.install:input/simple-print.list
 
 test.run.cmdline:M4_EXECUTABLE simple-print.list
 

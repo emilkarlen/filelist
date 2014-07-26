@@ -5,9 +5,9 @@ m4_include(common.m4)
 name:comments-blanklines-single-print
 home:..
 
-setup.install:data
+setup.install:input/comments-blanklines-single-print.list
 
-test.run.cmdline:M4_EXECUTABLE data/comments-blanklines-single-print.list
+test.run.cmdline:M4_EXECUTABLE comments-blanklines-single-print.list
 
 check.exitcode:0
 check.stdout.file.eq:output/comments-blanklines-single-print.txt

@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:custom-instruction-prefix
 home:..
 
-setup.install:data/custom-instruction-prefix.list
+setup.install:input/custom-instruction-prefix.list
 
 test.run.cmdline:M4_EXECUTABLE --instruction-prefix PREFIX custom-instruction-prefix.list
 

@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:parse-invalid-instruction-name
 home:..
 
-setup.install:data/parse-invalid-instruction-name.list
+setup.install:input/parse-invalid-instruction-name.list
 
 test.run.cmdline:M4_EXECUTABLE parse-invalid-instruction-name.list
 

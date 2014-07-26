@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:parse-invalid-line-syntax
 home:..
 
-setup.install:data/parse-invalid-line-syntax.list
+setup.install:input/parse-invalid-line-syntax.list
 
 test.run.cmdline:M4_EXECUTABLE parse-invalid-line-syntax.list
 

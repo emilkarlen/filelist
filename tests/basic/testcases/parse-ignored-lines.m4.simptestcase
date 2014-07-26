@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:parse-ignored-lines
 home:..
 
-setup.install:data/parse-ignored-lines.list
+setup.install:input/parse-ignored-lines.list
 
 test.run.cmdline:M4_EXECUTABLE parse-ignored-lines.list
 
