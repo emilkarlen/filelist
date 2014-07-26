@@ -108,11 +108,12 @@ testcase (file-path/filter-on-tags default-operator-is-contains-any-of)
 testcase (file-path/filter-on-tags flexible-parsing-of-tag-list)
 
 
-testcase (list existing-directory)
-testcase (list existing-directory-absolute)
-testcase (list existing-directory-relative-file-argument)
+testcase (list/existing-directory basic)
+testcase (list/existing-directory absolute)
+testcase (list/existing-directory relative-file-argument)
+
 testcase (list directory-argument-missing)
-testcase (list list-home-dir)
+testcase (list list-same-dir)
 testcase (list sort)
 
 testcase (list/file-condition name--include--shell-pattern)

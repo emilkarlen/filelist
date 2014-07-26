@@ -1,2 +1,0 @@
-__SIMPTEST_TESTROOT__/existing-directory/dir/existing-file-2.txt
-__SIMPTEST_TESTROOT__/existing-directory/dir/existing-file.txt

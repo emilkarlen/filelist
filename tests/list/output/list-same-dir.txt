@@ -1,0 +1,2 @@
+dir
+list-same-dir.list

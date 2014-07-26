@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+# Tests listing an existing directory using an absolute path to the directory.
+
+m4_include(common.m4)
+
+name:absolute
+home:..
+
+M4_SETUP_INSTALL_DATA_AND_INPUT(absolute.list)
+setup.run.cmdline:ex -s -c g:CURRENT_DIRECTORY:s:CURRENT_DIRECTORY:${SIMPTEST_TESTROOT}:g -c x data/absolute.list
+
+test.run.cmdline:M4_EXECUTABLE data/absolute.list | sort
+
+check.prepare.replace-SIMPTEST-envvars/stdout
+
+check.exitcode:0
+check.stdout.file.eq/replaced:output/absolute.txt
