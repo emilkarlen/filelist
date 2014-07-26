@@ -25,6 +25,7 @@ name:sort
 home:..
 
 setup.install:data/sort
+setup.install:input/sort.list:sort
 
 test.run.cmdline:M4_EXECUTABLE_REL_LIST sort/sort.list
 
