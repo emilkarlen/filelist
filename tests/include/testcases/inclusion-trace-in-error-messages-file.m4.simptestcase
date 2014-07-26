@@ -14,7 +14,7 @@ m4_include(common.m4)
 name:inclusion-trace-in-error-messages-file
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(includes-list-with-ref-to-non-existing-file.list)
 
 test.run.cmdline:M4_EXECUTABLE data/includes-list-with-ref-to-non-existing-file.list
 

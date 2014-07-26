@@ -9,7 +9,7 @@ m4_include(common.m4)
 name:inclusion-trace-in-error-messages
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(inclusion-trace-in-error-messages.list)
 
 test.run.cmdline:M4_EXECUTABLE data/inclusion-trace-in-error-messages.list
 

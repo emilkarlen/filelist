@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:existing-in-same-dir-absolute-filename
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(include-existing-in-same-dir-absolute-filename.list)
 
 setup.run.cmdline:ex -s -c g:CURRENT_DIRECTORY:s:CURRENT_DIRECTORY:${SIMPTEST_TESTROOT}:g -c x data/include-existing-in-same-dir-absolute-filename.list
 

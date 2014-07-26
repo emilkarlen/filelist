@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:include-non-existing
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(include-non-existing.list)
 
 test.run.cmdline:M4_EXECUTABLE data/include-non-existing.list
 

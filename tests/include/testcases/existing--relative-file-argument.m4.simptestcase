@@ -5,7 +5,7 @@ m4_include(common.m4)
 name:include-existing--relative-file-argument
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(include-existing-in-subdir.list)
 
 test.run.cmdline:M4_EXECUTABLE --relative-file-argument-location data/include-existing-in-subdir.list
 
