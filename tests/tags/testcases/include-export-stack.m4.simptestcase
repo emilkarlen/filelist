@@ -9,7 +9,7 @@ m4_include(common.m4)
 name:include-export-stack
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(include-export-stack.list)
 
 test.run.cmdline:M4_EXECUTABLE data/include-export-stack.list
 

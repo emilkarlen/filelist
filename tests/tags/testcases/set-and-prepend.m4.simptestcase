@@ -9,7 +9,7 @@ m4_include(common.m4)
 name:set-and-prepend
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(set-tags-and-files.list)
 
 test.run.cmdline:M4_EXECUTABLE --prepend-tags data/set-tags-and-files.list
 

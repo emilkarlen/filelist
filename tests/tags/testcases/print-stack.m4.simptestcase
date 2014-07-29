@@ -11,7 +11,7 @@ m4_include(common.m4)
 name:tags-print-stack
 home:..
 
-setup.install:data/print-stack.list
+setup.install:input/print-stack.list
 
 test.run.cmdline:M4_EXECUTABLE print-stack.list
 

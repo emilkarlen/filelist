@@ -11,7 +11,7 @@ m4_include(common.m4)
 name:include-option-to-not-export-tags--current-tags--in-other-dir
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(include-option-to-not-export-tags--current-tags--in-other-dir.list)
 
 test.run.cmdline:M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--current-tags--in-other-dir.list
 

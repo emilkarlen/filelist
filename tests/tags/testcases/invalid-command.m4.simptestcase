@@ -9,7 +9,7 @@ m4_include(common.m4)
 name:invalid-command
 home:..
 
-setup.install:data/invalid-command.list
+setup.install:input/invalid-command.list
 
 test.run.cmdline:M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
 

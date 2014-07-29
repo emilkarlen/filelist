@@ -12,7 +12,7 @@ m4_include(common.m4)
 name:tags-set-and-print
 home:..
 
-setup.install:data/set-and-print.list
+setup.install:input/set-and-print.list
 
 test.run.cmdline:M4_EXECUTABLE set-and-print.list
 

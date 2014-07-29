@@ -9,7 +9,7 @@ m4_include(common.m4)
 name:stack-push-pop
 home:..
 
-setup.install:data/stack-push-pop.list
+setup.install:input/stack-push-pop.list
 
 test.run.cmdline:M4_EXECUTABLE stack-push-pop.list
 

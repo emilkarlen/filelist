@@ -11,7 +11,7 @@ m4_include(common.m4)
 name:stack-push
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(stack-push.list)
 
 test.run.cmdline:M4_EXECUTABLE data/stack-push.list
 

@@ -11,7 +11,7 @@ m4_include(common.m4)
 name:stack-pop-empty-stack
 home:..
 
-setup.install:data/stack-pop-empty-stack.list
+setup.install:input/stack-pop-empty-stack.list
 
 test.run.cmdline:M4_EXECUTABLE stack-pop-empty-stack.list
 

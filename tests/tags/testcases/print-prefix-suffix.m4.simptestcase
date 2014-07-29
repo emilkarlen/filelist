@@ -12,7 +12,7 @@ m4_include(common.m4)
 name:tags-print-prefix-suffix
 home:..
 
-setup.install:data/print-prefix-suffix.list
+setup.install:input/print-prefix-suffix.list
 
 test.run.cmdline:M4_EXECUTABLE print-prefix-suffix.list
 

@@ -9,7 +9,7 @@ m4_include(common.m4)
 name:set-and-append-list
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(set-tags-and-list.list)
 
 test.run.cmdline:M4_EXECUTABLE --append-tags data/set-tags-and-list.list
 

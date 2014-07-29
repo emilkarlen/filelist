@@ -12,7 +12,7 @@ m4_include(common.m4)
 name:tags-print--suppress-non-path-output
 home:..
 
-setup.install:data/print-prefix-suffix.list
+setup.install:input/print-prefix-suffix.list
 
 test.run.cmdline:M4_EXECUTABLE --suppress-non-path-output print-prefix-suffix.list
 
