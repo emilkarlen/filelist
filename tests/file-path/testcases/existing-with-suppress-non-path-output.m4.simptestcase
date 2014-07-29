@@ -10,7 +10,7 @@ m4_include(common.m4)
 name:existing-with-suppress-non-path-output
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(existing.list)
 
 test.run.cmdline:M4_EXECUTABLE --suppress-non-path-output data/existing.list
 
