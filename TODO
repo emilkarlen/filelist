@@ -30,7 +30,7 @@
 *** TODO file-path (ev är vissa paket klara)
 *** DONE tags
 *** TODO shell
-*** TODO preprocessor
+*** DONE preprocessor
 *** TODO stdin-as-file-argument
 ** Sprid ut tester av taggar till de enskilda instruktionerna
    test-paketet tags ska föregå andra instruktioner o file-path.
