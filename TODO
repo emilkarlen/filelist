@@ -68,3 +68,10 @@ Do this for non-pretty output.
     condition, and "- " for files that don't.
     Useful when all files must be processed somehow, but processing differes
     depending on filter satisfaction.
+** New instruction: find
+** New instruction: file
+   Syntax: @file PATH
+   One more form for file-path.
+   Same as file-path but the argument is split à la shell.
+   This instruction makes it possible to use shell quoting to specify the
+   path.
