@@ -25,13 +25,6 @@
    simptest.
    But it should be possible to implement it purely in Python, using Python's
    test framework.
-** Flytta listfiler till input/
-   Och installera m ha M4_SETUP_INSTALL_DATA_AND_INPUT.
-*** DONE file-path (ev är vissa paket klara)
-*** DONE tags
-*** DONE shell
-*** DONE preprocessor
-*** DONE stdin-as-file-argument
 ** Sprid ut tester av taggar till de enskilda instruktionerna
    test-paketet tags ska föregå andra instruktioner o file-path.
 * Build system
