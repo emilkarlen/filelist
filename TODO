@@ -27,6 +27,11 @@
    test framework.
 ** Flytta listfiler till input/
    Och installera m ha M4_SETUP_INSTALL_DATA_AND_INPUT.
+*** TODO file-path (ev är vissa paket klara)
+*** TODO tags
+*** TODO shell
+*** TODO preprocessor
+*** TODO stdin-as-file-argument
 ** Sprid ut tester av taggar till de enskilda instruktionerna
    test-paketet tags ska föregå andra instruktioner o file-path.
 * Build system
