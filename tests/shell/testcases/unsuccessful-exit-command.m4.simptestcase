@@ -10,7 +10,7 @@ m4_include(common.m4)
 name:unsuccessful-exit-command
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(unsuccessful-exit-command.list)
 
 test.run.cmdline:M4_EXECUTABLE data/unsuccessful-exit-command.list
 

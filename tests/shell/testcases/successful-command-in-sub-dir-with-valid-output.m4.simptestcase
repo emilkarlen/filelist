@@ -16,7 +16,7 @@ m4_include(common.m4)
 name:successful-command-in-sub-dir-with-valid-output
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(successful-command-in-sub-dir-with-valid-output.list)
 
 test.run.cmdline:M4_EXECUTABLE data/successful-command-in-sub-dir-with-valid-output.list
 

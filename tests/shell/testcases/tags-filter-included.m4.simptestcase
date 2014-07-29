@@ -10,7 +10,7 @@ m4_include(common.m4)
 name:tags-filter-included
 home:..
 
-setup.install:data
+M4_SETUP_INSTALL_DATA_AND_INPUT(tags.list)
 
 test.run.cmdline:M4_EXECUTABLE --filter-tags tag1 data/tags.list
 

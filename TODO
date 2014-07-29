@@ -29,7 +29,7 @@
    Och installera m ha M4_SETUP_INSTALL_DATA_AND_INPUT.
 *** TODO file-path (ev är vissa paket klara)
 *** DONE tags
-*** TODO shell
+*** DONE shell
 *** DONE preprocessor
 *** TODO stdin-as-file-argument
 ** Sprid ut tester av taggar till de enskilda instruktionerna
