@@ -31,7 +31,7 @@
 *** DONE tags
 *** DONE shell
 *** DONE preprocessor
-*** TODO stdin-as-file-argument
+*** DONE stdin-as-file-argument
 ** Sprid ut tester av taggar till de enskilda instruktionerna
    test-paketet tags ska föregå andra instruktioner o file-path.
 * Build system
