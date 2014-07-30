@@ -12,7 +12,7 @@ m4_include(common.m4)
 name:paths-relative-custom-dir
 home:..
 
-setup.install:data/empty-directory:data-root-dir
+setup.install:data/dir:data-root-dir
 setup.install:data:data-root-dir
 
 test.stdin:input/should-be-relative-cwd--other.list
