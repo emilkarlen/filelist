@@ -13,7 +13,10 @@ m4_include(common.m4)
 name:print-inclusion-hierarchy--relative-custom-dir
 home:..
 
-setup.install:data/empty-directory:data-root-dir
+# If not for weird simptest behaviour, the following line
+# would be: setup.install.run.cmdline:mkdir data-root-dir
+# and data/dir would not be in the repo.
+setup.install:data/dir:data-root-dir
 setup.install:data:data-root-dir
 
 test.stdin:input/should-be-relative-cwd--other.list
