@@ -22,10 +22,9 @@ cmake_minimum_required(VERSION 2.8)
 project(filelist NONE)
 
 # The version number.
-# set (filelist_VERSION_MAJOR 1)
-# set (filelist_VERSION_MINOR 0)
-
-# set (CMAKE_INSTALL_PREFIX /home/karlen/tmp/test-install/${CMAKE_PROJECT_NAME})
+set (filelist_VERSION_MAJOR 1)
+set (filelist_VERSION_MINOR 0)
+set (filelist_VERSION_PATCH 0)
 
 find_program(PYTHON python3)
 
@@ -33,16 +32,23 @@ install(PROGRAMS src/filelist DESTINATION bin)
 
 
 ###############################################################################
-# - build a CPack driven installer package -
+# - CPack configuration -
 ###############################################################################
 
 
-# include (InstallRequiredSystemLibraries)
-# set (CPACK_RESOURCE_FILE_LICENSE  
-#      "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-# set (CPACK_PACKAGE_VERSION_MAJOR "${filelist_VERSION_MAJOR}")
-# set (CPACK_PACKAGE_VERSION_MINOR "${filelist_VERSION_MINOR}")
-# include (CPack)
+set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+
+set (CPACK_PACKAGE_VERSION_MAJOR "${filelist_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION_MINOR "${filelist_VERSION_MINOR}")
+set (CPACK_PACKAGE_VERSION_PATCH "${filelist_VERSION_PATCH}")
+
+set (CPACK_SOURCE_IGNORE_FILES ".*~.*;\\\\.#.*;tmp/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/\\\\.git/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/\\\\.gitignore")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/\\\\.idea/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/doc/")
+
+include (CPack)
 
 
 ###############################################################################
