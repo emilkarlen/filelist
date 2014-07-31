@@ -1,0 +1,6 @@
+#! @PYTHON3@
+
+
+VERSION_MAJOR = "@filelist_VERSION_MAJOR@"
+VERSION_MINOR = "@filelist_VERSION_MINOR@"
+VERSION_PATCH = "@filelist_VERSION_PATCH@"

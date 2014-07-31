@@ -26,9 +26,28 @@ set (filelist_VERSION_MAJOR 1)
 set (filelist_VERSION_MINOR 0)
 set (filelist_VERSION_PATCH 0)
 
-find_program(PYTHON python3)
+find_program(PYTHON3 python3)
 
-install(PROGRAMS src/filelist DESTINATION bin)
+configure_file(
+  src/filelist-header.txt.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist-header.txt
+) 
+
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist-header.txt ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  COMMAND sed '/BEGIN filelist-header/,/END filelist-header/d' ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py >> ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  COMMAND chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py
+  COMMENT Building filelist
+  )
+
+add_custom_target(
+  filelist-executable ALL
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  )
+
+install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist DESTINATION bin)
 
 
 ###############################################################################

@@ -1,5 +1,10 @@
-#! /usr/bin/python3
-# -*- python -*-
+# BEGIN filelist-header
+# -*- coding: utf-8 -*-
+VERSION_MAJOR = "MAJOR"
+VERSION_MINOR = "MINOR"
+VERSION_PATCH = "PATCH"
+# END filelist-header
+
 # -*- coding: utf-8 -*-
 
 ###############################################################################
@@ -88,6 +93,10 @@ def write_lines(o_stream, lines):
 # - constants -
 ###############################################################################
 
+
+VERSION_STRING = ".".join([VERSION_MAJOR,
+                           VERSION_MINOR,
+                           VERSION_PATCH])
 
 # TODO Move this info to some kind of printer / settings.
 ERROR_MESSAGE_INDENT_STRING = "  "
@@ -3413,7 +3422,7 @@ def parse_command_line() -> CommandLineParseResult:
                         The normal output is suppressed.""")
     parser.add_argument("--version",
                         action="version",
-                        version="%(prog)s 1.0")
+                        version="%(prog)s " + VERSION_STRING)
     args = parser.parse_args()
     tags_condition = parse_tags_condition(tags_condition_setup,
                                           args.filter_tags,
