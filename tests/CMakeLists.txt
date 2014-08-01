@@ -30,10 +30,11 @@ set (MAKE_EXECUTABLE ${PYTHON3} ${CMAKE_SOURCE_DIR}/tools/make-interpreted-execu
 
 macro (make_interpreted_program interpreter dir source target)
   set(target_file ${dir}/${target})
+  set(source_file ${dir}/${source})
   add_custom_command (
     OUTPUT ${target_file}
-    COMMAND ${MAKE_EXECUTABLE} --interpreter ${interpreter} --output ${target_file} --source ${dir}/${source}
-    DEPENDS ${dir}/${source}
+    COMMAND ${MAKE_EXECUTABLE} --interpreter ${interpreter} --output ${target_file} --source ${source_file}
+    DEPENDS ${source_file}
     )
   add_custom_target(
     test-executable-${target} ALL
@@ -43,7 +44,7 @@ endmacro (make_interpreted_program)
 
 make_interpreted_program (${BASH} ${CMAKE_CURRENT_SOURCE_DIR}/scripts simptestcase.bash simptestcase)
 make_interpreted_program (${BASH} ${CMAKE_CURRENT_SOURCE_DIR}/scripts rename-simptestcase.bash rename-simptestcase)
-make_interpreted_program ("${AWK} -f" ${CMAKE_CURRENT_SOURCE_DIR}/scripts add-txt-suffix-to-file-paths.awk add-txt-suffix-to-file-paths)
+make_interpreted_program (${PYTHON3} ${CMAKE_CURRENT_SOURCE_DIR}/scripts add-txt-suffix-to-file-paths.py add-txt-suffix-to-file-paths)
 
 
 ###############################################################################

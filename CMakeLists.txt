@@ -28,7 +28,6 @@ set (filelist_VERSION_PATCH 0)
 
 find_program(PYTHON3 python3)
 find_program(BASH bash)
-find_program(AWK awk)
 find_program(SED sed)
 find_program(CP cp)
 find_program(CHMOD chmod)
