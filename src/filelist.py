@@ -2388,53 +2388,6 @@ class PreprocessorException(Exception):
 
 class LinesSourceForFileBase(LinesSource):
     def __init__(self,
-                 parsing_settings: ParsingSettings,
-                 file_name: str):
-        self._parsing_settings = parsing_settings
-
-    def _open(self, file_name: str):
-        raise NotImplementedError()
-
-    def __iter__(self):
-        if self._parsing_settings.preprocessor_shell_command_or_none:
-            raw_lines = self._raw_lines_from_processed_file(self._parsing_settings.preprocessor_shell_command_or_none)
-        else:
-            raw_lines = self._raw_lines_directly_from_file()
-        return self._from_raw_lines(raw_lines)
-
-    def _raw_lines_directly_from_file(self):
-        # Read all lines from the file so that we can close it before
-        # opening any included files.
-        # This prevents exhausting the number of open files.
-        open_file = self._open_file()
-        raw_lines = open_file.readlines()
-        open_file.close()
-        return raw_lines
-
-    def _raw_lines_from_processed_file(self,
-                                       preprocessor_shell_command: str):
-        open_file = self._open_file()
-        try:
-            output = subprocess.check_output(preprocessor_shell_command,
-                                             shell=True,
-                                             universal_newlines=True,
-                                             stdin=open_file)
-        except subprocess.CalledProcessError as ex:
-            raise PreprocessorException(ex)
-        open_file.close()
-        raw_lines = output.splitlines()
-        return raw_lines
-
-    @staticmethod
-    def _from_raw_lines(raw_lines: list):
-        lines = []
-        for lineWithPossibleNewLine in raw_lines:
-            lines.append(lineWithPossibleNewLine.strip("\n").rstrip())
-        return iter(lines)
-
-
-class LinesSourceForFileBase(LinesSource):
-    def __init__(self,
                  parsing_settings: ParsingSettings):
         self._parsing_settings = parsing_settings
 
