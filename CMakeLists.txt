@@ -22,8 +22,8 @@ cmake_minimum_required(VERSION 2.8)
 project(filelist NONE)
 
 # The version number.
-set (filelist_VERSION_MAJOR 1)
-set (filelist_VERSION_MINOR 0)
+set (filelist_VERSION_MAJOR 0)
+set (filelist_VERSION_MINOR 9)
 set (filelist_VERSION_PATCH 0)
 
 find_program(PYTHON3 python3)
@@ -60,6 +60,7 @@ install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist DESTINATION bin)
 
 
 set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set (CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION")
 
 set (CPACK_PACKAGE_VERSION_MAJOR "${filelist_VERSION_MAJOR}")
 set (CPACK_PACKAGE_VERSION_MINOR "${filelist_VERSION_MINOR}")
