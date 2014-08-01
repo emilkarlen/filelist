@@ -29,14 +29,15 @@ configure_file(
 set (MAKE_EXECUTABLE ${PYTHON3} ${CMAKE_SOURCE_DIR}/tools/make-interpreted-executable.py)
 
 macro (make_interpreted_program interpreter dir source target)
+  set(target_file ${dir}/${target})
   add_custom_command (
-    OUTPUT ${dir}/${target}
-    COMMAND ${MAKE_EXECUTABLE} --interpreter ${interpreter} --output ${dir}/${target} --source ${dir}/${source}
+    OUTPUT ${target_file}
+    COMMAND ${MAKE_EXECUTABLE} --interpreter ${interpreter} --output ${target_file} --source ${dir}/${source}
     DEPENDS ${dir}/${source}
     )
   add_custom_target(
     test-executable-${target} ALL
-    DEPENDS ${dir}/${target}
+    DEPENDS ${target_file}
     )
 endmacro (make_interpreted_program)
 
