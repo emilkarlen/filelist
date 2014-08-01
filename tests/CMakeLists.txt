@@ -26,6 +26,25 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/common.m4
 ) 
 
+set (MAKE_EXECUTABLE ${PYTHON3} ${CMAKE_SOURCE_DIR}/tools/make-interpreted-executable.py)
+
+macro (make_interpreted_program interpreter dir source target)
+  add_custom_command (
+    OUTPUT ${dir}/${target}
+    COMMAND ${MAKE_EXECUTABLE} --interpreter ${interpreter} --output ${dir}/${target} --source ${dir}/${source}
+    DEPENDS ${dir}/${source}
+    )
+  add_custom_target(
+    test-executable-${target} ALL
+    DEPENDS ${dir}/${target}
+    )
+endmacro (make_interpreted_program)
+
+make_interpreted_program (${BASH} ${CMAKE_CURRENT_SOURCE_DIR}/scripts simptestcase.bash simptestcase)
+make_interpreted_program (${BASH} ${CMAKE_CURRENT_SOURCE_DIR}/scripts rename-simptestcase.bash rename-simptestcase)
+make_interpreted_program ("${AWK} -f" ${CMAKE_CURRENT_SOURCE_DIR}/scripts add-txt-suffix-to-file-paths.awk add-txt-suffix-to-file-paths)
+
+
 ###############################################################################
 # Macro for test using simptestcase, with a test case that uses M4.
 #

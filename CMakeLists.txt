@@ -27,6 +27,11 @@ set (filelist_VERSION_MINOR 0)
 set (filelist_VERSION_PATCH 0)
 
 find_program(PYTHON3 python3)
+find_program(BASH bash)
+find_program(AWK awk)
+find_program(SED sed)
+find_program(CP cp)
+find_program(CHMOD chmod)
 
 configure_file(
   src/filelist-header.txt.in
@@ -34,10 +39,10 @@ configure_file(
 ) 
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
-  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist-header.txt ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
-  COMMAND sed '/BEGIN filelist-header/,/END filelist-header/d' ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py >> ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
-  COMMAND chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  OUTPUT  ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  COMMAND ${CP} ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist-header.txt ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  COMMAND ${SED} '/BEGIN filelist-header/,/END filelist-header/d' ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py >> ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
+  COMMAND ${CHMOD} +x ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py
   COMMENT Building filelist
   )

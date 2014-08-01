@@ -1,4 +1,3 @@
-#! /usr/bin/awk -f
 # -*- awk -*-
 
 # Remove comments and blank lines.
