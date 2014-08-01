@@ -1,0 +1,3 @@
+@print # Set and print tags
+@tags set tag
+@tags print

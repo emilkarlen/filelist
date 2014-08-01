@@ -637,11 +637,12 @@ class RenditionEnvironment(ResultItemsConstructionEnvironment):
     def for_top_level_file(file_name: str,
                            program_should_fail_on_non_existing_file: bool,
                            tags_condition: TagsCondition,
-                           settings: RenditionSettings):
+                           settings: RenditionSettings,
+                           tags: Tags):
         return RenditionEnvironment(FileReferenceEnvironment.for_top_level_file(file_name),
                                     program_should_fail_on_non_existing_file,
                                     tags_condition,
-                                    Tags.new_empty(),
+                                    tags,
                                     settings)
 
     def __init__(self,
@@ -2611,6 +2612,7 @@ class Command:
     """
     def execute(self,
                 file_names: list,
+                forward_tags: bool,
                 stdin_paths_are_relative_empty: list,
                 program_should_fail_on_non_existing_file: bool,
                 tags_condition: TagsCondition,
@@ -2624,10 +2626,14 @@ class Command:
             file_parser = ListFileParser.for_top_level(parsing_settings,
                                                        parsing_and_rendition_file_name)
             file_processor = file_parser.apply(lines_source)
+            tags = Tags.new_empty()
+            if file_number > 1 and forward_tags:
+                tags = env.tags()
             env = RenditionEnvironment.for_top_level_file(parsing_and_rendition_file_name,
                                                           program_should_fail_on_non_existing_file,
                                                           tags_condition,
-                                                          rendition_settings)
+                                                          rendition_settings,
+                                                          tags)
             self.process_list_file(file_number, file_processor, parsing_settings, env)
             file_number += 1
 
@@ -3181,6 +3187,7 @@ class CommandLineParseResult:
                  command: Command,
                  instruction_prefix: str,
                  file_names: list,
+                 forward_tags: bool,
                  stdin_paths_are_relative_or_empty: list,
                  tags_condition: TagsCondition,
                  file_existence_handling_settings: FileExistenceHandlingSettings,
@@ -3189,6 +3196,7 @@ class CommandLineParseResult:
         self.command = command
         self.instruction_prefix = instruction_prefix
         self.file_names = file_names
+        self.forward_tags = forward_tags
         self.stdin_paths_are_relative_or_empty = stdin_paths_are_relative_or_empty
         self.file_existence_handling_settings = file_existence_handling_settings
         self.tags_condition = tags_condition
@@ -3396,6 +3404,12 @@ def parse_command_line() -> CommandLineParseResult:
                         but the handling depends on weather the file-path satisfies
                         the filter or not. (Note that the program must be executed two times
                         for this.)""")
+    parser.add_argument("--forward-tags",
+                        default=False,
+                        action="store_true",
+                        help="""\
+                        The current tags at the end of a file on the command line,
+                        is forwarded to the following file on the command line.""")
     parser.add_argument("--preprocessor",
                         metavar="PROCESSOR",
                         nargs=1,
@@ -3440,6 +3454,7 @@ def parse_command_line() -> CommandLineParseResult:
     return CommandLineParseResult(args.command,
                                   args.instruction_prefix[0],
                                   args.files,
+                                  args.forward_tags,
                                   args.stdin_paths_are_relative,
                                   tags_condition,
                                   file_existence_handling_settings,
@@ -3452,6 +3467,7 @@ def main():
     parse_result.exit_if_invalid()
     try:
         parse_result.command.execute(parse_result.file_names,
+                                     parse_result.forward_tags,
                                      parse_result.stdin_paths_are_relative_or_empty,
                                      parse_result.file_existence_handling_settings.program_should_fail_on_non_existing,
                                      parse_result.tags_condition,

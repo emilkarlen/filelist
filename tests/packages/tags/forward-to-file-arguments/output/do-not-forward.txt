@@ -1,0 +1,4 @@
+# Set and print tags
+tag
+# Print current tags
+
