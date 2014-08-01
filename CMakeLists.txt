@@ -42,7 +42,7 @@ add_custom_command(
   COMMAND ${CP} ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist-header.txt ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
   COMMAND ${SED} '/BEGIN filelist-header/,/END filelist-header/d' ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py >> ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
   COMMAND ${CHMOD} +x ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist.py ${CMAKE_CURRENT_SOURCE_DIR}/src/filelist-header.txt
   COMMENT Building filelist
   )
 
