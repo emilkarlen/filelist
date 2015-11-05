@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/parse-ignored-lines.list
+
+[act]
+
+M4_EXECUTABLE parse-ignored-lines.list
+
+[assert]
+
+exitcode 0
+stdout   empty

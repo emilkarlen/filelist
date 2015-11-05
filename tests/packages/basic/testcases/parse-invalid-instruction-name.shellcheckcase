@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/parse-invalid-instruction-name.list
+
+[act]
+
+M4_EXECUTABLE parse-invalid-instruction-name.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty

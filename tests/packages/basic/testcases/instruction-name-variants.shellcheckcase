@@ -1,0 +1,21 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+#
+# Tests variants of the instruction names.
+#
+
+home ..
+
+[setup]
+install input/instruction-name-variants.list
+
+[act]
+
+M4_EXECUTABLE instruction-name-variants.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/instruction-name-variants.txt

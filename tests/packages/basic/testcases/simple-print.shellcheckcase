@@ -1,0 +1,17 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+install input/simple-print.list
+
+[act]
+
+M4_EXECUTABLE simple-print.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/simple-print.txt

@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/comments-blanklines-single-print.list
+
+[act]
+
+M4_EXECUTABLE comments-blanklines-single-print.list
+
+[assert]
+
+exitcode 0
+stdout --rel-home output/comments-blanklines-single-print.txt
