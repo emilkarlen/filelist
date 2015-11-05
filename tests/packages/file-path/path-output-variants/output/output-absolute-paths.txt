@@ -1,9 +1,9 @@
 LOCAL
-__SIMPTEST_TESTROOT__/home/file.txt
-__SIMPTEST_TESTROOT__/home/dir
-__SIMPTEST_TESTROOT__/home/dir/dir-file.txt
+SHELLCHECK_ACT/home/file.txt
+SHELLCHECK_ACT/home/dir
+SHELLCHECK_ACT/home/dir/dir-file.txt
 LIST
-__SIMPTEST_TESTROOT__/home/dir/dir-file.txt
+SHELLCHECK_ACT/home/dir/dir-file.txt
 INCLUDE
-__SIMPTEST_TESTROOT__/home/file.txt
-__SIMPTEST_TESTROOT__/home/dir/dir-file.txt
+SHELLCHECK_ACT/home/file.txt
+SHELLCHECK_ACT/home/dir/dir-file.txt
