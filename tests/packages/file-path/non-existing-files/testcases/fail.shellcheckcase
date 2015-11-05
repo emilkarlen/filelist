@@ -9,12 +9,17 @@ m4_include(common.m4)
 # SHOULD exit with exit status that indicates a missing file.
 #
 
-name:fail
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --missing-file-handling fail data/list.list
+install data
 
-check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
-check.stdout.file.eq:output/fail.txt
+[act]
+
+M4_EXECUTABLE --missing-file-handling fail data/list.list
+
+[assert]
+
+exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+stdout   --rel-home output/fail.txt

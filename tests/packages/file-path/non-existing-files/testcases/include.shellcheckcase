@@ -10,12 +10,17 @@ m4_include(common.m4)
 # existing file.
 #
 
-name:include
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --missing-file-handling include data/list.list
+install data
 
-check.exitcode:0
-check.stdout.file.eq:output/include.txt
+[act]
+
+M4_EXECUTABLE --missing-file-handling include data/list.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/include.txt

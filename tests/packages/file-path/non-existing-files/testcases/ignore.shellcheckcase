@@ -9,12 +9,17 @@ m4_include(common.m4)
 # SHOULD continue as if the line with the file-path did not exist in the list.
 #
 
-name:ignore
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --missing-file-handling ignore data/list.list
+install data
 
-check.exitcode:0
-check.stdout.file.eq:output/ignore.txt
+[act]
+
+M4_EXECUTABLE --missing-file-handling ignore data/list.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/ignore.txt

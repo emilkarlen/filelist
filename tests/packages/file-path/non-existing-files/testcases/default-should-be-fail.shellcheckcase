@@ -8,12 +8,17 @@ m4_include(common.m4)
 # SHOULD default to "fail".
 #
 
-name:default-should-be-fail
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE data/list.list
+install data
 
-check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
-check.stdout.file.eq:output/fail.txt
+[act]
+
+M4_EXECUTABLE data/list.list
+
+[assert]
+
+exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+stdout   --rel-home output/fail.txt

@@ -8,12 +8,17 @@
 
 m4_include(common.m4)
 
-name:only
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --missing-file-handling only data/list.list
+install data
 
-check.exitcode:0
-check.stdout.file.eq:output/only.txt
+[act]
+
+M4_EXECUTABLE --missing-file-handling only data/list.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/only.txt
