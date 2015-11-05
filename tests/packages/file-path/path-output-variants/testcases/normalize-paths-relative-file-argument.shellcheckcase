@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install data/home
+
+[act]
+
+M4_EXECUTABLE --normalize-paths --relative-file-argument-location home/normalize-paths.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/normalize-paths-relative-file-argument.txt
