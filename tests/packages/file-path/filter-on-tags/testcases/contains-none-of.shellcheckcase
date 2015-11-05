@@ -2,12 +2,17 @@
 
 m4_include(common.m4)
 
-name:contains-none-of
-home:..
+home ..
 
-setup.install:data
+[setup]
+
+install data
+
+[act]
 
 M4_RUN_WITH_OPERATOR(`contains-none-of')
 
-check.exitcode:0
-check.stdout.file.eq:output/contains-none-of.txt
+[assert]
+
+exitcode 0
+stdout   --rel-home output/contains-none-of.txt

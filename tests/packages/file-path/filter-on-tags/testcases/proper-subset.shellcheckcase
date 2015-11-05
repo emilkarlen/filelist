@@ -2,12 +2,17 @@
 
 m4_include(common.m4)
 
-name:proper-subset
-home:..
+home ..
 
-setup.install:data
+[setup]
+
+install data
+
+[act]
 
 M4_RUN_WITH_OPERATOR(`proper-subset')
 
-check.exitcode:0
-check.stdout.file.eq:output/proper-subset.txt
+[assert]
+
+exitcode 0
+stdout   --rel-home output/proper-subset.txt

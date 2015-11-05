@@ -45,6 +45,7 @@ endmacro (make_interpreted_program)
 make_interpreted_program (${BASH} ${CMAKE_CURRENT_SOURCE_DIR}/scripts simptestcase.bash simptestcase)
 make_interpreted_program (${BASH} ${CMAKE_CURRENT_SOURCE_DIR}/scripts rename-simptestcase.bash rename-simptestcase)
 make_interpreted_program (${PYTHON3} ${CMAKE_CURRENT_SOURCE_DIR}/scripts add-txt-suffix-to-file-paths.py add-txt-suffix-to-file-paths)
+make_interpreted_program (${PYTHON3} ${CMAKE_CURRENT_SOURCE_DIR}/scripts shellcheck.py shellcheck)
 
 
 ###############################################################################
@@ -69,61 +70,70 @@ macro (testcase testPkgDir testFileNameHead)
 endmacro (testcase)
 
 
+macro (testcaseSC testPkgDir testFileNameHead)
+  add_test (
+    NAME SHELLCHECK/${testPkgDir}::${testFileNameHead}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND bin/shellcheck --preprocessor "m4 -P" packages/${testPkgDir}/testcases/${testFileNameHead}.shellcheckcase
+    )
+endmacro (testcaseSC)
+
+
 ###############################################################################
 # Testcases
 ###############################################################################
 
 
-testcase (basic invalid-arguments-file-does-not-exist)
-testcase (basic comments-blanklines-single-print)
-testcase (basic usage-no-file-arguments)
-testcase (basic parse-ignored-lines)
-testcase (basic parse-invalid-instruction-name)
-testcase (basic parse-invalid-line-syntax)
-testcase (basic simple-print)
-testcase (basic print--suppress-non-path-output)
-testcase (basic instruction-name-variants)
-testcase (basic multiple-file-arguments)
-testcase (basic custom-instruction-prefix)
+testcaseSC (basic invalid-arguments-file-does-not-exist)
+testcaseSC (basic comments-blanklines-single-print)
+testcaseSC (basic usage-no-file-arguments)
+testcaseSC (basic parse-ignored-lines)
+testcaseSC (basic parse-invalid-instruction-name)
+testcaseSC (basic parse-invalid-line-syntax)
+testcaseSC (basic simple-print)
+testcaseSC (basic print--suppress-non-path-output)
+testcaseSC (basic instruction-name-variants)
+testcaseSC (basic multiple-file-arguments)
+testcaseSC (basic custom-instruction-prefix)
 
 
-testcase (file-path multiple-file-arguments)
-testcase (file-path existing)
-testcase (file-path existing-relative-file-argument)
-testcase (file-path existing-with-suppress-non-path-output)
-testcase (file-path absolute-file-paths-existing)
-testcase (file-path absolute-file-paths-existing-with-output-absolute-name)
-testcase (file-path absolute-file-paths-nonexisting)
+testcaseSC (file-path multiple-file-arguments)
+testcaseSC (file-path existing)
+testcaseSC (file-path existing-relative-file-argument)
+testcaseSC (file-path existing-with-suppress-non-path-output)
+testcaseSC (file-path absolute-file-paths-existing)
+testcaseSC (file-path absolute-file-paths-existing-with-output-absolute-name)
+testcaseSC (file-path absolute-file-paths-nonexisting)
 
-testcase (file-path/path-output-variants normalize-paths)
-testcase (file-path/path-output-variants normalize-paths-relative-file-argument)
-testcase (file-path/path-output-variants output-absolute-paths)
+testcaseSC (file-path/path-output-variants normalize-paths)
+testcaseSC (file-path/path-output-variants normalize-paths-relative-file-argument)
+testcaseSC (file-path/path-output-variants output-absolute-paths)
 
 
-testcase (file-path/non-existing-files fail)
-testcase (file-path/non-existing-files ignore)
-testcase (file-path/non-existing-files include)
-testcase (file-path/non-existing-files only)
-testcase (file-path/non-existing-files default-should-be-fail)
+testcaseSC (file-path/non-existing-files fail)
+testcaseSC (file-path/non-existing-files ignore)
+testcaseSC (file-path/non-existing-files include)
+testcaseSC (file-path/non-existing-files only)
+testcaseSC (file-path/non-existing-files default-should-be-fail)
 
-testcase (file-path/filter-on-tags contains-any-of)
-testcase (file-path/filter-on-tags contains-any-of--alias--any-of)
-testcase (file-path/filter-on-tags contains-none-of)
-testcase (file-path/filter-on-tags contains-none-of--alias--none-of)
-testcase (file-path/filter-on-tags proper-subset)
-testcase (file-path/filter-on-tags subset)
-testcase (file-path/filter-on-tags equals)
-testcase (file-path/filter-on-tags equals--negated)
-testcase (file-path/filter-on-tags equals--negated-2-times)
-testcase (file-path/filter-on-tags equals--negated-3-times)
-testcase (file-path/filter-on-tags proper-superset)
-testcase (file-path/filter-on-tags superset)
-testcase (file-path/filter-on-tags superset--negated)
-testcase (file-path/filter-on-tags unequals)
+testcaseSC (file-path/filter-on-tags contains-any-of)
+testcaseSC (file-path/filter-on-tags contains-any-of--alias--any-of)
+testcaseSC (file-path/filter-on-tags contains-none-of)
+testcaseSC (file-path/filter-on-tags contains-none-of--alias--none-of)
+testcaseSC (file-path/filter-on-tags proper-subset)
+testcaseSC (file-path/filter-on-tags subset)
+testcaseSC (file-path/filter-on-tags equals)
+testcaseSC (file-path/filter-on-tags equals--negated)
+testcaseSC (file-path/filter-on-tags equals--negated-2-times)
+testcaseSC (file-path/filter-on-tags equals--negated-3-times)
+testcaseSC (file-path/filter-on-tags proper-superset)
+testcaseSC (file-path/filter-on-tags superset)
+testcaseSC (file-path/filter-on-tags superset--negated)
+testcaseSC (file-path/filter-on-tags unequals)
 # testcase (file-path/filter-on-tags command-line-parsing-of-empty-set)
 # THE above test is not included due to ugly limitations of simptest.
-testcase (file-path/filter-on-tags default-operator-is-contains-any-of)
-testcase (file-path/filter-on-tags flexible-parsing-of-tag-list)
+testcaseSC (file-path/filter-on-tags default-operator-is-contains-any-of)
+testcaseSC (file-path/filter-on-tags flexible-parsing-of-tag-list)
 
 
 testcase (list/existing-directory basic)
