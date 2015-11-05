@@ -2,12 +2,17 @@
 
 m4_include(common.m4)
 
-name:directory-argument-missing
-home:..
+home ..
 
-setup.install:input/directory-argument-missing.list
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE directory-argument-missing.list
+install input/directory-argument-missing.list
 
-check.exitcode:M4_EXIT_SYNTAX
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE directory-argument-missing.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty

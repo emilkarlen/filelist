@@ -21,12 +21,17 @@
 
 m4_include(common.m4)
 
-name:sort
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(sort.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST data/sort.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(sort.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/sort.txt
+[act]
+
+M4_EXECUTABLE_REL_LIST data/sort.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/sort.txt

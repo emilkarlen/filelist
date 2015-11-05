@@ -140,9 +140,9 @@ testcase (list/existing-directory basic)
 testcase (list/existing-directory absolute)
 testcase (list/existing-directory relative-file-argument)
 
-testcase (list directory-argument-missing)
-testcase (list list-same-dir)
-testcase (list sort)
+testcaseSC (list directory-argument-missing)
+testcaseSC (list list-same-dir)
+testcaseSC (list sort)
 
 testcase (list/file-condition name--include--shell-pattern)
 testcase (list/file-condition name--include--shell-pattern--invalid)
