@@ -2,12 +2,19 @@
 
 m4_include(common.m4)
 
-name:basic
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(dir.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE data/dir.list | sort
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(dir.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/basic.txt
+[act]
+
+M4_EXECUTABLE data/dir.list
+
+[assert]
+
+M4_SORT_STDOUT_TO(stdout-sorted.txt)
+
+exitcode 0
+contents stdout-sorted.txt --rel-home output/basic.txt

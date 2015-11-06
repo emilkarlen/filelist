@@ -7,7 +7,7 @@ home ..
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT__sc(absolute-file-paths-existing.list)
-shell ex -s -c g:CURRENT_DIRECTORY:s:CURRENT_DIRECTORY:${SHELLCHECK_ACT}:g -c x data/absolute-file-paths-existing.list
+M4_REPLACE_WITH_SHELLCHECK_ACT_DIR(CURRENT_DIRECTORY, data/absolute-file-paths-existing.list)
 
 [act]
 

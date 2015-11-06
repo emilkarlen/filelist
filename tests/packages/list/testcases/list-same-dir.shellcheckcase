@@ -19,7 +19,7 @@ M4_EXECUTABLE_REL_LIST data/list-same-dir.list
 
 [assert]
 
-shell sort ${SHELLCHECK_RESULT_DIR}/stdout > stdout-sorted.txt
+M4_SORT_STDOUT_TO(stdout-sorted.txt)
 
 exitcode 0
 contents stdout-sorted.txt --rel-home output/list-same-dir.txt

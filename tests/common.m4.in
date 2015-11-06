@@ -43,6 +43,15 @@ install data
 install input/$1 data
 ')
 
+# Utilities
+# Syntax: OUTPUT-FILENAME
+m4_define(`M4_SORT_STDOUT_TO',
+`shell sort $'`{SHELLCHECK_RESULT_DIR}/stdout > $1')
+
+# Syntax: STRING EXISTING-FILE
+m4_define(`M4_REPLACE_WITH_SHELLCHECK_ACT_DIR',
+`shell ex -s -c %s:$1:$`'{SHELLCHECK_ACT}:g -c x $2')
+
 # Exit codes
 m4_define(`M4_EXIT_USAGE',2)
 m4_define(`M4_EXIT_INVALID_ARGUMENTS',3)

@@ -136,9 +136,9 @@ testcaseSC (file-path/filter-on-tags default-operator-is-contains-any-of)
 testcaseSC (file-path/filter-on-tags flexible-parsing-of-tag-list)
 
 
-testcase (list/existing-directory basic)
-testcase (list/existing-directory absolute)
-testcase (list/existing-directory relative-file-argument)
+testcaseSC (list/existing-directory basic)
+testcaseSC (list/existing-directory absolute)
+testcaseSC (list/existing-directory relative-file-argument)
 
 testcaseSC (list directory-argument-missing)
 testcaseSC (list list-same-dir)

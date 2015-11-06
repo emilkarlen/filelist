@@ -1,2 +1,2 @@
-__SIMPTEST_TESTROOT__/data/dir/existing-file-2.txt
-__SIMPTEST_TESTROOT__/data/dir/existing-file.txt
+SHELLCHECK_ACT/data/dir/existing-file-2.txt
+SHELLCHECK_ACT/data/dir/existing-file.txt
