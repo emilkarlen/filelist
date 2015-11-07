@@ -8,12 +8,17 @@
 
 m4_include(common.m4)
 
-name:in-same-directory-pretty
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --print-inclusion-hierarchy-pretty data/in-same-directory.list
+install data
 
-check.exitcode:0
-check.stdout.file.eq:output/in-same-directory-pretty.txt
+[act]
+
+M4_EXECUTABLE --print-inclusion-hierarchy-pretty data/in-same-directory.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/in-same-directory-pretty.txt

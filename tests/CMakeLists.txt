@@ -166,12 +166,12 @@ testcaseSC (include inclusion-trace-in-error-messages-file)
 testcaseSC (include preserve-current-directory)
 
 
-testcase (print-inclusion-hierarchy in-same-directory)
-testcase (print-inclusion-hierarchy in-sub-directory)
-testcase (print-inclusion-hierarchy in-same-directory-pretty)
-testcase (print-inclusion-hierarchy in-sub-directory-pretty)
-testcase (print-inclusion-hierarchy in-same-directory-multiple-args)
-testcase (print-inclusion-hierarchy in-same-directory-multiple-args-pretty)
+testcaseSC (print-inclusion-hierarchy in-same-directory)
+testcaseSC (print-inclusion-hierarchy in-sub-directory)
+testcaseSC (print-inclusion-hierarchy in-same-directory-pretty)
+testcaseSC (print-inclusion-hierarchy in-sub-directory-pretty)
+testcaseSC (print-inclusion-hierarchy in-same-directory-multiple-args)
+testcaseSC (print-inclusion-hierarchy in-same-directory-multiple-args-pretty)
 
 
 testcase (tags set-and-print)
