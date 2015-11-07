@@ -7,12 +7,17 @@
 
 m4_include(common.m4)
 
-name:preprocessor/preprocessor-failure
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(single-file.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/not-a-program data/single-file.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(single-file.list)
 
-check.exitcode:M4_EXIT_PRE_PROCESSING
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/not-a-program data/single-file.list
+
+[assert]
+
+exitcode M4_EXIT_PRE_PROCESSING
+stdout   empty

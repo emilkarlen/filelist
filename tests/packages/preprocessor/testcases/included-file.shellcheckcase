@@ -7,12 +7,17 @@
 
 m4_include(common.m4)
 
-name:preprocessor/included-file
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(included-file.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths data/included-file.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(included-file.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/included-file.txt
+[act]
+
+M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths data/included-file.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/included-file.txt

@@ -216,9 +216,9 @@ testcaseSC (shell tags-filter-included)
 testcaseSC (shell tags-filter-excluded)
 
 
-testcase (preprocessor only-top-level-file)
-testcase (preprocessor included-file)
-testcase (preprocessor preprocessor-failure)
+testcaseSC (preprocessor only-top-level-file)
+testcaseSC (preprocessor included-file)
+testcaseSC (preprocessor preprocessor-failure)
 
 
 testcase (stdin-as-file-argument just-print)
