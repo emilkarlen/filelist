@@ -17,7 +17,7 @@ M4_EXECUTABLE data/absolute.list
 
 [assert]
 
-M4_SORT_STDOUT_TO(stdout-sorted.txt)
+M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
 exitcode 0
-contents stdout-sorted.txt --with-replaced-env-vars --rel-home output/absolute.txt
+contents --rel-tmp stdout-sorted.txt --with-replaced-env-vars --rel-home output/absolute.txt

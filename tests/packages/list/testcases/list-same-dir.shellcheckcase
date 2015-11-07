@@ -19,7 +19,7 @@ M4_EXECUTABLE_REL_LIST data/list-same-dir.list
 
 [assert]
 
-M4_SORT_STDOUT_TO(stdout-sorted.txt)
+M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
 exitcode 0
-contents stdout-sorted.txt --rel-home output/list-same-dir.txt
+contents --rel-tmp stdout-sorted.txt --rel-home output/list-same-dir.txt

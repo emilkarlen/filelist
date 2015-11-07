@@ -45,8 +45,8 @@ install input/$1 data
 
 # Utilities
 # Syntax: OUTPUT-FILENAME
-m4_define(`M4_SORT_STDOUT_TO',
-`shell sort $'`{SHELLCHECK_RESULT_DIR}/stdout > $1')
+m4_define(`M4_SORT_STDOUT_TO_TMP_FILE',
+`shell sort $'`{SHELLCHECK_RESULT_DIR}/stdout > $'`{SHELLCHECK_TMP}/$1')
 
 # Syntax: STRING EXISTING-FILE
 m4_define(`M4_REPLACE_WITH_SHELLCHECK_ACT_DIR',
