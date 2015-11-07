@@ -10,18 +10,23 @@
 
 m4_include(common.m4)
 
-name:print-inclusion-hierarchy--relative-custom-dir
-home:..
+home ..
+
+[setup]
 
 # If not for weird simptest behaviour, the following line
 # would be: setup.install.run.cmdline:mkdir data-root-dir
 # and data/dir would not be in the repo.
-setup.install:data/dir:data-root-dir
-setup.install:data:data-root-dir
+install data/dir data-root-dir
+install data data-root-dir
 
-test.stdin:input/should-be-relative-cwd--other.list
+stdin input/should-be-relative-cwd--other.list
 
-test.run.cmdline:M4_EXECUTABLE --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
+[act]
 
-check.exitcode:0
-check.stdout.file.eq:output/print-inclusion-hierarchy--relative-custom-dir.txt
+M4_EXECUTABLE --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/print-inclusion-hierarchy--relative-custom-dir.txt

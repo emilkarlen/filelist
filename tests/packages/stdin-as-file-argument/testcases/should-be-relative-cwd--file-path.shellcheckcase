@@ -8,14 +8,19 @@
 
 m4_include(common.m4)
 
-name:should-be-relative-cwd--file-path
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.stdin:input/should-be-relative-cwd--file-path.list
+install data
 
-test.run.cmdline:M4_EXECUTABLE -- -
+stdin input/should-be-relative-cwd--file-path.list
 
-check.exitcode:0
-check.stdout.file.eq:output/should-be-relative-cwd--file-path.txt
+[act]
+
+M4_EXECUTABLE -- -
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/should-be-relative-cwd--file-path.txt

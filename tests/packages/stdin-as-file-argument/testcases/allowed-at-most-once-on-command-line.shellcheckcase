@@ -2,10 +2,13 @@
 
 m4_include(common.m4)
 
-name:allowed-at-most-once
-home:..
+home ..
 
-test.run.cmdline:M4_EXECUTABLE -- - -
+[act]
 
-check.exitcode:M4_EXIT_USAGE
-check.stdout.empty
+M4_EXECUTABLE -- - -
+
+[assert]
+
+exitcode M4_EXIT_USAGE
+stdout   empty
