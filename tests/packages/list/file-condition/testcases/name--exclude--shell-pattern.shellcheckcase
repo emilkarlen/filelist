@@ -8,12 +8,19 @@
 
 m4_include(common.m4)
 
-name:name--exclude--shell-pattern
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(name--exclude--shell-pattern.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST data/name--exclude--shell-pattern.list | sort
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(name--exclude--shell-pattern.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/name--exclude--shell-pattern.txt
+[act]
+
+M4_EXECUTABLE_REL_LIST data/name--exclude--shell-pattern.list
+
+[assert]
+
+M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
+
+exitcode 0
+contents --rel-tmp stdout-sorted.txt --rel-home output/name--exclude--shell-pattern.txt

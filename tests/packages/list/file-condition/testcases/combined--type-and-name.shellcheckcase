@@ -2,12 +2,19 @@
 
 m4_include(common.m4)
 
-name:combined--type-and-name
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(combined--type-and-name.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST data/combined--type-and-name.list | sort
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(combined--type-and-name.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/combined--type-and-name.txt
+[act]
+
+M4_EXECUTABLE_REL_LIST data/combined--type-and-name.list
+
+[assert]
+
+M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
+
+exitcode 0
+contents --rel-tmp stdout-sorted.txt --rel-home output/combined--type-and-name.txt

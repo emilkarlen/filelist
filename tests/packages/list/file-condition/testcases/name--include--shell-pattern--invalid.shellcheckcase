@@ -2,12 +2,17 @@
 
 m4_include(common.m4)
 
-name:name--include--shell-pattern--invalid
-home:..
+home ..
 
-setup.install:input/name--include--shell-pattern--invalid.list
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE_REL_LIST name--include--shell-pattern--invalid.list
+install input/name--include--shell-pattern--invalid.list
 
-check.exitcode:M4_EXIT_SYNTAX
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE_REL_LIST name--include--shell-pattern--invalid.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty
