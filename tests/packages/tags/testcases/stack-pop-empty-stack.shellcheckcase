@@ -8,12 +8,17 @@
 
 m4_include(common.m4)
 
-name:stack-pop-empty-stack
-home:..
+home ..
 
-setup.install:input/stack-pop-empty-stack.list
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE stack-pop-empty-stack.list
+install input/stack-pop-empty-stack.list
 
-check.exitcode:M4_EXIT_TAGS_ERROR
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE stack-pop-empty-stack.list
+
+[assert]
+
+exitcode M4_EXIT_TAGS_ERROR
+stdout   empty

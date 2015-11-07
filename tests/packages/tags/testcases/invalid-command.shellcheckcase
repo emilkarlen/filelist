@@ -6,12 +6,17 @@
 
 m4_include(common.m4)
 
-name:invalid-command
-home:..
+home ..
 
-setup.install:input/invalid-command.list
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
+install input/invalid-command.list
 
-check.exitcode:M4_EXIT_SYNTAX
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty

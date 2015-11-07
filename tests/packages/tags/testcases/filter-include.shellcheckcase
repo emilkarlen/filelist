@@ -9,12 +9,17 @@
 
 m4_include(common.m4)
 
-name:tags-filter-include
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(filter-include.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --filter-tags included1,included2 data/filter-include.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(filter-include.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/filter.txt
+[act]
+
+M4_EXECUTABLE --filter-tags included1,included2 data/filter-include.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/filter.txt

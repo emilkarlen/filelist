@@ -8,12 +8,17 @@
 
 m4_include(common.m4)
 
-name:include-option-to-not-export-tags--stack--in-same-dir
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(include-option-to-not-export-tags--stack--in-same-dir.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--stack--in-same-dir.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(include-option-to-not-export-tags--stack--in-same-dir.list)
 
-check.exitcode:M4_EXIT_TAGS_ERROR
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--stack--in-same-dir.list
+
+[assert]
+
+exitcode M4_EXIT_TAGS_ERROR
+stdout   empty

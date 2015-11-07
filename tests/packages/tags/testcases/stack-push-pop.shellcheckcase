@@ -6,12 +6,17 @@
 
 m4_include(common.m4)
 
-name:stack-push-pop
-home:..
+home ..
 
-setup.install:input/stack-push-pop.list
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE stack-push-pop.list
+install input/stack-push-pop.list
 
-check.exitcode:0
-check.stdout.file.eq:output/stack-push-pop.txt
+[act]
+
+M4_EXECUTABLE stack-push-pop.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/stack-push-pop.txt
