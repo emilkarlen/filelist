@@ -8,12 +8,17 @@
 
 m4_include(common.m4)
 
-name:preserve-current-directory
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(preserve-current-directory.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE data/preserve-current-directory.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(preserve-current-directory.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/preserve-current-directory.txt
+[act]
+
+M4_EXECUTABLE data/preserve-current-directory.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/preserve-current-directory.txt

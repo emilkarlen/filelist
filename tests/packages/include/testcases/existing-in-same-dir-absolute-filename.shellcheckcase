@@ -2,16 +2,20 @@
 
 m4_include(common.m4)
 
-name:existing-in-same-dir-absolute-filename
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(existing-in-same-dir-absolute-filename.list)
+[setup]
 
-setup.run.cmdline:ex -s -c g:CURRENT_DIRECTORY:s:CURRENT_DIRECTORY:${SIMPTEST_TESTROOT}:g -c x data/existing-in-same-dir-absolute-filename.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(existing-in-same-dir-absolute-filename.list)
 
-test.run.cmdline:M4_EXECUTABLE data/existing-in-same-dir-absolute-filename.list
+M4_REPLACE_WITH_SHELLCHECK_ACT_DIR(CURRENT_DIRECTORY,data/existing-in-same-dir-absolute-filename.list)
 
-check.prepare.replace-SIMPTEST-envvars/stdout
+[act]
 
-check.exitcode:0
-check.stdout.file.eq/replaced:output/existing-in-same-dir-absolute-filename.txt
+M4_EXECUTABLE data/existing-in-same-dir-absolute-filename.list
+
+[assert]
+
+
+exitcode 0
+stdout --with-replaced-env-vars --rel-home output/existing-in-same-dir-absolute-filename.txt

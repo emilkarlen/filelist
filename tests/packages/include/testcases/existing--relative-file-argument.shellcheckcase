@@ -2,12 +2,17 @@
 
 m4_include(common.m4)
 
-name:include-existing--relative-file-argument
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(existing-in-subdir.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE --relative-file-argument-location data/existing-in-subdir.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(existing-in-subdir.list)
 
-check.exitcode:0
-check.stdout.file.eq:output/existing--relative-file-argument.txt
+[act]
+
+M4_EXECUTABLE --relative-file-argument-location data/existing-in-subdir.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/existing--relative-file-argument.txt

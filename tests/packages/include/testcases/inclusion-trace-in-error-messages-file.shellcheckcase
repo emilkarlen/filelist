@@ -11,13 +11,18 @@
 
 m4_include(common.m4)
 
-name:inclusion-trace-in-error-messages-file
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(includes-list-with-ref-to-non-existing-file.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE data/includes-list-with-ref-to-non-existing-file.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(includes-list-with-ref-to-non-existing-file.list)
 
-check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
-check.stdout.empty
-check.stderr.file.eq:output/inclusion-trace-in-error-messages-file.txt
+[act]
+
+M4_EXECUTABLE data/includes-list-with-ref-to-non-existing-file.list
+
+[assert]
+
+exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+stdout   empty
+stderr   --rel-home output/inclusion-trace-in-error-messages-file.txt
