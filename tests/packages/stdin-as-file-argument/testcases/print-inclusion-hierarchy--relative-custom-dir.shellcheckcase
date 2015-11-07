@@ -14,10 +14,7 @@ home ..
 
 [setup]
 
-# If not for weird simptest behaviour, the following line
-# would be: setup.install.run.cmdline:mkdir data-root-dir
-# and data/dir would not be in the repo.
-install data/dir data-root-dir
+shell mkdir data-root-dir
 install data data-root-dir
 
 stdin input/should-be-relative-cwd--other.list
