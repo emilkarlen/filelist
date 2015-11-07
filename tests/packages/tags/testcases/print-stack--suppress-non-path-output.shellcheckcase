@@ -1,0 +1,25 @@
+# -*- shell-script -*-
+
+#
+# WHEN the tags print-stack command
+# is used together with the option of supression of non-path output
+# THEN the print-stack command
+# SHOULD produced no output
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/print-stack.list
+
+[act]
+
+M4_EXECUTABLE --suppress-non-path-output print-stack.list
+
+[assert]
+
+exitcode 0
+stdout   empty

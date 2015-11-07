@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/name--include--shell-pattern--invalid.list
+
+[act]
+
+M4_EXECUTABLE_REL_LIST name--include--shell-pattern--invalid.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty

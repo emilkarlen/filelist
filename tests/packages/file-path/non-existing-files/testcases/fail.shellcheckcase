@@ -1,0 +1,25 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+#
+# WHEN mode for handling missing files is "fail",
+# and a file-path for a missing file is encountered,
+# THEN the program
+# SHOULD exit with exit status that indicates a missing file.
+#
+
+home ..
+
+[setup]
+
+install data
+
+[act]
+
+M4_EXECUTABLE --missing-file-handling fail data/list.list
+
+[assert]
+
+exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+stdout   --rel-home output/fail.txt

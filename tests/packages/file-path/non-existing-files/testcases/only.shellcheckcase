@@ -1,0 +1,24 @@
+# -*- shell-script -*-
+
+#
+# WHEN mode for handling missing files is "only",
+# THEN the program
+# SHOULD output only the non-existing files.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install data
+
+[act]
+
+M4_EXECUTABLE --missing-file-handling only data/list.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/only.txt

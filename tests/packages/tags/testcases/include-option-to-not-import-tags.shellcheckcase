@@ -1,0 +1,24 @@
+# -*- shell-script -*-
+
+#
+# WHEN the @list is used with the option to not import tags
+# THEN modifications of the tags in the included file
+# SHOULD be ignored by the including file.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(include-option-to-not-import-tags.list)
+
+[act]
+
+M4_EXECUTABLE --append-tags data/include-option-to-not-import-tags.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/include-option-to-not-import-tags.txt

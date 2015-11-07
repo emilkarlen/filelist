@@ -1,0 +1,18 @@
+# -*- m4 -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install data
+
+[act]
+
+M4_RUN_WITH_OPERATOR(`superset')
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/superset.txt

@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+#
+# Tests preprocessing the list files.
+# The preprocessor fails.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(single-file.list)
+
+[act]
+
+M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/not-a-program data/single-file.list
+
+[assert]
+
+exitcode M4_EXIT_PRE_PROCESSING
+stdout   empty

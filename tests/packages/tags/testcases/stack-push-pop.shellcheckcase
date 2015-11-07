@@ -1,0 +1,22 @@
+# -*- shell-script -*-
+
+#
+# Test of correct usage of push and pop.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/stack-push-pop.list
+
+[act]
+
+M4_EXECUTABLE stack-push-pop.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/stack-push-pop.txt

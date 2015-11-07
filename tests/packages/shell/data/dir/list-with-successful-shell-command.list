@@ -1,1 +1,1 @@
-@shell ${SIMPTEST_HOME}/scripts/print-arguments ../*.txt
+@shell ${SHELLCHECK_HOME}/scripts/print-arguments ../*.txt

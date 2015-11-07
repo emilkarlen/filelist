@@ -1,0 +1,25 @@
+# -*- shell-script -*-
+
+#
+# Ability to list the contents of the home directory -
+# the directory where the source file is located.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(list-same-dir.list)
+
+[act]
+
+M4_EXECUTABLE_REL_LIST data/list-same-dir.list
+
+[assert]
+
+M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
+
+exitcode 0
+contents --rel-tmp stdout-sorted.txt --rel-home output/list-same-dir.txt

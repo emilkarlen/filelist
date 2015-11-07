@@ -1,0 +1,28 @@
+# -*- shell-script -*-
+
+#
+# WHEN stdin is used as a listfile on the command line
+# THEN , in the inclusion hierarchy,
+# SHOULD the file should be presented in the correct way
+#
+# (For the "correct way", see the expected output.)
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install data
+
+stdin input/should-be-relative-cwd--other.list
+
+[act]
+
+M4_EXECUTABLE --print-inclusion-hierarchy -- -
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/print-inclusion-hierarchy.txt

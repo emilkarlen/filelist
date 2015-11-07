@@ -1,0 +1,25 @@
+# -*- shell-script -*-
+
+#
+# WHEN the settings say that tags should be forwarded
+# THEN the tags
+# SHOULD be forwarded to following file arguments
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install data
+
+# M4_EXECUTABLE  data/set-and-print-tags.list data/print-tags.list
+[act]
+
+M4_EXECUTABLE --forward-tags data/set-and-print-tags.list data/print-tags.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/do-forward.txt

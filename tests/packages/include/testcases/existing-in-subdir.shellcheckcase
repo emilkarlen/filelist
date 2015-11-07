@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(existing-in-subdir.list)
+
+[act]
+
+M4_EXECUTABLE data/existing-in-subdir.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/existing-in-subdir.txt

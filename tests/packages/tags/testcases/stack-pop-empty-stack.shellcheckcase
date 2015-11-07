@@ -1,0 +1,24 @@
+# -*- shell-script -*-
+
+#
+# WHEN the tags stack is empty
+# THEN the the use of the tags POP sub-command
+# SHOULD cause an error.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/stack-pop-empty-stack.list
+
+[act]
+
+M4_EXECUTABLE stack-pop-empty-stack.list
+
+[assert]
+
+exitcode M4_EXIT_TAGS_ERROR
+stdout   empty

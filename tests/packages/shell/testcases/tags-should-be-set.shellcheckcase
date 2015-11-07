@@ -1,0 +1,22 @@
+# -*- shell-script -*-
+
+#
+# Tests that tags are set correctly by the shell instruction.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(tags.list)
+
+[act]
+
+M4_EXECUTABLE_PREPEND_TAGS data/tags.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/tags-should-be-set.txt

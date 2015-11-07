@@ -1,0 +1,24 @@
+# -*- shell-script -*-
+
+#
+# WHEN exclusion patterns (regex) are given
+# THEN no file who's name matches the pattern
+# SHOULD be printed
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(name--exclude--regex.list)
+
+[act]
+
+M4_EXECUTABLE_REL_LIST data/name--exclude--regex.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/name--exclude--regex.txt

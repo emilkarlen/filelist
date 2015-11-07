@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+#
+# Tests executing a shell command.
+# The shell command exists with unsuccessful status.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(unsuccessful-exit-command.list)
+
+[act]
+
+M4_EXECUTABLE data/unsuccessful-exit-command.list
+
+[assert]
+
+exitcode M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR
+stdout   empty

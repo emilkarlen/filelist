@@ -1,0 +1,24 @@
+# -*- shell-script -*-
+
+#
+# WHEN the tags print-stack command
+# THEN the tags stack
+# SHOULD be printed on a single line
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/print-stack.list
+
+[act]
+
+M4_EXECUTABLE print-stack.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/print-stack.txt

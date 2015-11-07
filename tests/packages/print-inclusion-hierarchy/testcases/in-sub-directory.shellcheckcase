@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+#
+# Tests printing the file inclusion hierarchy.
+# List files are located in different directories.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install data
+
+[act]
+
+M4_EXECUTABLE --print-inclusion-hierarchy data/in-sub-directory.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/in-sub-directory.txt

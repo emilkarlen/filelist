@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+#
+# Tests preprocessing the list files.
+# Only a top-level files.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(single-file.list)
+
+[act]
+
+M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths data/single-file.list data/single-file.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/only-top-level-file.txt

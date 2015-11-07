@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+#
+# Tests stdin as file-argument
+# with just a @print instruction.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+stdin input/just-print.list
+
+[act]
+
+M4_EXECUTABLE -- -
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/just-print.txt

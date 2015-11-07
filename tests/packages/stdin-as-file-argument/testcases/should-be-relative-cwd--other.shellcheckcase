@@ -1,0 +1,26 @@
+# -*- shell-script -*-
+
+#
+# WHEN stdin is used as a listfile on the command line
+# THEN paths used by instructions (other than file-path)
+# SHOULD be relative the Current Working Directory of the process.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install data
+
+stdin input/should-be-relative-cwd--other.list
+
+[act]
+
+M4_EXECUTABLE -- -
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/should-be-relative-cwd--other.txt

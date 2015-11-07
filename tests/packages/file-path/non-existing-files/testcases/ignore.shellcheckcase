@@ -1,0 +1,25 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+#
+# WHEN mode for handling missing files is "ignore",
+# and a file-path for a missing file is encountered,
+# THEN the program
+# SHOULD continue as if the line with the file-path did not exist in the list.
+#
+
+home ..
+
+[setup]
+
+install data
+
+[act]
+
+M4_EXECUTABLE --missing-file-handling ignore data/list.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/ignore.txt

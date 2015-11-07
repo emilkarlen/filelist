@@ -1,0 +1,29 @@
+# -*- shell-script -*-
+
+#
+# WHEN stdin is used as a listfile on the command line,
+# together with the specification of a custom relative directory
+# THEN , in the inclusion hierarchy,
+# SHOULD the customer relative directory should appear
+# in the output.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+shell mkdir data-root-dir
+install data data-root-dir
+
+stdin input/should-be-relative-cwd--other.list
+
+[act]
+
+M4_EXECUTABLE --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/print-inclusion-hierarchy--relative-custom-dir.txt

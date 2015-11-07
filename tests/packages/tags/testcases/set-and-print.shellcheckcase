@@ -1,0 +1,25 @@
+# -*- shell-script -*-
+
+#
+# WHEN tags are set using the set command, and
+# then the tags print command is issued
+# THEN the current tags
+# SHOULD be printed on a single line in alphanumerical order.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/set-and-print.list
+
+[act]
+
+M4_EXECUTABLE set-and-print.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/set-and-print.txt

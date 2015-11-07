@@ -1,0 +1,37 @@
+# -*- shell-script -*-
+
+#
+# Tests sorting the files in a directory
+#
+# IMPORTANT: THIS IS A BAD TEST!!!
+#
+# The reason is that currently it is not possible to
+# specify that the files in a directory should be read in
+# an unsorted order.
+#   This means that it is possible that the list files
+# are sorted before the program should sort them.  If this is the case, this
+# test will pass even though the program does not sort the list.
+#
+#   What this test garranties to test, though, is that the result will not
+# become unsorted by using the sort-option!
+#
+# (Note: while developing this sort functionality, it was noted that
+# reading the files of the test-dir did not give an already sorted result.)
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(sort.list)
+
+[act]
+
+M4_EXECUTABLE_REL_LIST data/sort.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/sort.txt

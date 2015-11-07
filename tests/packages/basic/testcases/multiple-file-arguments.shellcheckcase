@@ -1,0 +1,19 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/print-1.list
+install input/print-2.list
+
+[act]
+
+M4_EXECUTABLE print-1.list print-2.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/multiple-file-arguments.txt

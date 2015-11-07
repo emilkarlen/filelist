@@ -1,0 +1,22 @@
+# -*- shell-script -*-
+
+#
+# Tests removing tags.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(remove.list)
+
+[act]
+
+M4_EXECUTABLE_PREPEND_TAGS data/remove.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/remove.txt

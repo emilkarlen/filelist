@@ -1,0 +1,18 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/directory-argument-missing.list
+
+[act]
+
+M4_EXECUTABLE directory-argument-missing.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty

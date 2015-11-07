@@ -1,0 +1,22 @@
+# -*- shell-script -*-
+
+#
+# Tests detection of an invalid command.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+install input/invalid-command.list
+
+[act]
+
+M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty

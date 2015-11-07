@@ -1,0 +1,26 @@
+# -*- shell-script -*-
+
+m4_include(common.m4)
+
+#
+# WHEN mode for handling missing files is "include",
+# and a file-path for a missing file is encountered,
+# THEN the program
+# SHOULD include the file in the output just as if it was an
+# existing file.
+#
+
+home ..
+
+[setup]
+
+install data
+
+[act]
+
+M4_EXECUTABLE --missing-file-handling include data/list.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/include.txt

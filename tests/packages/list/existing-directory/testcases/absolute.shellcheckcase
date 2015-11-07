@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+# Tests listing an existing directory using an absolute path to the directory.
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(absolute.list)
+M4_REPLACE_WITH_SHELLCHECK_ACT_DIR(CURRENT_DIRECTORY, data/absolute.list)
+
+[act]
+
+M4_EXECUTABLE data/absolute.list
+
+[assert]
+
+M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
+
+exitcode 0
+contents --rel-tmp stdout-sorted.txt --with-replaced-env-vars --rel-home output/absolute.txt

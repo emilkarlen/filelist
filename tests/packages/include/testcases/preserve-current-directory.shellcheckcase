@@ -1,0 +1,24 @@
+# -*- shell-script -*-
+
+#
+# WHEN @include is used with the option to preseve current directory
+# THEN file-paths in the included file
+# SHOULD be relative the including file.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(preserve-current-directory.list)
+
+[act]
+
+M4_EXECUTABLE data/preserve-current-directory.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/preserve-current-directory.txt

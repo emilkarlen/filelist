@@ -1,0 +1,23 @@
+# -*- shell-script -*-
+
+#
+# Tests that error messages contain a the chain of list-inclusions.
+#
+
+m4_include(common.m4)
+
+home ..
+
+[setup]
+
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(inclusion-trace-in-error-messages.list)
+
+[act]
+
+M4_EXECUTABLE data/inclusion-trace-in-error-messages.list
+
+[assert]
+
+exitcode M4_EXIT_SYNTAX
+stdout   empty
+stderr   --rel-home output/inclusion-trace-in-error-messages.txt
