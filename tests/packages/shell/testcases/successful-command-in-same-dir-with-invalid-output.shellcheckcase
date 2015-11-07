@@ -9,12 +9,17 @@
 
 m4_include(common.m4)
 
-name:successful-command-in-same-dir-with-invalid-output
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(successful-command-in-same-dir-with-invalid-output.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE data/successful-command-in-same-dir-with-invalid-output.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(successful-command-in-same-dir-with-invalid-output.list)
 
-check.exitcode:M4_EXIT_FILE_DOES_NOT_EXIST
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE data/successful-command-in-same-dir-with-invalid-output.list
+
+[assert]
+
+exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+stdout   empty

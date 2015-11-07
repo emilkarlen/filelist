@@ -7,12 +7,17 @@
 
 m4_include(common.m4)
 
-name:unsuccessful-exit-command
-home:..
+home ..
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(unsuccessful-exit-command.list)
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE data/unsuccessful-exit-command.list
+M4_SETUP_INSTALL_DATA_AND_INPUT__sc(unsuccessful-exit-command.list)
 
-check.exitcode:M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR
-check.stdout.empty
+[act]
+
+M4_EXECUTABLE data/unsuccessful-exit-command.list
+
+[assert]
+
+exitcode M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR
+stdout   empty

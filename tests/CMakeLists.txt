@@ -207,13 +207,13 @@ testcaseSC (tags/forward-to-file-arguments do-not-forward)
 testcaseSC (tags/forward-to-file-arguments do-forward)
 
 
-testcase (shell successful-command-in-same-dir-with-valid-output)
-testcase (shell successful-command-in-same-dir-with-invalid-output)
-testcase (shell unsuccessful-exit-command)
-testcase (shell successful-command-in-sub-dir-with-valid-output)
-testcase (shell tags-should-be-set)
-testcase (shell tags-filter-included)
-testcase (shell tags-filter-excluded)
+testcaseSC (shell successful-command-in-same-dir-with-valid-output)
+testcaseSC (shell successful-command-in-same-dir-with-invalid-output)
+testcaseSC (shell unsuccessful-exit-command)
+testcaseSC (shell successful-command-in-sub-dir-with-valid-output)
+testcaseSC (shell tags-should-be-set)
+testcaseSC (shell tags-filter-included)
+testcaseSC (shell tags-filter-excluded)
 
 
 testcase (preprocessor only-top-level-file)

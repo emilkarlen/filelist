@@ -3,4 +3,4 @@
 
 @print
 @print * Paths from top-level file
-@shell ${SIMPTEST_HOME}/scripts/print-arguments *.txt
+@shell ${SHELLCHECK_HOME}/scripts/print-arguments *.txt
