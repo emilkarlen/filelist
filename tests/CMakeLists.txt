@@ -203,8 +203,8 @@ testcaseSC (tags stack-push-pop)
 testcaseSC (tags print-stack)
 testcaseSC (tags print-stack--suppress-non-path-output)
 
-testcase (tags/forward-to-file-arguments do-not-forward)
-testcase (tags/forward-to-file-arguments do-forward)
+testcaseSC (tags/forward-to-file-arguments do-not-forward)
+testcaseSC (tags/forward-to-file-arguments do-forward)
 
 
 testcase (shell successful-command-in-same-dir-with-valid-output)

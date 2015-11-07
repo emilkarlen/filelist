@@ -8,12 +8,17 @@
 
 m4_include(common.m4)
 
-name:do-not-forward
-home:..
+home ..
 
-setup.install:data
+[setup]
 
-test.run.cmdline:M4_EXECUTABLE data/set-and-print-tags.list data/print-tags.list
+install data
 
-check.exitcode:0
-check.stdout.file.eq:output/do-not-forward.txt
+[act]
+
+M4_EXECUTABLE data/set-and-print-tags.list data/print-tags.list
+
+[assert]
+
+exitcode 0
+stdout   --rel-home output/do-not-forward.txt
