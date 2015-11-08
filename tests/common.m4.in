@@ -33,12 +33,6 @@ m4_define(`M4_COMMON_SCRIPTS_DIR',`M4_TEST_DIR/scripts')
 # The file is installed into the installed data directory.
 m4_define(`M4_SETUP_INSTALL_DATA_AND_INPUT',
 `
-setup.install:data
-setup.install:input/$1:data
-')
-
-m4_define(`M4_SETUP_INSTALL_DATA_AND_INPUT__sc',
-`
 install data
 install input/$1 data
 ')

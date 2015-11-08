@@ -12,7 +12,7 @@ home ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT__sc(name--exclude--regex.list)
+M4_SETUP_INSTALL_DATA_AND_INPUT(name--exclude--regex.list)
 
 [act]
 

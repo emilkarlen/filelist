@@ -13,7 +13,7 @@ home ..
 
 [setup]
 
-shell mkdir data-root-dir
+mkdir        data-root-dir
 install data data-root-dir
 
 stdin input/should-be-relative-cwd--other.list

@@ -6,7 +6,7 @@ home ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT__sc(name--include--shell-pattern.list)
+M4_SETUP_INSTALL_DATA_AND_INPUT(name--include--shell-pattern.list)
 
 [act]
 
