@@ -14,7 +14,11 @@ home ..
 
 install data
 
-stdin input/preprocess.list
+stdin <<EOF
+@print # Main file
+data/existing-file-1
+@include data/listfile-without-suffixes.list
+EOF
 
 [act]
 
