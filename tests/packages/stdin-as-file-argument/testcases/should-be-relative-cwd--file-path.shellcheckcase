@@ -14,7 +14,9 @@ home ..
 
 install data
 
-stdin input/should-be-relative-cwd--file-path.list
+stdin <<EOF
+data/existing-file-1.txt
+EOF
 
 [act]
 
