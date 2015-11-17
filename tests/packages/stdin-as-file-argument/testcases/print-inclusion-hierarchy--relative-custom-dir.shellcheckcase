@@ -12,18 +12,28 @@ m4_include(common.m4)
 
 home ..
 
+
 [setup]
+
 
 mkdir        data-root-dir
 install data data-root-dir
 
 stdin input/should-be-relative-cwd--other.list
 
+
 [act]
+
 
 M4_EXECUTABLE --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
 
+
 [assert]
 
+
 exitcode 0
-stdout   --rel-home output/print-inclusion-hierarchy--relative-custom-dir.txt
+
+stdout <<EOF
+data-root-dir/-
+ data-root-dir/data/listfile.list
+EOF
