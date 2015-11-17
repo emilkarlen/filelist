@@ -6,23 +6,38 @@
 
 m4_include(common.m4)
 
+
 home ..
+
 
 [setup]
 
+
 M4_SETUP_INSTALL_DATA_AND_INPUT(set-tags-and-list.list)
+
 
 [act]
 
+
 M4_EXECUTABLE --append-tags data/set-tags-and-list.list
+
 
 [assert]
 
-# Sort the two "section" - each originating from listing the files in the
-# same directory.
-shell sed -n '1,2p' ${SHELLCHECK_RESULT_DIR}/stdout | sort >  ${SHELLCHECK_TMP}/stdout-fixed.txt
-shell sed -n '3,4p' ${SHELLCHECK_RESULT_DIR}/stdout | sort >> ${SHELLCHECK_TMP}/stdout-fixed.txt
-
 
 exitcode 0
-contents --rel-tmp stdout-fixed.txt --rel-home output/set-and-append-list.txt
+
+pwd --rel-tmp
+
+# Sort the two "section" - each originating from listing the files in the
+# same directory.
+
+shell sed -n '1,2p' ${SHELLCHECK_RESULT_DIR}/stdout | sort >  stdout-fixed.txt
+shell sed -n '3,4p' ${SHELLCHECK_RESULT_DIR}/stdout | sort >> stdout-fixed.txt
+
+contents stdout-fixed.txt <<EOF
+data/dir/existing-file-1.txt:tag1
+data/dir/existing-file-2.txt:tag1
+data/dir/existing-file-1.txt:
+data/dir/existing-file-2.txt:
+EOF

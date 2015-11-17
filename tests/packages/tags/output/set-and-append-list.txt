@@ -1,4 +1,0 @@
-data/dir/existing-file-1.txt:tag1
-data/dir/existing-file-2.txt:tag1
-data/dir/existing-file-1.txt:
-data/dir/existing-file-2.txt:
