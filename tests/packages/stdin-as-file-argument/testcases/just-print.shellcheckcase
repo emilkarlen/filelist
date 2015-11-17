@@ -9,17 +9,26 @@ m4_include(common.m4)
 
 home ..
 
+
 [setup]
+
 
 stdin <<EOF
 @print Print output
 EOF
 
+
 [act]
+
 
 M4_EXECUTABLE -- -
 
+
 [assert]
 
+
 exitcode 0
-stdout   --rel-home output/just-print.txt
+
+stdout <<EOF
+Print output
+EOF
