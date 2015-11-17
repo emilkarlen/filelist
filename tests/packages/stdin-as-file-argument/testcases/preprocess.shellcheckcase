@@ -27,4 +27,9 @@ M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths 
 [assert]
 
 exitcode 0
-stdout   --rel-home output/preprocess.txt
+stdout <<EOF
+# Main file
+data/existing-file-1.txt
+# listfile-without-suffixes
+data/existing-file-1.txt
+EOF
