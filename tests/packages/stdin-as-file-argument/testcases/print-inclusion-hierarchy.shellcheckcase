@@ -12,17 +12,27 @@ m4_include(common.m4)
 
 home ..
 
+
 [setup]
+
 
 install data
 
 stdin input/should-be-relative-cwd--other.list
 
+
 [act]
+
 
 M4_EXECUTABLE --print-inclusion-hierarchy -- -
 
+
 [assert]
 
+
 exitcode 0
-stdout   --rel-home output/print-inclusion-hierarchy.txt
+
+stdout <<EOF
+-
+ data/listfile.list
+EOF
