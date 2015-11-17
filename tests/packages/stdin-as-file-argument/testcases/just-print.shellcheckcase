@@ -11,7 +11,9 @@ home ..
 
 [setup]
 
-stdin input/just-print.list
+stdin <<EOF
+@print Print output
+EOF
 
 [act]
 
