@@ -6,7 +6,7 @@ m4_include(common.m4)
 
 [act]
 
-M4_EXECUTABLE
+filelist
 
 [assert]
 

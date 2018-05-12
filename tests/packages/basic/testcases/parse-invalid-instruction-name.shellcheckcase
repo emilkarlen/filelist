@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/parse-invalid-instruction-name.list
 
 [act]
 
-M4_EXECUTABLE parse-invalid-instruction-name.list
+filelist parse-invalid-instruction-name.list
 
 [assert]
 

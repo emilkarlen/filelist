@@ -4,11 +4,9 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [act]
 
-M4_EXECUTABLE non-existing-file.list
+filelist non-existing-file.list
 
 [assert]
 

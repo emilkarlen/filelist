@@ -4,8 +4,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/print-1.list
@@ -13,7 +11,7 @@ copy input/print-2.list
 
 [act]
 
-M4_EXECUTABLE print-1.list print-2.list
+filelist print-1.list print-2.list
 
 [assert]
 

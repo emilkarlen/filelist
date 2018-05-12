@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/parse-ignored-lines.list
 
 [act]
 
-M4_EXECUTABLE parse-ignored-lines.list
+filelist parse-ignored-lines.list
 
 [assert]
 

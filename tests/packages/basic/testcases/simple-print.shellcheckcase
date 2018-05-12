@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/simple-print.list
 
 [act]
 
-M4_EXECUTABLE simple-print.list
+filelist simple-print.list
 
 [assert]
 

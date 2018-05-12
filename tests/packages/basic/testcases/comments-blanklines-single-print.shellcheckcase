@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/comments-blanklines-single-print.list
 
 [act]
 
-M4_EXECUTABLE comments-blanklines-single-print.list
+filelist comments-blanklines-single-print.list
 
 [assert]
 

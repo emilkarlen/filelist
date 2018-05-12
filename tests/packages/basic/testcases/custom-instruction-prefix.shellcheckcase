@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/custom-instruction-prefix.list
 
 [act]
 
-M4_EXECUTABLE --instruction-prefix PREFIX custom-instruction-prefix.list
+filelist --instruction-prefix PREFIX custom-instruction-prefix.list
 
 [assert]
 

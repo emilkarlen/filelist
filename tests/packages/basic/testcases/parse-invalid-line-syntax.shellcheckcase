@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/parse-invalid-line-syntax.list
 
 [act]
 
-M4_EXECUTABLE parse-invalid-line-syntax.list
+filelist parse-invalid-line-syntax.list
 
 [assert]
 
