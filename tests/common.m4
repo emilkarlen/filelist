@@ -14,17 +14,12 @@ m4_define(`M4_TEST_DIR',`/home/karlen/vcs/filelist/default/tests')
 # Aboslute name of the src directory.
 m4_define(`M4_SRC_DIR',`/home/karlen/vcs/filelist/default/src')
 
-# Absolute name of the executable
-m4_define(`M4_EXECUTABLE',`M4_SRC_DIR/filelist')
-
 # The executable invoked for printing paths relative the
 # list file.
 m4_define(`M4_EXECUTABLE_REL_LIST',
 `filelist --relative-file-argument-location')
 
 # The executable invoked for prefixing each path with tags
-m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`M4_EXECUTABLE --prepend-tags')
-
 m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`filelist --prepend-tags')
 
 m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
