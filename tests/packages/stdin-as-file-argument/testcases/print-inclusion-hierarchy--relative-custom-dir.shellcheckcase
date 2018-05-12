@@ -27,4 +27,8 @@ filelist --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -
 
 exit-code == 0
 
-stdout equals -file output/print-inclusion-hierarchy--relative-custom-dir.txt
+stdout equals
+<<-
+data-root-dir/-
+ data-root-dir/data/listfile.list
+-

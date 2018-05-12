@@ -26,4 +26,8 @@ filelist --print-inclusion-hierarchy -- -
 
 exit-code == 0
 
-stdout equals -file output/print-inclusion-hierarchy.txt
+stdout equals
+<<---
+-
+ data/listfile.list
+---

@@ -14,7 +14,10 @@ m4_include(common.m4)
 
 copy data
 
-stdin = -file input/should-be-relative-cwd--file-path.list
+stdin =
+<<-
+data/existing-file-1.txt
+-
 
 [act]
 
@@ -24,4 +27,7 @@ filelist -- -
 
 exit-code == 0
 
-stdout equals -file output/should-be-relative-cwd--file-path.txt
+stdout equals
+<<-
+data/existing-file-1.txt
+-
