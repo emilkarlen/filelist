@@ -18,7 +18,7 @@ filelist data/inclusion-trace-in-error-messages.list
 
 [assert]
 
-exit-code == M4_EXIT_SYNTAX
+exit-code == @[EXIT_SYNTAX]@
 
 stdout empty
 

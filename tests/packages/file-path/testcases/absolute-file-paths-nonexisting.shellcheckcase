@@ -18,6 +18,6 @@ filelist data/absolute-file-paths-nonexisting.list
 
 [assert]
 
-exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
 
 stdout empty

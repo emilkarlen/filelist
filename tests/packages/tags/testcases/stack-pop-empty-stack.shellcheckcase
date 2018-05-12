@@ -20,5 +20,6 @@ filelist stack-pop-empty-stack.list
 
 [assert]
 
-exit-code == M4_EXIT_TAGS_ERROR
+exit-code == @[EXIT_TAGS_ERROR]@
+
 stdout   empty

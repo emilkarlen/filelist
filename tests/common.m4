@@ -35,10 +35,11 @@ m4_define(`M4_SORT_STDOUT_TO_TMP_FILE',
 def path COMMON_SCRIPTS_DIR = -rel-act-home ../tests/scripts
 
 # Exit codes
-m4_define(`M4_EXIT_USAGE',2)
-m4_define(`M4_EXIT_INVALID_ARGUMENTS',3)
-m4_define(`M4_EXIT_SYNTAX',4)
-m4_define(`M4_EXIT_PRE_PROCESSING',5)
-m4_define(`M4_EXIT_FILE_DOES_NOT_EXIST',m4_eval(8 + 0))
-m4_define(`M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR',m4_eval(8 + 1))
-m4_define(`M4_EXIT_TAGS_ERROR',m4_eval(8 + 2))
+
+def string EXIT_USAGE                         = 2
+def string EXIT_INVALID_ARGUMENTS             = 3
+def string EXIT_SYNTAX                        = 4
+def string EXIT_PRE_PROCESSING                = 5
+def string EXIT_FILE_DOES_NOT_EXIST           = "8 + 0"
+def string EXIT_SHELL_COMMAND_EXECUTION_ERROR = "8 + 1"
+def string EXIT_TAGS_ERROR                    = "8 + 2"

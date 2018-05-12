@@ -14,6 +14,6 @@ filelist parse-invalid-instruction-name.list
 
 [assert]
 
-exit-code == M4_EXIT_SYNTAX
+exit-code == @[EXIT_SYNTAX]@
 
 stdout empty

@@ -21,5 +21,6 @@ filelist data/existing-dir.list
 # TODO is there a better exit code?
 [assert]
 
-exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
+
 stdout   empty

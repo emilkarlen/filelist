@@ -21,5 +21,6 @@ filelist --missing-file-handling fail data/list.list
 
 [assert]
 
-exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
+
 stdout equals -file output/fail.txt

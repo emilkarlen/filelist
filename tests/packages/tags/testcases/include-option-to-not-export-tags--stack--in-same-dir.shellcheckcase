@@ -20,5 +20,6 @@ filelist --append-tags data/include-option-to-not-export-tags--stack--in-same-di
 
 [assert]
 
-exit-code == M4_EXIT_TAGS_ERROR
+exit-code == @[EXIT_TAGS_ERROR]@
+
 stdout   empty

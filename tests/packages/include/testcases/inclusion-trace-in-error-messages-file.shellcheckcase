@@ -23,7 +23,7 @@ filelist data/includes-list-with-ref-to-non-existing-file.list
 
 [assert]
 
-exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
 
 stdout   empty
 

@@ -19,6 +19,6 @@ filelist --preprocessor @[COMMON_SCRIPTS_DIR]@/not-a-program data/single-file.li
 
 [assert]
 
-exit-code == M4_EXIT_PRE_PROCESSING
+exit-code == @[EXIT_PRE_PROCESSING]@
 
 stdout empty

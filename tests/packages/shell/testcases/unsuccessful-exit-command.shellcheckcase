@@ -27,6 +27,6 @@ filelist data/unsuccessful-exit-command.list
 [assert]
 
 
-exit-code == M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR
+exit-code == @[EXIT_SHELL_COMMAND_EXECUTION_ERROR]@
 
 stdout empty

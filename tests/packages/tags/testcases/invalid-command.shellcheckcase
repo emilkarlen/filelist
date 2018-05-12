@@ -18,5 +18,6 @@ M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
 
 [assert]
 
-exit-code == M4_EXIT_SYNTAX
+exit-code == @[EXIT_SYNTAX]@
+
 stdout   empty

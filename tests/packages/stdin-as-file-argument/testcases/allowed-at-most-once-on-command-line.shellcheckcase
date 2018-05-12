@@ -10,6 +10,6 @@ filelist -- - -
 
 [assert]
 
-exit-code == M4_EXIT_USAGE
+exit-code == @[EXIT_USAGE]@
 
 stdout empty
