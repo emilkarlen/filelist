@@ -9,15 +9,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
 
 [act]
 
-M4_EXECUTABLE --print-inclusion-hierarchy data/in-same-directory.list data/in-same-directory.list
+filelist --print-inclusion-hierarchy data/in-same-directory.list data/in-same-directory.list
 
 [assert]
 
