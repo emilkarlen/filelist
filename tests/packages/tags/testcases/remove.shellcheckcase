@@ -14,7 +14,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(remove.list)
 
 [act]
 
-M4_EXECUTABLE_PREPEND_TAGS__NEW data/remove.list
+M4_EXECUTABLE_PREPEND_TAGS data/remove.list
 
 [assert]
 

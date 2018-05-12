@@ -14,7 +14,7 @@ copy input/invalid-command.list
 
 [act]
 
-M4_EXECUTABLE_PREPEND_TAGS__NEW invalid-command.list
+M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
 
 [assert]
 

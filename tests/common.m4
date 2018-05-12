@@ -25,7 +25,7 @@ m4_define(`M4_EXECUTABLE_REL_LIST',
 # The executable invoked for prefixing each path with tags
 m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`M4_EXECUTABLE --prepend-tags')
 
-m4_define(`M4_EXECUTABLE_PREPEND_TAGS__NEW',`filelist --prepend-tags')
+m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`filelist --prepend-tags')
 
 m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
 m4_define(`M4_COMMON_SCRIPTS_DIR',`M4_TEST_DIR/scripts')
