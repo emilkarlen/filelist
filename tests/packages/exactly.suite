@@ -1,3 +1,13 @@
+#
+# Test suite using the tool Exactly.
+#
+# Dependencies: Python 3.5 or higher.
+#
+# Install from PyPi:
+#
+#   > pip3 install exactly
+#
+
 [suites]
 
 basic/exactly.suite
