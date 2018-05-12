@@ -8,12 +8,6 @@
 
 act-home = ../../../../src
 
-# Aboslute name of the test directory.
-m4_define(`M4_TEST_DIR',`/home/karlen/vcs/filelist/default/tests')
-
-# Aboslute name of the src directory.
-m4_define(`M4_SRC_DIR',`/home/karlen/vcs/filelist/default/src')
-
 # The executable invoked for printing paths relative the
 # list file.
 m4_define(`M4_EXECUTABLE_REL_LIST',
@@ -21,9 +15,6 @@ m4_define(`M4_EXECUTABLE_REL_LIST',
 
 # The executable invoked for prefixing each path with tags
 m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`filelist --prepend-tags')
-
-m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
-m4_define(`M4_COMMON_SCRIPTS_DIR',`M4_TEST_DIR/scripts')
 
 # Installs the directory data and a given file that must
 # exist under input/.
@@ -38,6 +29,10 @@ copy input/$1 data
 # Syntax: OUTPUT-FILENAME
 m4_define(`M4_SORT_STDOUT_TO_TMP_FILE',
 `file -rel-tmp $1 = -stdout-from % sort @[EXACTLY_RESULT]@/stdout')
+
+[setup]
+
+def path COMMON_SCRIPTS_DIR = -rel-act-home ../tests/scripts
 
 # Exit codes
 m4_define(`M4_EXIT_USAGE',2)

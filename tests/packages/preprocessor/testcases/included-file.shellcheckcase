@@ -15,7 +15,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(included-file.list)
 
 [act]
 
-filelist --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths data/included-file.list
+filelist --preprocessor @[COMMON_SCRIPTS_DIR]@/add-txt-suffix-to-file-paths data/included-file.list
 
 [assert]
 
