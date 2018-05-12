@@ -5,13 +5,15 @@
 # List files are located in different directories.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -19,5 +21,6 @@ M4_EXECUTABLE --print-inclusion-hierarchy data/in-sub-directory.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/in-sub-directory.txt
+exit-code == 0
+
+stdout equals -file output/in-sub-directory.txt

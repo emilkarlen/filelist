@@ -1,12 +1,19 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(dir.list)
+copy data
+
+file data/dir.list =
+<<-
+@LIST dir
+-
 
 [act]
 
@@ -16,5 +23,11 @@ M4_EXECUTABLE data/dir.list
 
 M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
-exitcode 0
-contents --rel-tmp stdout-sorted.txt --rel-home output/basic.txt
+exit-code == 0
+
+contents -rel-tmp stdout-sorted.txt
+         equals
+<<-
+data/dir/existing-file-2.txt
+data/dir/existing-file.txt
+-

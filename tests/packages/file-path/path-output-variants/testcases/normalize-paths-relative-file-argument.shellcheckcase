@@ -1,12 +1,14 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data/home
+copy data/home
 
 [act]
 
@@ -14,5 +16,5 @@ M4_EXECUTABLE --normalize-paths --relative-file-argument-location home/normalize
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/normalize-paths-relative-file-argument.txt
+exit-code == 0
+stdout equals -file output/normalize-paths-relative-file-argument.txt

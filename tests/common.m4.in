@@ -28,9 +28,9 @@ m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`M4_EXECUTABLE --prepend-tags')
 m4_define(`M4_COMMON_TESTDATA_DIR',`M4_TEST_DIR/testdata')
 m4_define(`M4_COMMON_SCRIPTS_DIR',`M4_TEST_DIR/scripts')
 
-# Installs the directory data and a given file that must
+# Installs the directory named data/ and a given file that must
 # exist under input/.
-# The file is installed into the installed data directory.
+# The file is installed into the installed data/ directory.
 m4_define(`M4_SETUP_INSTALL_DATA_AND_INPUT',
 `
 install data

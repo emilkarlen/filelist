@@ -1,1 +1,0 @@
-SHELLCHECK_ACT/data/dir/existing-file.txt

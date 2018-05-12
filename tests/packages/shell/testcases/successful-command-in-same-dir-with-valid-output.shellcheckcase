@@ -7,19 +7,46 @@
 # file-names.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
+
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(successful-command-in-same-dir-with-valid-output.list)
+
+copy data
+
+file data/successful-command-in-same-dir-with-valid-output.list =
+<<-
+@print * From shell instruction
+@shell @[EXACTLY_HOME]@/scripts/print-arguments *.txt
+
+@print
+@print * From file-names
+existing-file-1.txt
+-
+
 
 [act]
 
+
 M4_EXECUTABLE data/successful-command-in-same-dir-with-valid-output.list
+
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/successful-command-in-same-dir-with-valid-output.txt
+
+exit-code == 0
+
+stdout equals
+<<-
+* From shell instruction
+data/existing-file-1.txt
+data/existing-file-2.txt
+
+* From file-names
+data/existing-file-1.txt
+-

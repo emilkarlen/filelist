@@ -1,13 +1,15 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/print-1.list
-install input/print-2.list
+copy input/print-1.list
+copy input/print-2.list
 
 [act]
 
@@ -15,5 +17,7 @@ M4_EXECUTABLE print-1.list print-2.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/multiple-file-arguments.txt
+exit-code == 0
+
+stdout equals
+       -file -rel-home output/multiple-file-arguments.txt

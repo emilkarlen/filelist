@@ -6,9 +6,11 @@
 # SHOULD exit with error status.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -21,5 +23,5 @@ M4_EXECUTABLE data/existing-dir.list
 # TODO is there a better exit code?
 [assert]
 
-exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
 stdout   empty

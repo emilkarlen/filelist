@@ -1,12 +1,14 @@
 # -*- m4 -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -14,5 +16,6 @@ M4_EXECUTABLE_REL_LIST --filter-tags a,b data/tagged-files.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/contains-any-of.txt
+exit-code == 0
+
+stdout equals -file output/contains-any-of.txt

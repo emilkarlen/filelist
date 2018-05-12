@@ -1,7 +1,0 @@
-# List files in the directory with tags.
-@TAGS SET tag1
-@LIST dir *.txt
-
-# List files in the directory without tags.
-@TAGS SET
-@LIST dir *.txt

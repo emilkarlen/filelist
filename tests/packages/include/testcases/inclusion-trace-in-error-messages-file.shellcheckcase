@@ -9,9 +9,11 @@
 # printed correctly (e.g., paths are relative CWD).
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -23,6 +25,8 @@ M4_EXECUTABLE data/includes-list-with-ref-to-non-existing-file.list
 
 [assert]
 
-exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+
 stdout   empty
-stderr   --rel-home output/inclusion-trace-in-error-messages-file.txt
+
+stderr equals -file output/inclusion-trace-in-error-messages-file.txt

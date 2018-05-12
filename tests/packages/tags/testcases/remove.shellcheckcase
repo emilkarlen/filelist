@@ -4,9 +4,11 @@
 # Tests removing tags.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -18,5 +20,5 @@ M4_EXECUTABLE_PREPEND_TAGS data/remove.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/remove.txt
+exit-code == 0
+stdout equals -file output/remove.txt

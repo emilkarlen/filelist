@@ -4,9 +4,11 @@
 # Tests adding tags.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -18,5 +20,5 @@ M4_EXECUTABLE_PREPEND_TAGS data/add.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/add.txt
+exit-code == 0
+stdout equals -file output/add.txt

@@ -6,9 +6,11 @@
 # SHOULD be ignored by the included file.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -20,5 +22,5 @@ M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--stack--in-ot
 
 [assert]
 
-exitcode M4_EXIT_TAGS_ERROR
+exit-code == M4_EXIT_TAGS_ERROR
 stdout   empty

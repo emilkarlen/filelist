@@ -1,2 +1,0 @@
-data/dir/existing-file-2.txt
-data/dir/existing-file.txt

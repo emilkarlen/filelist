@@ -1,12 +1,12 @@
-# -*- m4 -*-
+[conf]
 
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -14,5 +14,6 @@ M4_EXECUTABLE_REL_LIST --operator-for-filter-tags equals --filter-tags ,a,b,,c, 
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/flexible-parsing-of-tag-list.txt
+exit-code == 0
+
+stdout equals -file output/flexible-parsing-of-tag-list.txt

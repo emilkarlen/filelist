@@ -6,9 +6,11 @@
 # SHOULD be printed
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -22,5 +24,8 @@ M4_EXECUTABLE_REL_LIST data/name--exclude--shell-pattern.list
 
 M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
-exitcode 0
-contents --rel-tmp stdout-sorted.txt --rel-home output/name--exclude--shell-pattern.txt
+exit-code == 0
+
+contents -rel-tmp stdout-sorted.txt
+         equals
+         -file output/name--exclude--shell-pattern.txt

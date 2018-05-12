@@ -5,9 +5,11 @@
 # Only a top-level files.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -19,5 +21,7 @@ M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths 
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/included-file.txt
+exit-code == 0
+
+stdout equals
+       -file -rel-home output/included-file.txt

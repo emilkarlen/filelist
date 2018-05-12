@@ -1,12 +1,14 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/parse-invalid-instruction-name.list
+copy input/parse-invalid-instruction-name.list
 
 [act]
 
@@ -14,5 +16,6 @@ M4_EXECUTABLE parse-invalid-instruction-name.list
 
 [assert]
 
-exitcode M4_EXIT_SYNTAX
-stdout   empty
+exit-code == M4_EXIT_SYNTAX
+
+stdout empty

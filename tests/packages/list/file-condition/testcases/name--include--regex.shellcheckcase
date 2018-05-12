@@ -2,9 +2,11 @@
 
 # Tests @list with reg-ex for the condition on file names.
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -18,5 +20,8 @@ M4_EXECUTABLE_REL_LIST data/name--include--regex.list
 
 M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
-exitcode 0
-contents --rel-tmp stdout-sorted.txt --rel-home output/name--include--regex.txt
+exit-code == 0
+
+contents -rel-tmp stdout-sorted.txt
+         equals
+         -file output/name--include--regex.txt

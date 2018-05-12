@@ -1,7 +1,5 @@
 # -*- shell-script -*-
 
-m4_include(common.m4)
-
 #
 # WHEN mode for handling missing files is "include",
 # and a file-path for a missing file is encountered,
@@ -10,11 +8,15 @@ m4_include(common.m4)
 # existing file.
 #
 
-home ..
+[conf]
+
+m4_include(common.m4)
+
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -22,5 +24,5 @@ M4_EXECUTABLE --missing-file-handling include data/list.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/include.txt
+exit-code == 0
+stdout equals -file output/include.txt

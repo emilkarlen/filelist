@@ -1,5 +1,7 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
 #
@@ -8,11 +10,11 @@ m4_include(common.m4)
 # SHOULD default to "fail".
 #
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -20,5 +22,5 @@ M4_EXECUTABLE data/list.list
 
 [assert]
 
-exitcode M4_EXIT_FILE_DOES_NOT_EXIST
-stdout   --rel-home output/fail.txt
+exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+stdout equals -file output/fail.txt

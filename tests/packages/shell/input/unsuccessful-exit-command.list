@@ -1,2 +1,0 @@
-@shell exit 1
-@print this-should-not-be-output

@@ -6,20 +6,22 @@
 # SHOULD be forwarded to following file arguments
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
-# M4_EXECUTABLE  data/set-and-print-tags.list data/print-tags.list
 [act]
 
 M4_EXECUTABLE --forward-tags data/set-and-print-tags.list data/print-tags.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/do-forward.txt
+exit-code == 0
+
+stdout equals -file output/do-forward.txt

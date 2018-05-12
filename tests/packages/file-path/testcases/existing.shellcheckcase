@@ -1,12 +1,20 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(existing.list)
+copy data
+
+file data/existing.list =
+<<EOF
+existing-file.txt
+dir
+EOF
 
 [act]
 
@@ -14,5 +22,10 @@ M4_EXECUTABLE data/existing.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/existing.txt
+exit-code == 0
+
+stdout equals
+<<EOF
+data/existing-file.txt
+data/dir
+EOF

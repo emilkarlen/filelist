@@ -4,40 +4,57 @@
 # Tests setting tags and including them in the output by appending them.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-
-home ..
-
+home = ..
 
 [setup]
 
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(set-tags-and-list.list)
+copy data
+
+file data/set-tags-and-list.list =
+<<-
+# List files in the directory with tags.
+@TAGS SET tag1
+@LIST dir *.txt
+
+# List files in the directory without tags.
+@TAGS SET
+@LIST dir *.txt
+-
 
 
 [act]
 
-
 M4_EXECUTABLE --append-tags data/set-tags-and-list.list
+
+[before-assert]
+
+
+# Sort the two "section" - each originating from listing the files in the
+# same directory.
+
+file -rel-tmp stdout-fixed-1-2.txt = -stdout-from $ sed -n '1,2p' @[EXACTLY_RESULT]@/stdout | sort
+
+file -rel-tmp stdout-fixed-3-4.txt = -stdout-from $ sed -n '3,4p' @[EXACTLY_RESULT]@/stdout | sort
 
 
 [assert]
 
 
-exitcode 0
-
-pwd --rel-tmp
-
-# Sort the two "section" - each originating from listing the files in the
-# same directory.
-
-shell sed -n '1,2p' ${SHELLCHECK_RESULT_DIR}/stdout | sort >  stdout-fixed.txt
-shell sed -n '3,4p' ${SHELLCHECK_RESULT_DIR}/stdout | sort >> stdout-fixed.txt
-
-contents stdout-fixed.txt <<EOF
+contents -rel-tmp stdout-fixed-1-2.txt
+         equals
+<<-
 data/dir/existing-file-1.txt:tag1
 data/dir/existing-file-2.txt:tag1
+-
+
+contents -rel-tmp stdout-fixed-3-4.txt
+         equals
+<<-
 data/dir/existing-file-1.txt:
 data/dir/existing-file-2.txt:
-EOF
+-

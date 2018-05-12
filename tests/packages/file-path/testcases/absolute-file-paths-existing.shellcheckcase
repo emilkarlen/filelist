@@ -1,13 +1,19 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(absolute-file-paths-existing.list)
-shell ex -s -c %s:CURRENT_DIRECTORY:${SHELLCHECK_ACT}:g -c x data/absolute-file-paths-existing.list
+copy data
+
+file data/absolute-file-paths-existing.list = <<EOF
+@[EXACTLY_ACT]@/data/dir/existing-file.txt
+EOF
+
 
 [act]
 
@@ -15,5 +21,8 @@ M4_EXECUTABLE data/absolute-file-paths-existing.list
 
 [assert]
 
-exitcode 0
-stdout   --with-replaced-env-vars --rel-home output/absolute-file-paths-existing.txt
+exit-code == 0
+
+stdout equals <<EOF
+@[EXACTLY_ACT]@/data/dir/existing-file.txt
+EOF

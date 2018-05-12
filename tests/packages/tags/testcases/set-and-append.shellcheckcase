@@ -4,9 +4,11 @@
 # Tests setting tags and including them in the output by appending them.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -18,5 +20,5 @@ M4_EXECUTABLE --append-tags data/set-tags-and-files.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/set-and-append.txt
+exit-code == 0
+stdout equals -file output/set-and-append.txt

@@ -1,12 +1,19 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(list-with-existing-in-same-dir.list)
+copy data
+
+file data/list-with-existing-in-same-dir.list =
+<<EOF
+existing-file.txt
+EOF
 
 [act]
 
@@ -14,5 +21,10 @@ M4_EXECUTABLE data/list-with-existing-in-same-dir.list data/dir-with-listfile/li
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/multiple-file-arguments.txt
+exit-code == 0
+
+stdout equals
+<<EOF
+data/existing-file.txt
+data/dir-with-listfile/include-existing-file.txt
+EOF

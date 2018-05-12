@@ -1,24 +1,33 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
-file data/the.list <<EOF
+file data/dir.list =
+<<-
 @LIST dir
-EOF
+-
 
 [act]
 
-M4_EXECUTABLE_REL_LIST data/the.list
+M4_EXECUTABLE_REL_LIST data/dir.list
 
 [assert]
 
 M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
-exitcode 0
-contents --rel-tmp stdout-sorted.txt --rel-home output/relative-file-argument.txt
+exit-code == 0
+
+contents -rel-tmp stdout-sorted.txt
+         equals
+<<-
+dir/existing-file-2.txt
+dir/existing-file.txt
+-

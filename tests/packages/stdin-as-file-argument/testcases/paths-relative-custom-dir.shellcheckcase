@@ -7,16 +7,18 @@
 # SHOULD be relative the given custom directory
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-mkdir        data-root-dir
-install data data-root-dir
+dir data-root-dir
+copy data data-root-dir
 
-stdin input/should-be-relative-cwd--other.list
+stdin = -file input/should-be-relative-cwd--other.list
 
 [act]
 
@@ -24,5 +26,6 @@ M4_EXECUTABLE --stdin-paths-are-relative data-root-dir  -- -
 
 [assert]
 
-exitcode 0
-#stdout   --rel-home output/paths-relative-custom-dir.txt
+exit-code == 0
+
+stdout equals -file output/paths-relative-custom-dir.txt

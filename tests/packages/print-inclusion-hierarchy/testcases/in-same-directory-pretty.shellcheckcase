@@ -6,13 +6,15 @@
 # Pretty layout.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -20,5 +22,6 @@ M4_EXECUTABLE --print-inclusion-hierarchy-pretty data/in-same-directory.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/in-same-directory-pretty.txt
+exit-code == 0
+
+stdout equals -file output/in-same-directory-pretty.txt

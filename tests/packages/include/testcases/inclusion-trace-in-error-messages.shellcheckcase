@@ -4,9 +4,11 @@
 # Tests that error messages contain a the chain of list-inclusions.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -18,6 +20,8 @@ M4_EXECUTABLE data/inclusion-trace-in-error-messages.list
 
 [assert]
 
-exitcode M4_EXIT_SYNTAX
-stdout   empty
-stderr   --rel-home output/inclusion-trace-in-error-messages.txt
+exit-code == M4_EXIT_SYNTAX
+
+stdout empty
+
+stderr equals -file output/inclusion-trace-in-error-messages.txt

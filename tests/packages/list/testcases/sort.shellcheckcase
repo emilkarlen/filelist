@@ -19,9 +19,11 @@
 # reading the files of the test-dir did not give an already sorted result.)
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -33,5 +35,6 @@ M4_EXECUTABLE_REL_LIST data/sort.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/sort.txt
+exit-code == 0
+
+stdout equals -file output/sort.txt

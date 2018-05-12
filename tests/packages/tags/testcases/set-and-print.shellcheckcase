@@ -7,13 +7,15 @@
 # SHOULD be printed on a single line in alphanumerical order.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/set-and-print.list
+copy input/set-and-print.list
 
 [act]
 
@@ -21,5 +23,5 @@ M4_EXECUTABLE set-and-print.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/set-and-print.txt
+exit-code == 0
+stdout equals -file output/set-and-print.txt

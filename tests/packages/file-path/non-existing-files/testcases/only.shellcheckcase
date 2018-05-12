@@ -6,13 +6,15 @@
 # SHOULD output only the non-existing files.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -20,5 +22,6 @@ M4_EXECUTABLE --missing-file-handling only data/list.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/only.txt
+exit-code == 0
+
+stdout equals -file output/only.txt

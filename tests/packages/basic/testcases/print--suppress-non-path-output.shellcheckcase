@@ -5,13 +5,15 @@
 # used with the PRINT instruction.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/simple-print.list
+copy input/simple-print.list
 
 [act]
 
@@ -19,5 +21,6 @@ M4_EXECUTABLE --suppress-non-path-output simple-print.list
 
 [assert]
 
-exitcode 0
-stdout   empty
+exit-code == 0
+
+stdout empty

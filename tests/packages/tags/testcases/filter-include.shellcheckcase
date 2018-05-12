@@ -7,9 +7,11 @@
 # This should be true for files in included lists.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -21,5 +23,5 @@ M4_EXECUTABLE --filter-tags included1,included2 data/filter-include.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/filter.txt
+exit-code == 0
+stdout equals -file output/filter.txt

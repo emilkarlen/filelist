@@ -1,5 +1,7 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
 [act]
@@ -8,5 +10,6 @@ M4_EXECUTABLE
 
 [assert]
 
-exitcode 0
+exit-code == 0
+
 stdout empty

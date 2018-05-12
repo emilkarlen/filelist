@@ -4,13 +4,15 @@
 # Test of correct usage of push and pop.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/stack-push-pop.list
+copy input/stack-push-pop.list
 
 [act]
 
@@ -18,5 +20,5 @@ M4_EXECUTABLE stack-push-pop.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/stack-push-pop.txt
+exit-code == 0
+stdout equals -file output/stack-push-pop.txt

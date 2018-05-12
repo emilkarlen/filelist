@@ -5,13 +5,22 @@
 # The shell command exists with unsuccessful status.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(unsuccessful-exit-command.list)
+copy data
+
+file data/unsuccessful-exit-command.list =
+<<-
+@shell exit 1
+@print this-should-not-be-output
+-
+
 
 [act]
 
@@ -19,5 +28,7 @@ M4_EXECUTABLE data/unsuccessful-exit-command.list
 
 [assert]
 
-exitcode M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR
-stdout   empty
+
+exit-code == M4_EXIT_SHELL_COMMAND_EXECUTION_ERROR
+
+stdout empty

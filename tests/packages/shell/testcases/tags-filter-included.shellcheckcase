@@ -5,13 +5,21 @@
 # A filter that includes files from the shell command.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(tags.list)
+copy data
+
+file data/tags.list =
+<<-
+@tags set tag1
+@shell @[EXACTLY_HOME]@/scripts/print-arguments *.txt
+-
 
 [act]
 
@@ -19,5 +27,10 @@ M4_EXECUTABLE --filter-tags tag1 data/tags.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/tags-filter-included.txt
+exit-code == 0
+
+stdout equals
+<<-
+data/existing-file-1.txt
+data/existing-file-2.txt
+-

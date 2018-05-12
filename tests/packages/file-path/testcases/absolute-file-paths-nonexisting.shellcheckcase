@@ -1,13 +1,18 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(absolute-file-paths-nonexisting.list)
-M4_REPLACE_WITH_SHELLCHECK_ACT_DIR(CURRENT_DIRECTORY, data/absolute-file-paths-nonexisting.list)
+copy data
+
+file data/absolute-file-paths-nonexisting.list = <<EOF
+@[EXACTLY_ACT]@/data/dir/nonexisting-file.txt
+EOF
 
 [act]
 
@@ -15,5 +20,6 @@ M4_EXECUTABLE data/absolute-file-paths-nonexisting.list
 
 [assert]
 
-exitcode M4_EXIT_FILE_DOES_NOT_EXIST
-stdout   empty
+exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+
+stdout empty

@@ -5,13 +5,23 @@
 # A filter that excludes files from the shell command.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(tags.list)
+
+copy data
+
+file data/tags.list =
+<<-
+@tags set tag1
+@shell @[EXACTLY_HOME]@/scripts/print-arguments *.txt
+-
+
 
 [act]
 
@@ -19,5 +29,7 @@ M4_EXECUTABLE --filter-tags undefined-tag data/tags.list
 
 [assert]
 
-exitcode 0
-stdout   empty
+
+exit-code == 0
+
+stdout empty

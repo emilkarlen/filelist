@@ -1,12 +1,14 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/directory-argument-missing.list
+copy input/directory-argument-missing.list
 
 [act]
 
@@ -14,5 +16,6 @@ M4_EXECUTABLE directory-argument-missing.list
 
 [assert]
 
-exitcode M4_EXIT_SYNTAX
+exit-code == M4_EXIT_SYNTAX
+
 stdout   empty

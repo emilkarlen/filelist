@@ -1,8 +1,10 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -14,5 +16,5 @@ M4_EXECUTABLE data/non-existing.list
 
 [assert]
 
-exitcode M4_EXIT_FILE_DOES_NOT_EXIST
+exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
 stdout   empty

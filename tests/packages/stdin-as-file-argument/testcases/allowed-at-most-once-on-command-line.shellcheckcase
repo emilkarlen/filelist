@@ -1,8 +1,10 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [act]
 
@@ -10,5 +12,6 @@ M4_EXECUTABLE -- - -
 
 [assert]
 
-exitcode M4_EXIT_USAGE
-stdout   empty
+exit-code == M4_EXIT_USAGE
+
+stdout empty

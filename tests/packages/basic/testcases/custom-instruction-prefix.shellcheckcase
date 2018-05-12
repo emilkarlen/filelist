@@ -1,12 +1,14 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/custom-instruction-prefix.list
+copy input/custom-instruction-prefix.list
 
 [act]
 
@@ -14,5 +16,7 @@ M4_EXECUTABLE --instruction-prefix PREFIX custom-instruction-prefix.list
 
 [assert]
 
-exitcode 0
-stdout --rel-home output/custom-instruction-prefix.txt
+exit-code == 0
+
+stdout equals
+       -file -rel-home output/custom-instruction-prefix.txt

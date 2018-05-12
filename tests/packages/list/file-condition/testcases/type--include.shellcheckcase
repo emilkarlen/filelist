@@ -1,8 +1,10 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -14,5 +16,6 @@ M4_EXECUTABLE_REL_LIST data/type--include.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/type--include.txt
+exit-code == 0
+
+stdout equals -file output/type--include.txt

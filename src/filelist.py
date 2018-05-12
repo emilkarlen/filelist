@@ -1118,13 +1118,13 @@ class ProcessorForFilePath(Processor):
 
 
 ###############################################################################
-# - ProcessorForDirectoryListing -
+# - ProcessorForFind -
 ###############################################################################
 
 
-class ListSettings:
+class ListAndFindSettings:
     """
-    Settings relevant to directory listing.
+    Settings relevant to directory listing and find.
 
     The settings are on a "high level" - ready for use
     without further parsing.
@@ -1145,8 +1145,10 @@ class FileMatchInfo:
     """
     def __init__(self,
                  path: str,
+                 path_rel_dir_argument: str,
                  base_name: str):
         self._path = path
+        self._path_rel_dir_argument = path_rel_dir_argument
         self._base_name = base_name
         self._stat_result = None
 
@@ -1163,13 +1165,13 @@ class FileMatchInfo:
         return self._stat_result
 
 
-class ProcessorForDirectoryListing(Processor):
+class ProcessorForFileSetBase(Processor):
     """
     An instruction that resolves the contents of a directory.
     """
     def __init__(self,
                  source: SourceReference,
-                 settings: ListSettings):
+                 settings: ListAndFindSettings):
         Processor.__init__(self, source)
         self.settings = settings
         self.env_for_dir = None
@@ -1212,7 +1214,66 @@ class ProcessorForDirectoryListing(Processor):
             yield self._new_file_result(file_base_name, env)
 
     def _new_file_match_info(self, base_name: str) -> FileMatchInfo:
+        raise NotImplementedError()
+
+    def _new_file_result(self,
+                         base_name: str,
+                         env: ResultItemsConstructionEnvironment) -> ResultItemForFilePathExisting:
+        return ResultItemForFilePathExisting(
+            self.env_for_dir.file_ref_env.file_name_relative_top_level_source_file(base_name),
+            env.tags().frozen_tags())
+
+
+class ProcessorForFind(ProcessorForFileSetBase):
+    """
+    An instruction that resolves the contents of a directory.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 settings: ListAndFindSettings):
+        ProcessorForFileSetBase.__init__(self, source, settings)
+
+
+###############################################################################
+# - ProcessorForDirectoryListing -
+###############################################################################
+
+
+class ProcessorForDirectoryListing(ProcessorForFileSetBase):
+    """
+    An instruction that resolves the contents of a directory.
+    """
+    def __init__(self,
+                 source: SourceReference,
+                 settings: ListAndFindSettings):
+        ProcessorForFileSetBase.__init__(self, source, settings)
+
+    def _sorted_iterable(self,
+                         dir_path: str,
+                         env: ResultItemsConstructionEnvironment) -> iter:
+        all_files = [self._new_file_match_info(file_name) for file_name in os.listdir(dir_path)]
+        matching_base_names = list(map(FileMatchInfo.base_name,
+                                   filter(self.settings.file_matcher,
+                                          all_files)))
+        # sort
+        # Sorting here lets us sort on base_name, which is faster than sorting on
+        # the complete result file name.
+        matching_base_names.sort()
+        file_paths = [self._new_file_result(base_name, env)
+                      for base_name in matching_base_names]
+        return iter(file_paths)
+
+    def _unsorted_iterable(self,
+                           dir_path: str,
+                           env: ResultItemsConstructionEnvironment) -> iter:
+        for file_base_name in os.listdir(dir_path):
+            if not self.settings.file_matcher(self._new_file_match_info(file_base_name)):
+                continue
+            yield self._new_file_result(file_base_name, env)
+
+    def _new_file_match_info(self, base_name: str) -> FileMatchInfo:
         return FileMatchInfo(self.env_for_dir.file_ref_env.file_name_relative_current_dir_of_process(base_name),
+                             base_name,
                              base_name)
 
     def _new_file_result(self,
@@ -2005,7 +2066,7 @@ def list__parse_excludes(list_args: argparse.Namespace) -> list:
 
 
 class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgumentParser):
-    """Parser for the contents of a directory."""
+    """Parser for listing files in a directory."""
 
     DESCRIPTION = """
     Prints paths of the files inside a directory.
@@ -2032,7 +2093,7 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
         return self._parser
 
     def _parse_argument(self,
-                        instruction_argument: str) -> ListSettings:
+                        instruction_argument: str) -> ListAndFindSettings:
         arguments = shlex.split(instruction_argument)
         if not arguments:
             msg = "A directory must be given (use '.' for current directory)."
@@ -2041,9 +2102,137 @@ class InstructionArgumentParserForDirectoryListing(InstructionWithArgparseArgume
 
         args = self._parse(arguments[1:])
         matcher = self._parse_matcher(args)
-        return ListSettings(directory,
+        return ListAndFindSettings(directory,
                             matcher,
                             args.sort)
+
+    _TOP_LEVEL_ANDS = [list__parse_file_type_matcher,
+                       list__parse_include_name_matchers_new_new,
+                       list__parse_excludes]
+
+    def _parse_matcher(self,
+                       args: argparse.Namespace):
+        and_list = []
+        for constructor in self._TOP_LEVEL_ANDS:
+            and_list.extend(constructor(args))
+        return and_matcher(and_list)
+
+    def _construct_argparser(self, instruction_name_for_help_text: str) -> argparse.ArgumentParser:
+        parser = argparse.ArgumentParser(prog=instruction_name_for_help_text + " DIRECTORY",
+                                         add_help=False,
+                                         description=self.DESCRIPTION)
+        parser.add_argument("patterns",
+                            metavar="PATTERN",
+                            nargs="*",
+                            help="""\
+                            A condition of the files in the directory to include,
+                            in terms of a Unix like shell-style wildcard.
+
+                            (E.g. the constructs "*, ?, [abc],[!abc]".)
+                            Each PATTERN is applied to the base-name of the files in the
+                            directory.
+                            If no PATTERN is given, then there is no condition on the
+                            file name.
+                            If PATTERNs are given, then the condition on the file name
+                            is to match at least one of these.
+                            """)
+        parser.add_argument("-r", "--regex",
+                            metavar="REG-EX",
+                            nargs=1,
+                            dest="regex_list",
+                            action="append",
+                            default=[],
+                            help="""\
+                            A condition of the files in the directory to include,
+                            in terms of a regular expression.
+
+                            This option can be used multiple times. Each file that matches
+                            ANY of the REG-EX will be included.
+
+                            Each REG-EX is applied to the base-name of the files in the
+                            directory.
+
+                            The REG-EX is considered to match a file name if it matches
+                            any part of the file-name.
+                            To limit matches to file-names who's whole name matches the REG-EX,
+                            begin and end REG-EX with '^' and '$', respectively.
+                            """)
+        parser.add_argument("-e", "--exclude",
+                            metavar="PATTERN",
+                            nargs=1,
+                            dest="exclude_pattern_list",
+                            action="append",
+                            default=[],
+                            help="""\
+                            Excludes all files who's name matching the given pattern.""")
+        parser.add_argument("-E", "--exclude-regex",
+                            metavar="REG-EX",
+                            nargs=1,
+                            dest="exclude_regex_list",
+                            action="append",
+                            default=[],
+                            help="""\
+                            Excludes all files who's name matching the given regular expression.""")
+        parser.add_argument("-t", "--type",
+                            nargs=1,
+                            metavar="TYPE",
+                            default=[],
+                            action="append",
+                            type=FileType,
+                            help="""\
+                            Include only files who's type is the given.
+                            "f" for regular file.
+                            "d" for directory.
+
+                            If used more than once, they are OR:ed.""")
+        parser.add_argument("-s", "--sort",
+                            action="store_const",
+                            const=True,
+                            default=False,
+                            help="Makes the output being sorted in alphabetical order.")
+        return parser
+
+
+class InstructionArgumentParserForFind(InstructionWithArgparseArgumentParser):
+    """Parser for finding files à la Unix find."""
+
+    DESCRIPTION = """
+    Prints paths of the files at arbitrary depth inside a hierarchical directory structure.
+
+    DIRECTORY is the directory to list-files in.
+    Use . for the directory of the list-file.
+
+    Arguments uses shell-style syntax for quoting, etc.
+    """
+
+    def __init__(self,
+                 instruction_name: str):
+        InstructionWithArgparseArgumentParser.__init__(self, instruction_name)
+        self._parser = self._construct_argparser(instruction_name)
+
+    def apply(self,
+              parsing_settings: ParsingSettings,
+              source: SourceReference,
+              instruction_argument: str):
+        list_settings = self._parse_argument(instruction_argument)
+        return [ProcessorForDirectoryListing(source, list_settings)]
+
+    def arg_parser(self) -> argparse.ArgumentParser:
+        return self._parser
+
+    def _parse_argument(self,
+                        instruction_argument: str) -> ListAndFindSettings:
+        arguments = shlex.split(instruction_argument)
+        if not arguments:
+            msg = "A directory must be given (use '.' for current directory)."
+            raise InstructionArgumentParserSyntaxErrorException([msg])
+        directory = arguments[0]
+
+        args = self._parse(arguments[1:])
+        matcher = self._parse_matcher(args)
+        return ListAndFindSettings(directory,
+                                   matcher,
+                                   args.sort)
 
     _TOP_LEVEL_ANDS = [list__parse_file_type_matcher,
                        list__parse_include_name_matchers_new_new,
@@ -3058,6 +3247,9 @@ def system_line_parsers(instruction_prefix: str):
 
 
 instruction_configurations = [
+    InstructionConfiguration.for_instruction_with_argparser(
+        ["F"],
+        InstructionArgumentParserForFind("FIND")),
     InstructionConfiguration.for_instruction_with_argparser(
         ["I"],
         InstructionArgumentParserForInclude("INCLUDE")),

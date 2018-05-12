@@ -139,12 +139,17 @@ testcase (list/file-condition name--include--shell-pattern)
 testcase (list/file-condition name--include--shell-pattern--invalid)
 testcase (list/file-condition name--include--regex)
 testcase (list/file-condition name--include--shell-pattern-and-regex)
+testcase (list/file-condition mode--include)
 testcase (list/file-condition name--exclude--shell-pattern)
 testcase (list/file-condition name--exclude--regex)
 testcase (list/file-condition type--include)
 testcase (list/file-condition excludes-have-precedence)
 testcase (list/file-condition combined--type-and-name)
 
+
+testcase (find/basic/existing-directory plain)
+# testcase (find/basic/existing-directory absolute)
+# testcase (find/basic/existing-directory relative-file-argument)
 
 testcase (include existing--relative-file-argument)
 testcase (include existing-in-same-dir)

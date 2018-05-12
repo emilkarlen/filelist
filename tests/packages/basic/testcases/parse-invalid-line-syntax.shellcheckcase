@@ -1,12 +1,14 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/parse-invalid-line-syntax.list
+copy input/parse-invalid-line-syntax.list
 
 [act]
 
@@ -14,5 +16,6 @@ M4_EXECUTABLE parse-invalid-line-syntax.list
 
 [assert]
 
-exitcode M4_EXIT_FILE_DOES_NOT_EXIST
-stdout   empty
+exit-code == M4_EXIT_FILE_DOES_NOT_EXIST
+
+stdout empty

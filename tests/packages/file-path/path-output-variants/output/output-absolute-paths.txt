@@ -1,9 +1,9 @@
 LOCAL
-SHELLCHECK_ACT/home/file.txt
-SHELLCHECK_ACT/home/dir
-SHELLCHECK_ACT/home/dir/dir-file.txt
+EXACTLY_ACT/home/file.txt
+EXACTLY_ACT/home/dir
+EXACTLY_ACT/home/dir/dir-file.txt
 LIST
-SHELLCHECK_ACT/home/dir/dir-file.txt
+EXACTLY_ACT/home/dir/dir-file.txt
 INCLUDE
-SHELLCHECK_ACT/home/file.txt
-SHELLCHECK_ACT/home/dir/dir-file.txt
+EXACTLY_ACT/home/file.txt
+EXACTLY_ACT/home/dir/dir-file.txt

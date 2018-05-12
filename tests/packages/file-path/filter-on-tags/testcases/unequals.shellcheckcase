@@ -1,12 +1,12 @@
-# -*- m4 -*-
+[conf]
 
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
 [act]
 
@@ -14,5 +14,6 @@ M4_RUN_WITH_OPERATOR(`unequals')
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/unequals.txt
+exit-code == 0
+
+stdout equals -file output/unequals.txt

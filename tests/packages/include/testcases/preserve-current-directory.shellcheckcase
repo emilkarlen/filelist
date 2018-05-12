@@ -6,9 +6,11 @@
 # SHOULD be relative the including file.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -20,5 +22,5 @@ M4_EXECUTABLE data/preserve-current-directory.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/preserve-current-directory.txt
+exit-code == 0
+stdout equals -file output/preserve-current-directory.txt

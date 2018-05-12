@@ -6,13 +6,15 @@
 # SHOULD cause an error.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/stack-pop-empty-stack.list
+copy input/stack-pop-empty-stack.list
 
 [act]
 
@@ -20,5 +22,5 @@ M4_EXECUTABLE stack-pop-empty-stack.list
 
 [assert]
 
-exitcode M4_EXIT_TAGS_ERROR
+exit-code == M4_EXIT_TAGS_ERROR
 stdout   empty

@@ -2,27 +2,34 @@
 
 # Tests listing an existing directory using an absolute path to the directory.
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
-file data/the.list <<EOF
-@LIST CURRENT_DIRECTORY/data/dir
-EOF
-
-M4_REPLACE_WITH_SHELLCHECK_ACT_DIR(CURRENT_DIRECTORY, data/the.list)
+file data/absolute.list =
+<<-
+@LIST @[EXACTLY_ACT]@/data/dir
+-
 
 [act]
 
-M4_EXECUTABLE data/the.list
+M4_EXECUTABLE data/absolute.list
 
 [assert]
 
 M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
-exitcode 0
-contents --rel-tmp stdout-sorted.txt --with-replaced-env-vars --rel-home output/absolute.txt
+exit-code == 0
+
+contents -rel-tmp stdout-sorted.txt
+         equals
+<<-
+@[EXACTLY_ACT]@/data/dir/existing-file-2.txt
+@[EXACTLY_ACT]@/data/dir/existing-file.txt
+-

@@ -1,8 +1,10 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -14,5 +16,5 @@ M4_EXECUTABLE --relative-file-argument-location data/existing-in-subdir.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/existing--relative-file-argument.txt
+exit-code == 0
+stdout equals -file output/existing--relative-file-argument.txt

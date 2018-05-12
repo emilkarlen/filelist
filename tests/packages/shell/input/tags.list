@@ -1,2 +1,0 @@
-@tags set tag1
-@shell ${SHELLCHECK_HOME}/scripts/print-arguments *.txt

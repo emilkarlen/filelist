@@ -8,9 +8,11 @@
 # Tags set in an included file should also be set in the including file.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -22,5 +24,5 @@ M4_EXECUTABLE --append-tags data/include-import--in-same-dir.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/include-import--in-same-dir.txt
+exit-code == 0
+stdout equals -file output/include-import--in-same-dir.txt

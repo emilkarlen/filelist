@@ -1,8 +1,10 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [act]
 
@@ -10,5 +12,6 @@ M4_EXECUTABLE non-existing-file.list
 
 [assert]
 
-exitcode M4_EXIT_INVALID_ARGUMENTS
-stdout   empty
+exit-code == M4_EXIT_INVALID_ARGUMENTS
+
+stdout empty

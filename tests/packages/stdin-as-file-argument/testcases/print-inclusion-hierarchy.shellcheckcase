@@ -8,31 +8,24 @@
 # (For the "correct way", see the expected output.)
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
-
+home = ..
 
 [setup]
 
+copy data
 
-install data
-
-stdin input/should-be-relative-cwd--other.list
-
+stdin = -file input/should-be-relative-cwd--other.list
 
 [act]
 
-
 M4_EXECUTABLE --print-inclusion-hierarchy -- -
-
 
 [assert]
 
+exit-code == 0
 
-exitcode 0
-
-stdout <<EOF
--
- data/listfile.list
-EOF
+stdout equals -file output/print-inclusion-hierarchy.txt

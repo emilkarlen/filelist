@@ -11,19 +11,43 @@
 # file-names.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(successful-command-in-sub-dir-with-valid-output.list)
+copy data
+
+file data/the.list =
+<<-
+@print * Paths from included file
+@include dir/list-with-successful-shell-command.list
+
+@print
+@print * Paths from top-level file
+@shell @[EXACTLY_HOME]@/scripts/print-arguments *.txt
+-
+
 
 [act]
 
-M4_EXECUTABLE data/successful-command-in-sub-dir-with-valid-output.list
+M4_EXECUTABLE data/the.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/successful-command-in-sub-dir-with-valid-output.txt
+
+exit-code == 0
+
+stdout equals
+<<-
+* Paths from included file
+data/dir/../existing-file-1.txt
+data/dir/../existing-file-2.txt
+
+* Paths from top-level file
+data/existing-file-1.txt
+data/existing-file-2.txt
+-

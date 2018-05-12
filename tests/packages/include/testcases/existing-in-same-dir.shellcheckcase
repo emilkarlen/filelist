@@ -1,8 +1,10 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -14,5 +16,5 @@ M4_EXECUTABLE data/existing-in-same-dir.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/existing-in-same-dir.txt
+exit-code == 0
+stdout equals -file output/existing-in-same-dir.txt

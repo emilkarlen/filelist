@@ -5,30 +5,31 @@
 # with just a @print instruction.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
-
+home = ..
 
 [setup]
 
 
-stdin <<EOF
+stdin =
+<<-
 @print Print output
-EOF
+-
 
 
 [act]
 
-
 M4_EXECUTABLE -- -
-
 
 [assert]
 
 
-exitcode 0
+exit-code == 0
 
-stdout <<EOF
+stdout equals
+<<-
 Print output
-EOF
+-

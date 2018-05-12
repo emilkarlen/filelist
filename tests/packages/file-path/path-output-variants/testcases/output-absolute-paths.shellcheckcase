@@ -1,13 +1,15 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
 
-home ..
+home = ..
 
 [setup]
 
-install data/home
+copy data/home
 
 [act]
 
@@ -15,5 +17,8 @@ M4_EXECUTABLE --absolute-paths home/output-absolute-paths.list
 
 [assert]
 
-exitcode 0
-stdout   --with-replaced-env-vars --rel-home output/output-absolute-paths.txt
+exit-code == 0
+
+stdout -transformed-by REPLACE_TEST_CASE_DIRS
+       equals
+       -file output/output-absolute-paths.txt

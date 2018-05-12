@@ -1,14 +1,21 @@
 # -*- shell-script -*-
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-M4_SETUP_INSTALL_DATA_AND_INPUT(existing-in-same-dir-absolute-filename.list)
+copy data
 
-M4_REPLACE_WITH_SHELLCHECK_ACT_DIR(CURRENT_DIRECTORY,data/existing-in-same-dir-absolute-filename.list)
+file data/existing-in-same-dir-absolute-filename.list =
+<<-
+existing-file.txt
+@INCLUDE @[EXACTLY_ACT]@/data/list-with-existing-in-same-dir.list
+existing-file.txt
+-
 
 [act]
 
@@ -17,5 +24,11 @@ M4_EXECUTABLE data/existing-in-same-dir-absolute-filename.list
 [assert]
 
 
-exitcode 0
-stdout --with-replaced-env-vars --rel-home output/existing-in-same-dir-absolute-filename.txt
+exit-code == 0
+
+stdout equals
+<<-
+data/existing-file.txt
+@[EXACTLY_ACT]@/data/existing-file.txt
+data/existing-file.txt
+-

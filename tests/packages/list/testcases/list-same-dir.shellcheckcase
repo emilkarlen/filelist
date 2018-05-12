@@ -5,9 +5,11 @@
 # the directory where the source file is located.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -21,5 +23,8 @@ M4_EXECUTABLE_REL_LIST data/list-same-dir.list
 
 M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
-exitcode 0
-contents --rel-tmp stdout-sorted.txt --rel-home output/list-same-dir.txt
+exit-code == 0
+
+contents -rel-tmp stdout-sorted.txt
+         equals
+         -file output/list-same-dir.txt

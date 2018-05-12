@@ -6,15 +6,17 @@
 # SHOULD be relative the Current Working Directory of the process.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install data
+copy data
 
-stdin input/should-be-relative-cwd--other.list
+stdin = -file input/should-be-relative-cwd--other.list
 
 [act]
 
@@ -22,5 +24,6 @@ M4_EXECUTABLE -- -
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/should-be-relative-cwd--other.txt
+exit-code == 0
+
+stdout equals -file output/should-be-relative-cwd--other.txt

@@ -6,13 +6,15 @@
 # SHOULD be printed on a single line
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/print-stack.list
+copy input/print-stack.list
 
 [act]
 
@@ -20,5 +22,5 @@ M4_EXECUTABLE print-stack.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/print-stack.txt
+exit-code == 0
+stdout equals -file output/print-stack.txt

@@ -4,9 +4,11 @@
 # Tests that the tags stack is imported from included files.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -18,5 +20,5 @@ M4_EXECUTABLE data/include-import-stack.list
 
 [assert]
 
-exitcode 0
-stdout   --rel-home output/include-import-stack.txt
+exit-code == 0
+stdout equals -file output/include-import-stack.txt

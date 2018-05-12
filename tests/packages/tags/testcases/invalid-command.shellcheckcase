@@ -4,13 +4,15 @@
 # Tests detection of an invalid command.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
-install input/invalid-command.list
+copy input/invalid-command.list
 
 [act]
 
@@ -18,5 +20,5 @@ M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
 
 [assert]
 
-exitcode M4_EXIT_SYNTAX
+exit-code == M4_EXIT_SYNTAX
 stdout   empty

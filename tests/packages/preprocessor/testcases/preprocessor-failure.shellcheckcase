@@ -5,9 +5,11 @@
 # The preprocessor fails.
 #
 
+[conf]
+
 m4_include(common.m4)
 
-home ..
+home = ..
 
 [setup]
 
@@ -19,5 +21,6 @@ M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/not-a-program data/single-fil
 
 [assert]
 
-exitcode M4_EXIT_PRE_PROCESSING
-stdout   empty
+exit-code == M4_EXIT_PRE_PROCESSING
+
+stdout empty
