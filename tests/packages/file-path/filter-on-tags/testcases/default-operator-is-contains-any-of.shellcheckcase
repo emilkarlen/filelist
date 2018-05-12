@@ -10,7 +10,7 @@ copy data
 
 [act]
 
-M4_EXECUTABLE_REL_LIST --filter-tags a,b data/tagged-files.list
+M4_EXECUTABLE_REL_LIST__NEW --filter-tags a,b data/tagged-files.list
 
 [assert]
 
