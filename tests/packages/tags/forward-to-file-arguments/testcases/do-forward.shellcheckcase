@@ -10,15 +10,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
 
 [act]
 
-M4_EXECUTABLE --forward-tags data/set-and-print-tags.list data/print-tags.list
+filelist --forward-tags data/set-and-print-tags.list data/print-tags.list
 
 [assert]
 
