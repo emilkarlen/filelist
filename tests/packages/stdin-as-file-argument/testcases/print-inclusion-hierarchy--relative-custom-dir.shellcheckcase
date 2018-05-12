@@ -12,8 +12,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 dir data-root-dir
@@ -23,7 +21,7 @@ stdin = -file input/should-be-relative-cwd--other.list
 
 [act]
 
-M4_EXECUTABLE --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
+filelist --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
 
 [assert]
 

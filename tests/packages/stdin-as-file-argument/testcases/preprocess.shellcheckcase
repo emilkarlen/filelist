@@ -10,8 +10,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 
@@ -22,7 +20,7 @@ stdin = -file input/preprocess.list
 
 [act]
 
-M4_EXECUTABLE --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths -- -
+filelist --preprocessor M4_COMMON_SCRIPTS_DIR/add-txt-suffix-to-file-paths -- -
 
 [assert]
 
