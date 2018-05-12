@@ -4,8 +4,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
@@ -17,7 +15,7 @@ EOF
 
 [act]
 
-M4_EXECUTABLE --absolute-paths data/absolute-file-paths-existing.list
+filelist --absolute-paths data/absolute-file-paths-existing.list
 
 [assert]
 

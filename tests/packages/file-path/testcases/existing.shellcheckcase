@@ -4,8 +4,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
@@ -18,7 +16,7 @@ EOF
 
 [act]
 
-M4_EXECUTABLE data/existing.list
+filelist data/existing.list
 
 [assert]
 
