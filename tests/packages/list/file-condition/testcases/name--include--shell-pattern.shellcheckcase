@@ -10,7 +10,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(name--include--shell-pattern.list)
 
 [act]
 
-M4_EXECUTABLE_REL_LIST__NEW data/name--include--shell-pattern.list
+M4_EXECUTABLE_REL_LIST data/name--include--shell-pattern.list
 
 [assert]
 

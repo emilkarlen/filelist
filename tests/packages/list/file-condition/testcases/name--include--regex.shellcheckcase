@@ -12,7 +12,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(name--include--regex.list)
 
 [act]
 
-M4_EXECUTABLE_REL_LIST__NEW data/name--include--regex.list
+M4_EXECUTABLE_REL_LIST data/name--include--regex.list
 
 [assert]
 

@@ -15,7 +15,7 @@ file data/dir.list =
 
 [act]
 
-M4_EXECUTABLE_REL_LIST__NEW data/dir.list
+M4_EXECUTABLE_REL_LIST data/dir.list
 
 [assert]
 
