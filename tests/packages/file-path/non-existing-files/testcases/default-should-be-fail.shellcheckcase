@@ -1,16 +1,14 @@
 # -*- shell-script -*-
 
-[conf]
-
-m4_include(common.m4)
-
 #
 # WHEN mode for handling missing files not specified
 # THEN the mode
 # SHOULD default to "fail".
 #
 
-home = ..
+[conf]
+
+m4_include(common.m4)
 
 [setup]
 
@@ -18,7 +16,7 @@ copy data
 
 [act]
 
-M4_EXECUTABLE data/list.list
+filelist data/list.list
 
 [assert]
 

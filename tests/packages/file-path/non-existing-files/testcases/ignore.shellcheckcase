@@ -11,15 +11,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
 
 [act]
 
-M4_EXECUTABLE --missing-file-handling ignore data/list.list
+filelist --missing-file-handling ignore data/list.list
 
 [assert]
 

@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data/home
 
 [act]
 
-M4_EXECUTABLE --normalize-paths --relative-file-argument-location home/normalize-paths.list
+filelist --normalize-paths --relative-file-argument-location home/normalize-paths.list
 
 [assert]
 

@@ -4,16 +4,13 @@
 
 m4_include(common.m4)
 
-
-home = ..
-
 [setup]
 
 copy data/home
 
 [act]
 
-M4_EXECUTABLE --absolute-paths home/output-absolute-paths.list
+filelist --absolute-paths home/output-absolute-paths.list
 
 [assert]
 
