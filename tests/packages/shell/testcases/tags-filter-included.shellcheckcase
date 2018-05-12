@@ -9,8 +9,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
@@ -23,7 +21,7 @@ file data/tags.list =
 
 [act]
 
-M4_EXECUTABLE --filter-tags tag1 data/tags.list
+filelist --filter-tags tag1 data/tags.list
 
 [assert]
 

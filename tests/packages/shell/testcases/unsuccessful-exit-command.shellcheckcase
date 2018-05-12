@@ -9,8 +9,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
@@ -24,7 +22,7 @@ file data/unsuccessful-exit-command.list =
 
 [act]
 
-M4_EXECUTABLE data/unsuccessful-exit-command.list
+filelist data/unsuccessful-exit-command.list
 
 [assert]
 

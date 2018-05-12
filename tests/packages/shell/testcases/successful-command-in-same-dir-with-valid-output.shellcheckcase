@@ -11,9 +11,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
-
 [setup]
 
 
@@ -33,7 +30,7 @@ existing-file-1.txt
 [act]
 
 
-M4_EXECUTABLE data/successful-command-in-same-dir-with-valid-output.list
+filelist data/successful-command-in-same-dir-with-valid-output.list
 
 
 [assert]

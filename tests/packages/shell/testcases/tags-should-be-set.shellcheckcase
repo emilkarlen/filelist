@@ -8,8 +8,6 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy data
@@ -23,7 +21,7 @@ file data/tags.list =
 
 [act]
 
-M4_EXECUTABLE_PREPEND_TAGS data/tags.list
+M4_EXECUTABLE_PREPEND_TAGS__NEW data/tags.list
 
 [assert]
 
