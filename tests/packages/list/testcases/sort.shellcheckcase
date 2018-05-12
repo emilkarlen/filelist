@@ -23,15 +23,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(sort.list)
 
 [act]
 
-M4_EXECUTABLE_REL_LIST data/sort.list
+M4_EXECUTABLE_REL_LIST__NEW data/sort.list
 
 [assert]
 
