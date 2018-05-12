@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN the tags stack is empty
 # THEN the the use of the tags POP sub-command

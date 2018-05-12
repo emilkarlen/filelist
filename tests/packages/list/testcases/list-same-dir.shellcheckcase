@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Ability to list the contents of the home directory -
 # the directory where the source file is located.

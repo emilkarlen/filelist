@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests that tags are exported to included files.
 #

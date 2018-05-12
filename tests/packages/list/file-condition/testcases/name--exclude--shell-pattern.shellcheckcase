@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN exclusion patterns (shell-pattern) are given
 # THEN no file who's name matches the pattern

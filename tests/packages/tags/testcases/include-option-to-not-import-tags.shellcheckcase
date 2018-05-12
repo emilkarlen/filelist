@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN the @list is used with the option to not import tags
 # THEN modifications of the tags in the included file

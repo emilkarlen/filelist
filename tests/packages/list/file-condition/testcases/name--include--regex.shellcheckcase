@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 # Tests @list with reg-ex for the condition on file names.
 
 [conf]

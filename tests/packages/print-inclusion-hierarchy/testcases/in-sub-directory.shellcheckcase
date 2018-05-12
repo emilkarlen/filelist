@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests printing the file inclusion hierarchy.
 # List files are located in different directories.

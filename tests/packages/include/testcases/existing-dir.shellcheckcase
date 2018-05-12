@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN The file argument to @include is a directory,
 # THEN the program

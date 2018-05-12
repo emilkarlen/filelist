@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests that filter-on-tags is handled correctly by the shell instruction:
 # A filter that includes files from the shell command.

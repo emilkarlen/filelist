@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN tags are set using the set command, and
 # then the tags print command is issued

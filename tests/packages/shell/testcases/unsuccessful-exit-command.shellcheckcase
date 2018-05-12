@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests executing a shell command.
 # The shell command exists with unsuccessful status.

@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN @include is used with the option to preseve current directory
 # THEN file-paths in the included file

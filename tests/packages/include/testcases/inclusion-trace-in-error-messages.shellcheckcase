@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests that error messages contain a the chain of list-inclusions.
 #

@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests the option to suppress all non-file output,
 # used with the PRINT instruction.

@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # * Tests that file-references in error messages are printed relative
 # the current working directory.

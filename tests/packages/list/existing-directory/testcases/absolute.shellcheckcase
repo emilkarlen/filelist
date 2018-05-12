@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 # Tests listing an existing directory using an absolute path to the directory.
 
 [conf]

@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests executing a shell command and the handling of sub-directories.
 # (Each shell command should be executed with a current directory of

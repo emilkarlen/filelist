@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 [conf]
 
 m4_include(common.m4)

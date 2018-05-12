@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests stdin as file-argument
 # with just a @print instruction.

@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN stdin is used together with the option that specifies
 # the directory which paths from stdin should be relative,

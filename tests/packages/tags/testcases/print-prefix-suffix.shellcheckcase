@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN the tags print command is issued with options for prefix and suffix
 # THEN the current tags

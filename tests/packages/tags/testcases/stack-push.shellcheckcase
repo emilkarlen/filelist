@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN tags are pushed
 # THEN the current tags

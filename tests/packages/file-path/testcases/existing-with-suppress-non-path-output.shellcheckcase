@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests the FILE instruction in combination with the
 # --suppress-non-path-output option.

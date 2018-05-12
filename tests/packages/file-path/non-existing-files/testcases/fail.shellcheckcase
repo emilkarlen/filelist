@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN mode for handling missing files is "fail",
 # and a file-path for a missing file is encountered,

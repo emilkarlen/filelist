@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests how tags are imported from included files.
 #

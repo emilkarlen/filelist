@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # Tests that tags are set correctly by the shell instruction.
 #

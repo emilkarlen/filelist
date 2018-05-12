@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # When a tags filter is used, then only files that are
 # tagged with any of the given tags should be output.

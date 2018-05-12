@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN the @list is used with the option to not export tags
 # THEN modifications of the tags stack in the included file

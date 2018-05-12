@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 # Tests @list with combination of wildcard and reg-ex
 # for the condition on file names.
 

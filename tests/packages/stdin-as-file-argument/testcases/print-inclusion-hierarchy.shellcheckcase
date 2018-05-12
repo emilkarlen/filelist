@@ -1,5 +1,3 @@
-# -*- shell-script -*-
-
 #
 # WHEN stdin is used as a listfile on the command line
 # THEN , in the inclusion hierarchy,
