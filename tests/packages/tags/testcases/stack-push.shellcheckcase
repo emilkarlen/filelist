@@ -10,15 +10,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(stack-push.list)
 
 [act]
 
-M4_EXECUTABLE data/stack-push.list
+filelist data/stack-push.list
 
 [assert]
 

@@ -12,15 +12,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(include-import--in-other-dir.list)
 
 [act]
 
-M4_EXECUTABLE --append-tags data/include-import--in-other-dir.list
+filelist --append-tags data/include-import--in-other-dir.list
 
 [assert]
 

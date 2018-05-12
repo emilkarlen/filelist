@@ -10,15 +10,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(include-option-to-not-export-tags--stack--in-same-dir.list)
 
 [act]
 
-M4_EXECUTABLE --append-tags data/include-option-to-not-export-tags--stack--in-same-dir.list
+filelist --append-tags data/include-option-to-not-export-tags--stack--in-same-dir.list
 
 [assert]
 

@@ -11,15 +11,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(filter-include.list)
 
 [act]
 
-M4_EXECUTABLE --filter-tags included1,included2 data/filter-include.list
+filelist --filter-tags included1,included2 data/filter-include.list
 
 [assert]
 

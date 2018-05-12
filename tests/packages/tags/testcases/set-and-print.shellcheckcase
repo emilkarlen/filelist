@@ -11,15 +11,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/set-and-print.list
 
 [act]
 
-M4_EXECUTABLE set-and-print.list
+filelist set-and-print.list
 
 [assert]
 

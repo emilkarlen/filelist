@@ -8,15 +8,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/invalid-command.list
 
 [act]
 
-M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
+M4_EXECUTABLE_PREPEND_TAGS__NEW invalid-command.list
 
 [assert]
 

@@ -10,15 +10,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/print-stack.list
 
 [act]
 
-M4_EXECUTABLE print-stack.list
+filelist print-stack.list
 
 [assert]
 

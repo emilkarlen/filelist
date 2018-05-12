@@ -11,15 +11,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/print-prefix-suffix.list
 
 [act]
 
-M4_EXECUTABLE --suppress-non-path-output print-prefix-suffix.list
+filelist --suppress-non-path-output print-prefix-suffix.list
 
 [assert]
 

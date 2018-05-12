@@ -8,15 +8,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(include-export-stack.list)
 
 [act]
 
-M4_EXECUTABLE data/include-export-stack.list
+filelist data/include-export-stack.list
 
 [assert]
 

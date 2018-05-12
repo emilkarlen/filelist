@@ -8,15 +8,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/stack-push-pop.list
 
 [act]
 
-M4_EXECUTABLE stack-push-pop.list
+filelist stack-push-pop.list
 
 [assert]
 
