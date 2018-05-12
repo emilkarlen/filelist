@@ -7,15 +7,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(name--include--shell-pattern-and-regex.list)
 
 [act]
 
-M4_EXECUTABLE_REL_LIST data/name--include--shell-pattern-and-regex.list
+M4_EXECUTABLE_REL_LIST__NEW data/name--include--shell-pattern-and-regex.list
 
 [assert]
 

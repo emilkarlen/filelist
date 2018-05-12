@@ -4,15 +4,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 copy input/name--include--shell-pattern--invalid.list
 
 [act]
 
-M4_EXECUTABLE_REL_LIST name--include--shell-pattern--invalid.list
+M4_EXECUTABLE_REL_LIST__NEW name--include--shell-pattern--invalid.list
 
 [assert]
 
