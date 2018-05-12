@@ -1,0 +1,9 @@
+[suites]
+
+testcases/exactly.suite
+
+path-output-variants/exactly.suite
+
+non-existing-files/exactly.suite
+
+filter-on-tags/exactly.suite
