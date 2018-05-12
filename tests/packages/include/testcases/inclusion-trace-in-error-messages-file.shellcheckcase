@@ -13,15 +13,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(includes-list-with-ref-to-non-existing-file.list)
 
 [act]
 
-M4_EXECUTABLE data/includes-list-with-ref-to-non-existing-file.list
+filelist data/includes-list-with-ref-to-non-existing-file.list
 
 [assert]
 

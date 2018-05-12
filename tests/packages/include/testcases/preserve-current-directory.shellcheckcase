@@ -10,15 +10,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(preserve-current-directory.list)
 
 [act]
 
-M4_EXECUTABLE data/preserve-current-directory.list
+filelist data/preserve-current-directory.list
 
 [assert]
 

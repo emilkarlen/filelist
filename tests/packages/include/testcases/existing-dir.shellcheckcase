@@ -10,15 +10,13 @@
 
 m4_include(common.m4)
 
-home = ..
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(existing-dir.list)
 
 [act]
 
-M4_EXECUTABLE data/existing-dir.list
+filelist data/existing-dir.list
 
 # TODO is there a better exit code?
 [assert]
