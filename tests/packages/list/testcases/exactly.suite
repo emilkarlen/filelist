@@ -4,4 +4,4 @@ preprocessor = m4 -P
 
 [cases]
 
-*.shellcheckcase
+*.case
