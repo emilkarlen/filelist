@@ -9,7 +9,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(list-same-dir.list)
 
 [act]
 
-M4_EXECUTABLE_REL_LIST data/list-same-dir.list
+filelist @[REL_FILE_ARG_OPT]@ data/list-same-dir.list
 
 [assert]
 

@@ -9,7 +9,7 @@ file data/dir.list =
 
 [act]
 
-M4_EXECUTABLE_REL_LIST data/dir.list
+filelist @[REL_FILE_ARG_OPT]@ data/dir.list
 
 [assert]
 

@@ -6,6 +6,10 @@ act-home = ../src
 
 def path COMMON_SCRIPTS_DIR = -rel-here scripts
 
+def string PREPEND_TAGS_OPT = --prepend-tags
+
+def string REL_FILE_ARG_OPT = --relative-file-argument-location
+
 # Exit codes
 
 def string EXIT_USAGE                         = 2

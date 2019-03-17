@@ -8,7 +8,7 @@ copy input/invalid-command.list
 
 [act]
 
-M4_EXECUTABLE_PREPEND_TAGS invalid-command.list
+filelist @[PREPEND_TAGS_OPT]@ invalid-command.list
 
 [assert]
 

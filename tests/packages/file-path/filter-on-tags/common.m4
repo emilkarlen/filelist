@@ -2,7 +2,7 @@ m4_include(../../../common.m4)
 
 m4_define(`M4_STANDARD_SET',`a,b')
 
-m4_define(`M4_RUN_WITH_OPTIONS',`M4_EXECUTABLE_REL_LIST $1 --filter-tags M4_STANDARD_SET data/tagged-files.list'
+m4_define(`M4_RUN_WITH_OPTIONS',`filelist @[REL_FILE_ARG_OPT]@ $1 --filter-tags M4_STANDARD_SET data/tagged-files.list'
 )
 
 m4_define(`M4_RUN_WITH_OPERATOR',

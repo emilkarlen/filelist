@@ -4,7 +4,7 @@ copy data
 
 [act]
 
-M4_EXECUTABLE_REL_LIST --operator-for-filter-tags equals --filter-tags ,a,b,,c, data/tagged-files.list
+filelist @[REL_FILE_ARG_OPT]@ --operator-for-filter-tags equals --filter-tags ,a,b,,c, data/tagged-files.list
 
 [assert]
 

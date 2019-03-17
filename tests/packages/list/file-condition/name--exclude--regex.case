@@ -10,7 +10,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(name--exclude--regex.list)
 
 [act]
 
-M4_EXECUTABLE_REL_LIST data/name--exclude--regex.list
+filelist @[REL_FILE_ARG_OPT]@ data/name--exclude--regex.list
 
 [assert]
 

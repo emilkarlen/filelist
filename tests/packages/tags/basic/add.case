@@ -8,7 +8,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(add.list)
 
 [act]
 
-M4_EXECUTABLE_PREPEND_TAGS data/add.list
+filelist @[PREPEND_TAGS_OPT]@ data/add.list
 
 [assert]
 

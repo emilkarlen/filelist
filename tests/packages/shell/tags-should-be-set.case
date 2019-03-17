@@ -15,7 +15,7 @@ file data/tags.list =
 
 [act]
 
-M4_EXECUTABLE_PREPEND_TAGS data/tags.list
+filelist @[PREPEND_TAGS_OPT]@ data/tags.list
 
 [assert]
 

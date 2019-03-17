@@ -4,7 +4,7 @@ copy input/name--include--shell-pattern--invalid.list
 
 [act]
 
-M4_EXECUTABLE_REL_LIST name--include--shell-pattern--invalid.list
+filelist @[REL_FILE_ARG_OPT]@ name--include--shell-pattern--invalid.list
 
 [assert]
 

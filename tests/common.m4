@@ -4,14 +4,6 @@
 # All variables declared have the prefix "M4".
 ###############################################################################
 
-# The executable invoked for printing paths relative the
-# list file.
-m4_define(`M4_EXECUTABLE_REL_LIST',
-`filelist --relative-file-argument-location')
-
-# The executable invoked for prefixing each path with tags
-m4_define(`M4_EXECUTABLE_PREPEND_TAGS',`filelist --prepend-tags')
-
 # Installs the directory data and a given file that must
 # exist under input/.
 # The file is installed into the installed data directory.
