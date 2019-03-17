@@ -11,4 +11,4 @@ filelist comments-blanklines-single-print.list
 exit-code == 0
 
 stdout equals
-       -file -rel-home output/comments-blanklines-single-print.txt
+       -file output/comments-blanklines-single-print.txt

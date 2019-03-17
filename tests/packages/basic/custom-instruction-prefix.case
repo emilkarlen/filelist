@@ -11,4 +11,4 @@ filelist --instruction-prefix PREFIX custom-instruction-prefix.list
 exit-code == 0
 
 stdout equals
-       -file -rel-home output/custom-instruction-prefix.txt
+       -file output/custom-instruction-prefix.txt

@@ -11,4 +11,4 @@ filelist simple-print.list
 exit-code == 0
 
 stdout equals
-       -file -rel-home output/simple-print.txt
+       -file output/simple-print.txt

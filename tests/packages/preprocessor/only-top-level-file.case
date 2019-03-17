@@ -16,4 +16,4 @@ filelist --preprocessor @[COMMON_SCRIPTS_DIR]@/add-txt-suffix-to-file-paths data
 exit-code == 0
 
 stdout equals
-       -file -rel-home output/only-top-level-file.txt
+       -file output/only-top-level-file.txt

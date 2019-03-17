@@ -12,4 +12,4 @@ filelist print-1.list print-2.list
 exit-code == 0
 
 stdout equals
-       -file -rel-home output/multiple-file-arguments.txt
+       -file output/multiple-file-arguments.txt

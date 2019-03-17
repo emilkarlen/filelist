@@ -15,4 +15,4 @@ filelist instruction-name-variants.list
 exit-code == 0
 
 stdout equals
-       -file -rel-home output/instruction-name-variants.txt
+       -file output/instruction-name-variants.txt
