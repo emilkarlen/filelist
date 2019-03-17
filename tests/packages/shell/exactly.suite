@@ -1,3 +1,9 @@
-[suites]
+[conf]
 
-testcases
+preprocessor = m4 -P ../../common.m4
+
+including ../../common.xly
+
+[cases]
+
+*.case

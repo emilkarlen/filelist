@@ -1,8 +1,6 @@
 [conf]
 
-preprocessor = m4 -P common.m4
-
-home = ..
+preprocessor = m4 -P ../../../common.m4
 
 including ../common.xly
 

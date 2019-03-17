@@ -2,8 +2,6 @@
 
 preprocessor = m4 -P ../../../common.m4
 
-home = ..
-
 including ../common.xly
 
 [cases]
