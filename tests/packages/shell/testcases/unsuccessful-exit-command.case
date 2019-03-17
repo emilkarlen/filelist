@@ -3,10 +3,6 @@
 # The shell command exists with unsuccessful status.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

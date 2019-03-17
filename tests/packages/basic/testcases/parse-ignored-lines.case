@@ -1,7 +1,3 @@
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/parse-ignored-lines.list

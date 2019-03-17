@@ -6,10 +6,6 @@
 # Tags set in an included file should also be set in the including file.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(include-import--in-same-dir.list)

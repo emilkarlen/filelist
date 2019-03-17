@@ -4,10 +4,6 @@
 # SHOULD be ignored by the included file.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(include-option-to-not-export-tags--current-tags--in-same-dir.list)

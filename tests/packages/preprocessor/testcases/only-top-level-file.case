@@ -3,10 +3,6 @@
 # Only a top-level files.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(single-file.list)

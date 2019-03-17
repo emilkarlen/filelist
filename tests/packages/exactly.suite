@@ -10,20 +10,20 @@
 
 [suites]
 
-basic/exactly.suite
+basic
 
-file-path/exactly.suite
+file-path
 
-list/exactly.suite
+list
 
-include/exactly.suite
+include
 
-print-inclusion-hierarchy/exactly.suite
+print-inclusion-hierarchy
 
-tags/exactly.suite
+tags
 
-shell/exactly.suite
+shell
 
-preprocessor/exactly.suite
+preprocessor
 
-stdin-as-file-argument/exactly.suite
+stdin-as-file-argument

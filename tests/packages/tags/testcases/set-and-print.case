@@ -5,10 +5,6 @@
 # SHOULD be printed on a single line in alphanumerical order.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/set-and-print.list

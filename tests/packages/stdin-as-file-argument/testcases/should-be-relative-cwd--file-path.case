@@ -4,10 +4,6 @@
 # SHOULD be relative the Current Working Directory of the process.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

@@ -1,10 +1,6 @@
 # Tests @list with combination of wildcard and reg-ex
 # for the condition on file names.
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(name--include--shell-pattern-and-regex.list)

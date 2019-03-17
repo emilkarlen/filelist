@@ -4,10 +4,6 @@
 # SHOULD cause an error.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/stack-pop-empty-stack.list

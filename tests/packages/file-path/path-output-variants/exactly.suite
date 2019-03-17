@@ -1,7 +1,3 @@
-[conf]
+[suites]
 
-preprocessor = m4 -P
-
-[cases]
-
-testcases/*.case
+testcases

@@ -4,10 +4,6 @@
 # SHOULD be forwarded to following file arguments
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

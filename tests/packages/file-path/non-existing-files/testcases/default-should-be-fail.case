@@ -4,10 +4,6 @@
 # SHOULD default to "fail".
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

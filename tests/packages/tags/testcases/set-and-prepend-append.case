@@ -3,10 +3,6 @@
 # by both prepending and appending them.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(set-tags-and-files.list)

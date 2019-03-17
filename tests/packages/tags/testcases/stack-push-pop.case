@@ -2,10 +2,6 @@
 # Test of correct usage of push and pop.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/stack-push-pop.list

@@ -5,10 +5,6 @@
 # SHOULD be relative the given custom directory
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 dir data-root-dir

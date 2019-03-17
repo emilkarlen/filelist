@@ -4,10 +4,6 @@
 # The included file is located in a DIFFERENT directory.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(include-export--in-other-dir.list)

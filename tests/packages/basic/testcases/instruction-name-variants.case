@@ -2,10 +2,6 @@
 # Tests variants of the instruction names.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/instruction-name-variants.list

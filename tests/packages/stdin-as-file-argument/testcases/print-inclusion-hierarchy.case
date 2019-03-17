@@ -6,10 +6,6 @@
 # (For the "correct way", see the expected output.)
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

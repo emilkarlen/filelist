@@ -4,10 +4,6 @@
 # SHOULD output only the non-existing files.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

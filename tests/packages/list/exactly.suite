@@ -1,7 +1,7 @@
 [suites]
 
-testcases/exactly.suite
+testcases
 
-existing-directory/exactly.suite
+existing-directory
 
-file-condition/exactly.suite
+file-condition

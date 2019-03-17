@@ -1,9 +1,5 @@
 # Tests listing an existing directory using an absolute path to the directory.
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

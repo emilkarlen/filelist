@@ -1,12 +1,8 @@
 ###############################################################################
-# This file should be included at the top of every test case file
-#
 # Configuration and values common to all tests.
 #
 # All variables declared have the prefix "M4".
 ###############################################################################
-
-act-home = ../../../../src
 
 # The executable invoked for printing paths relative the
 # list file.

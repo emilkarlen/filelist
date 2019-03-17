@@ -9,10 +9,6 @@
 # file-names.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

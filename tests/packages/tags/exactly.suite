@@ -1,5 +1,5 @@
 [suites]
 
-testcases/exactly.suite
+testcases
 
-forward-to-file-arguments/exactly.suite
+forward-to-file-arguments

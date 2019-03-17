@@ -2,10 +2,6 @@
 # Tests detection of an invalid command.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/invalid-command.list

@@ -5,10 +5,6 @@
 # SHOULD produced no output
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/print-prefix-suffix.list

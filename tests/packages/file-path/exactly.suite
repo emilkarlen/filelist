@@ -1,9 +1,9 @@
 [suites]
 
-testcases/exactly.suite
+testcases
 
-path-output-variants/exactly.suite
+path-output-variants
 
-non-existing-files/exactly.suite
+non-existing-files
 
-filter-on-tags/exactly.suite
+filter-on-tags

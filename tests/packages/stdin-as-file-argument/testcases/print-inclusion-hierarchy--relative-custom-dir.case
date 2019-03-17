@@ -6,10 +6,6 @@
 # in the output.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 dir data-root-dir

@@ -5,10 +5,6 @@
 # SHOULD continue as if the line with the file-path did not exist in the list.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

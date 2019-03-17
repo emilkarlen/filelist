@@ -5,10 +5,6 @@
 # SHOULD exit with exit status that indicates a missing file.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

@@ -2,10 +2,6 @@
 # Tests that tags are set correctly by the shell instruction.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

@@ -3,10 +3,6 @@
 # used with the PRINT instruction.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy input/simple-print.list

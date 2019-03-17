@@ -2,10 +2,6 @@
 # Tests that error messages contain a the chain of list-inclusions.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(inclusion-trace-in-error-messages.list)

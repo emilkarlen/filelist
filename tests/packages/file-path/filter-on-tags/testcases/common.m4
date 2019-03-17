@@ -1,6 +1,3 @@
-home     = ..
-act-home = ..
-
 m4_include(../../../../common.m4)
 
 m4_define(`M4_STANDARD_SET',`a,b')

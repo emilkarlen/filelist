@@ -7,10 +7,6 @@
 # printed correctly (e.g., paths are relative CWD).
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 M4_SETUP_INSTALL_DATA_AND_INPUT(includes-list-with-ref-to-non-existing-file.list)

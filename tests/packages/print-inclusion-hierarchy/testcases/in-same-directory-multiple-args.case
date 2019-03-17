@@ -3,10 +3,6 @@
 # All file lists are located in the same directory.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data

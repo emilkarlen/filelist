@@ -3,10 +3,6 @@
 # A filter that includes files from the shell command.
 #
 
-[conf]
-
-m4_include(common.m4)
-
 [setup]
 
 copy data
