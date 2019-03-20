@@ -7,3 +7,8 @@ including ../common.xly
 [cases]
 
 *.case
+
+[suites]
+
+include
+set
