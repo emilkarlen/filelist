@@ -2,6 +2,9 @@
 
 act-home = ../src
 
+actor = -file python3
+
+
 [setup]
 
 def path COMMON_SCRIPTS_DIR = -rel-here scripts

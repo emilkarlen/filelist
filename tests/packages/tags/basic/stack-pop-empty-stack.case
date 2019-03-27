@@ -10,7 +10,7 @@ copy input/stack-pop-empty-stack.list
 
 [act]
 
-filelist stack-pop-empty-stack.list
+filelist.py stack-pop-empty-stack.list
 
 [assert]
 

@@ -10,7 +10,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(existing-dir.list)
 
 [act]
 
-filelist data/existing-dir.list
+filelist.py data/existing-dir.list
 
 # TODO is there a better exit code?
 [assert]

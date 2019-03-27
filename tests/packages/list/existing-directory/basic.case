@@ -9,7 +9,7 @@ file data/dir.list =
 
 [act]
 
-filelist data/dir.list
+filelist.py data/dir.list
 
 [assert]
 

@@ -8,7 +8,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(include-import-stack.list)
 
 [act]
 
-filelist data/include-import-stack.list
+filelist.py data/include-import-stack.list
 
 [assert]
 

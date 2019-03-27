@@ -21,7 +21,7 @@ file data/set-tags-and-list.list =
 
 [act]
 
-filelist --append-tags data/set-tags-and-list.list
+filelist.py --append-tags data/set-tags-and-list.list
 
 [before-assert]
 

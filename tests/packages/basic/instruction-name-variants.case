@@ -8,7 +8,7 @@ copy input/instruction-name-variants.list
 
 [act]
 
-filelist instruction-name-variants.list
+filelist.py instruction-name-variants.list
 
 [assert]
 

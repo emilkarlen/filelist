@@ -10,7 +10,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(include-export--in-other-dir.list)
 
 [act]
 
-filelist --append-tags data/include-export--in-other-dir.list
+filelist.py --append-tags data/include-export--in-other-dir.list
 
 [assert]
 

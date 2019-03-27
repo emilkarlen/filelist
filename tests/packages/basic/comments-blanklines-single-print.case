@@ -4,7 +4,7 @@ copy input/comments-blanklines-single-print.list
 
 [act]
 
-filelist comments-blanklines-single-print.list
+filelist.py comments-blanklines-single-print.list
 
 [assert]
 

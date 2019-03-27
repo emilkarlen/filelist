@@ -15,7 +15,7 @@ data/existing-file-1.txt
 
 [act]
 
-filelist -- -
+filelist.py -- -
 
 [assert]
 

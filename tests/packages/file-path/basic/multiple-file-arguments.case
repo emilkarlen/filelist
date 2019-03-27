@@ -9,7 +9,7 @@ EOF
 
 [act]
 
-filelist data/list-with-existing-in-same-dir.list data/dir-with-listfile/list-with-existing-file.list
+filelist.py data/list-with-existing-in-same-dir.list data/dir-with-listfile/list-with-existing-file.list
 
 [assert]
 

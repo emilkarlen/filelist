@@ -9,7 +9,7 @@ copy input/simple-print.list
 
 [act]
 
-filelist --suppress-non-path-output simple-print.list
+filelist.py --suppress-non-path-output simple-print.list
 
 [assert]
 

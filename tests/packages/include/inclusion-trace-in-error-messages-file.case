@@ -13,7 +13,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(includes-list-with-ref-to-non-existing-file.list
 
 [act]
 
-filelist data/includes-list-with-ref-to-non-existing-file.list
+filelist.py data/includes-list-with-ref-to-non-existing-file.list
 
 [assert]
 

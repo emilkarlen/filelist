@@ -9,7 +9,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(single-file.list)
 
 [act]
 
-filelist --preprocessor @[COMMON_SCRIPTS_DIR]@/add-txt-suffix-to-file-paths data/single-file.list data/single-file.list
+filelist.py --preprocessor @[COMMON_SCRIPTS_DIR]@/add-txt-suffix-to-file-paths data/single-file.list data/single-file.list
 
 [assert]
 

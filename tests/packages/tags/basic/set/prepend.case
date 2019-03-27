@@ -8,7 +8,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(set-tags-and-files.list)
 
 [act]
 
-filelist --prepend-tags data/set-tags-and-files.list
+filelist.py --prepend-tags data/set-tags-and-files.list
 
 [assert]
 

@@ -4,7 +4,7 @@ copy data/home
 
 [act]
 
-filelist --absolute-paths home/output-absolute-paths.list
+filelist.py --absolute-paths home/output-absolute-paths.list
 
 [assert]
 

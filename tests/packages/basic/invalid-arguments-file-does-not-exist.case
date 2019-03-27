@@ -1,6 +1,6 @@
 [act]
 
-filelist non-existing-file.list
+filelist.py non-existing-file.list
 
 [assert]
 

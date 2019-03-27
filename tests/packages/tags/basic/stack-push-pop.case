@@ -8,7 +8,7 @@ copy input/stack-push-pop.list
 
 [act]
 
-filelist stack-push-pop.list
+filelist.py stack-push-pop.list
 
 [assert]
 

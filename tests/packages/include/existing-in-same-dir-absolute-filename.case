@@ -11,7 +11,7 @@ existing-file.txt
 
 [act]
 
-filelist data/existing-in-same-dir-absolute-filename.list
+filelist.py data/existing-in-same-dir-absolute-filename.list
 
 [assert]
 

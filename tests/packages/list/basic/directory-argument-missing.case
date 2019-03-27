@@ -4,7 +4,7 @@ copy input/directory-argument-missing.list
 
 [act]
 
-filelist directory-argument-missing.list
+filelist.py directory-argument-missing.list
 
 [assert]
 

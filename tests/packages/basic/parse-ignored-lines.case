@@ -4,7 +4,7 @@ copy input/parse-ignored-lines.list
 
 [act]
 
-filelist parse-ignored-lines.list
+filelist.py parse-ignored-lines.list
 
 [assert]
 

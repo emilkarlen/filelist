@@ -9,7 +9,7 @@ EOF
 
 [act]
 
-filelist data/absolute-file-paths-existing.list
+filelist.py data/absolute-file-paths-existing.list
 
 [assert]
 

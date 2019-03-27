@@ -15,7 +15,7 @@ stdin = -file input/should-be-relative-cwd--other.list
 
 [act]
 
-filelist --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
+filelist.py --print-inclusion-hierarchy --stdin-paths-are-relative data-root-dir  -- -
 
 [assert]
 

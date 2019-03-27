@@ -11,7 +11,7 @@ file data/absolute.list =
 
 [act]
 
-filelist data/absolute.list
+filelist.py data/absolute.list
 
 [assert]
 

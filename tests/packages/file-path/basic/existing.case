@@ -10,7 +10,7 @@ EOF
 
 [act]
 
-filelist data/existing.list
+filelist.py data/existing.list
 
 [assert]
 

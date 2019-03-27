@@ -11,7 +11,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(filter-include.list)
 
 [act]
 
-filelist --filter-tags included1,included2 data/filter-include.list
+filelist.py --filter-tags included1,included2 data/filter-include.list
 
 [assert]
 

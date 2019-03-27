@@ -12,7 +12,7 @@ copy data
 
 [act]
 
-filelist --missing-file-handling include data/list.list
+filelist.py --missing-file-handling include data/list.list
 
 [assert]
 

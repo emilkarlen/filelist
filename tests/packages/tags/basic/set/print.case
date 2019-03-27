@@ -11,7 +11,7 @@ copy input/set-and-print.list
 
 [act]
 
-filelist set-and-print.list
+filelist.py set-and-print.list
 
 [assert]
 

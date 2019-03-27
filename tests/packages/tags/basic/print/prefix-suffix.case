@@ -11,7 +11,7 @@ copy input/print-prefix-suffix.list
 
 [act]
 
-filelist print-prefix-suffix.list
+filelist.py print-prefix-suffix.list
 
 [assert]
 

@@ -24,7 +24,7 @@ existing-file-1.txt
 [act]
 
 
-filelist data/successful-command-in-same-dir-with-valid-output.list
+filelist.py data/successful-command-in-same-dir-with-valid-output.list
 
 
 [assert]

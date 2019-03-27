@@ -14,7 +14,7 @@ stdin =
 
 [act]
 
-filelist -- -
+filelist.py -- -
 
 [assert]
 

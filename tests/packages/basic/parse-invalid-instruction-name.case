@@ -4,7 +4,7 @@ copy input/parse-invalid-instruction-name.list
 
 [act]
 
-filelist parse-invalid-instruction-name.list
+filelist.py parse-invalid-instruction-name.list
 
 [assert]
 

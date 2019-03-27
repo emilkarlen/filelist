@@ -10,7 +10,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(stack-push.list)
 
 [act]
 
-filelist data/stack-push.list
+filelist.py data/stack-push.list
 
 [assert]
 

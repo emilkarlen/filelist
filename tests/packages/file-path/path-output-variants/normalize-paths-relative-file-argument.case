@@ -4,7 +4,7 @@ copy data/home
 
 [act]
 
-filelist --normalize-paths --relative-file-argument-location home/normalize-paths.list
+filelist.py --normalize-paths --relative-file-argument-location home/normalize-paths.list
 
 [assert]
 

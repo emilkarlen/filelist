@@ -10,7 +10,7 @@ copy data
 
 [act]
 
-filelist data/list.list
+filelist.py data/list.list
 
 [assert]
 

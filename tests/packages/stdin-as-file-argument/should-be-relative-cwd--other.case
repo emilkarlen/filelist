@@ -12,7 +12,7 @@ stdin = -file input/should-be-relative-cwd--other.list
 
 [act]
 
-filelist -- -
+filelist.py -- -
 
 [assert]
 

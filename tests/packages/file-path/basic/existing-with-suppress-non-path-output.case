@@ -15,7 +15,7 @@ EOF
 
 [act]
 
-filelist --suppress-non-path-output data/existing.list
+filelist.py --suppress-non-path-output data/existing.list
 
 [assert]
 

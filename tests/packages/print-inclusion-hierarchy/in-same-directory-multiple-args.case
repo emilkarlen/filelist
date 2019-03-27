@@ -9,7 +9,7 @@ copy data
 
 [act]
 
-filelist --print-inclusion-hierarchy data/in-same-directory.list data/in-same-directory.list
+filelist.py --print-inclusion-hierarchy data/in-same-directory.list data/in-same-directory.list
 
 [assert]
 

@@ -5,7 +5,7 @@ copy input/print-2.list
 
 [act]
 
-filelist print-1.list print-2.list
+filelist.py print-1.list print-2.list
 
 [assert]
 

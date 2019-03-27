@@ -15,7 +15,7 @@ file data/tags.list =
 
 [act]
 
-filelist @[PREPEND_TAGS_OPT]@ data/tags.list
+filelist.py @[PREPEND_TAGS_OPT]@ data/tags.list
 
 [assert]
 

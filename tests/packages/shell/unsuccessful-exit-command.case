@@ -16,7 +16,7 @@ file data/unsuccessful-exit-command.list =
 
 [act]
 
-filelist data/unsuccessful-exit-command.list
+filelist.py data/unsuccessful-exit-command.list
 
 [assert]
 

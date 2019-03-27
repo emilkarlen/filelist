@@ -15,7 +15,7 @@ file data/tags.list =
 
 [act]
 
-filelist --filter-tags tag1 data/tags.list
+filelist.py --filter-tags tag1 data/tags.list
 
 [assert]
 

@@ -26,7 +26,7 @@ file data/the.list =
 
 [act]
 
-filelist data/the.list
+filelist.py data/the.list
 
 [assert]
 

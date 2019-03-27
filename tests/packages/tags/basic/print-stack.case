@@ -10,7 +10,7 @@ copy input/print-stack.list
 
 [act]
 
-filelist print-stack.list
+filelist.py print-stack.list
 
 [assert]
 

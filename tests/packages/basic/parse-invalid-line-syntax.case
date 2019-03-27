@@ -4,7 +4,7 @@ copy input/parse-invalid-line-syntax.list
 
 [act]
 
-filelist parse-invalid-line-syntax.list
+filelist.py parse-invalid-line-syntax.list
 
 [assert]
 

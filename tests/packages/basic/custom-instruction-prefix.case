@@ -4,7 +4,7 @@ copy input/custom-instruction-prefix.list
 
 [act]
 
-filelist --instruction-prefix PREFIX custom-instruction-prefix.list
+filelist.py --instruction-prefix PREFIX custom-instruction-prefix.list
 
 [assert]
 

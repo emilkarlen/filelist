@@ -8,7 +8,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(remove.list)
 
 [act]
 
-filelist @[PREPEND_TAGS_OPT]@ data/remove.list
+filelist.py @[PREPEND_TAGS_OPT]@ data/remove.list
 
 [assert]
 

@@ -8,7 +8,7 @@ copy input/invalid-command.list
 
 [act]
 
-filelist @[PREPEND_TAGS_OPT]@ invalid-command.list
+filelist.py @[PREPEND_TAGS_OPT]@ invalid-command.list
 
 [assert]
 

@@ -10,7 +10,7 @@ copy data
 
 [act]
 
-filelist --forward-tags data/set-and-print-tags.list data/print-tags.list
+filelist.py --forward-tags data/set-and-print-tags.list data/print-tags.list
 
 [assert]
 

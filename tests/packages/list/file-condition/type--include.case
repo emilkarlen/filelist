@@ -4,7 +4,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(type--include.list)
 
 [act]
 
-filelist @[REL_FILE_ARG_OPT]@ data/type--include.list
+filelist.py @[REL_FILE_ARG_OPT]@ data/type--include.list
 
 [assert]
 

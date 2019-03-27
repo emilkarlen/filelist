@@ -10,7 +10,7 @@ EOF
 
 [act]
 
-filelist --relative-file-argument-location data/existing.list
+filelist.py --relative-file-argument-location data/existing.list
 
 [assert]
 

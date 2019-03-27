@@ -8,7 +8,7 @@ M4_SETUP_INSTALL_DATA_AND_INPUT(inclusion-trace-in-error-messages.list)
 
 [act]
 
-filelist data/inclusion-trace-in-error-messages.list
+filelist.py data/inclusion-trace-in-error-messages.list
 
 [assert]
 

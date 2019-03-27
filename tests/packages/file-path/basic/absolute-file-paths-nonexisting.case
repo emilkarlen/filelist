@@ -8,7 +8,7 @@ EOF
 
 [act]
 
-filelist data/absolute-file-paths-nonexisting.list
+filelist.py data/absolute-file-paths-nonexisting.list
 
 [assert]
 
