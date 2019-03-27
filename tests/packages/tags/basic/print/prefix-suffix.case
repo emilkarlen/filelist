@@ -1,0 +1,19 @@
+#
+# WHEN the tags print command is issued with options for prefix and suffix
+# THEN the current tags
+# SHOULD be printed on a single line in alphanumerical order, with the
+# given prefix and suffix.
+#
+
+[setup]
+
+copy input/print-prefix-suffix.list
+
+[act]
+
+filelist print-prefix-suffix.list
+
+[assert]
+
+exit-code == 0
+stdout equals -file output/print-prefix-suffix.txt

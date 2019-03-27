@@ -1,0 +1,19 @@
+#
+# WHEN the tags print-stack command
+# is used together with the option of supression of non-path output
+# THEN the print-stack command
+# SHOULD produced no output
+#
+
+[setup]
+
+copy input/print-stack.list
+
+[act]
+
+filelist --suppress-non-path-output print-stack.list
+
+[assert]
+
+exit-code == 0
+stdout   empty

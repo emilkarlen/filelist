@@ -1,0 +1,18 @@
+#
+# WHEN the tags print-stack command
+# THEN the tags stack
+# SHOULD be printed on a single line
+#
+
+[setup]
+
+copy input/print-stack.list
+
+[act]
+
+filelist print-stack.list
+
+[assert]
+
+exit-code == 0
+stdout equals -file output/print-stack.txt
