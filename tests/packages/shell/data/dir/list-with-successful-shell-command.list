@@ -1,1 +1,1 @@
-@shell ${EXACTLY_HOME}/scripts/print-arguments ../*.txt
+@shell ${TEST_PACKAGE_HOME_DIR}/scripts/print-arguments ../*.txt

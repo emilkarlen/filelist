@@ -11,6 +11,8 @@
 
 [setup]
 
+env TEST_PACKAGE_HOME_DIR = @[EXACTLY_HOME]@
+
 copy data
 
 file data/the.list =
@@ -22,7 +24,6 @@ file data/the.list =
 @print * Paths from top-level file
 @shell @[EXACTLY_HOME]@/scripts/print-arguments *.txt
 -
-
 
 [act]
 
