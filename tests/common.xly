@@ -2,7 +2,7 @@
 
 act-home = ../src
 
-actor = -file python3
+actor = file % python3
 
 
 [setup]
