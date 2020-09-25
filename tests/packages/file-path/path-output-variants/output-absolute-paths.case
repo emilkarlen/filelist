@@ -10,6 +10,6 @@ filelist.py --absolute-paths home/output-absolute-paths.list
 
 exit-code == 0
 
-stdout -transformed-by REPLACE_TEST_CASE_DIRS
+stdout -transformed-by replace-test-case-dirs
        equals
        -file output/output-absolute-paths.txt
