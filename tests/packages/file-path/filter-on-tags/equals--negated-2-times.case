@@ -10,4 +10,4 @@ M4_RUN_WITH_OPERATOR_EQUALS(`-NN')
 
 exit-code == 0
 
-stdout equals -file output/equals.txt
+stdout equals -contents-of output/equals.txt

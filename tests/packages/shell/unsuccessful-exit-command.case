@@ -23,4 +23,4 @@ filelist.py data/unsuccessful-exit-command.list
 
 exit-code == @[EXIT_SHELL_COMMAND_EXECUTION_ERROR]@
 
-stdout empty
+stdout is-empty

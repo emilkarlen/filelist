@@ -14,4 +14,4 @@ filelist.py data/absolute-file-paths-nonexisting.list
 
 exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
 
-stdout empty
+stdout is-empty

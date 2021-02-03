@@ -17,4 +17,4 @@ filelist.py --append-tags data/include-import--in-other-dir.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/include-import--in-other-dir.txt
+stdout equals -contents-of output/include-import--in-other-dir.txt

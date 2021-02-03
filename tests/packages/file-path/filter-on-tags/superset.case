@@ -10,4 +10,4 @@ M4_RUN_WITH_OPERATOR(`superset')
 
 exit-code == 0
 
-stdout equals -file output/superset.txt
+stdout equals -contents-of output/superset.txt

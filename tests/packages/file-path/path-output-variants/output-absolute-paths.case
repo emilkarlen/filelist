@@ -12,4 +12,4 @@ exit-code == 0
 
 stdout -transformed-by replace-test-case-dirs
        equals
-       -file output/output-absolute-paths.txt
+       -contents-of output/output-absolute-paths.txt

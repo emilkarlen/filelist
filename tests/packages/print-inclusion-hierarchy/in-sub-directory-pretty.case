@@ -16,4 +16,4 @@ filelist.py --print-inclusion-hierarchy-pretty data/in-sub-directory.list
 
 exit-code == 0
 
-stdout equals -file output/in-sub-directory-pretty.txt
+stdout equals -contents-of output/in-sub-directory-pretty.txt

@@ -10,4 +10,4 @@ filelist.py @[REL_FILE_ARG_OPT]@ --filter-tags a,b data/tagged-files.list
 
 exit-code == 0
 
-stdout equals -file output/contains-any-of.txt
+stdout equals -contents-of output/contains-any-of.txt

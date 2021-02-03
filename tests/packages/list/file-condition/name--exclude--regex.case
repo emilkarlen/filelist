@@ -15,4 +15,4 @@ filelist.py @[REL_FILE_ARG_OPT]@ data/name--exclude--regex.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/name--exclude--regex.txt
+stdout equals -contents-of output/name--exclude--regex.txt

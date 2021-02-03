@@ -10,4 +10,4 @@ filelist.py --normalize-paths home/normalize-paths.list
 
 exit-code == 0
 
-stdout equals -file output/normalize-paths.txt
+stdout equals -contents-of output/normalize-paths.txt

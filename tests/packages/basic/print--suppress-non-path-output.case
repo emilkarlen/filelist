@@ -15,4 +15,4 @@ filelist.py --suppress-non-path-output simple-print.list
 
 exit-code == 0
 
-stdout empty
+stdout is-empty

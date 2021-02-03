@@ -16,4 +16,4 @@ filelist.py stack-pop-empty-stack.list
 
 exit-code == @[EXIT_TAGS_ERROR]@
 
-stdout   empty
+stdout   is-empty

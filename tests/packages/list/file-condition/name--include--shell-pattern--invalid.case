@@ -10,4 +10,4 @@ filelist.py @[REL_FILE_ARG_OPT]@ name--include--shell-pattern--invalid.list
 
 exit-code == @[EXIT_SYNTAX]@
 
-stdout   empty
+stdout   is-empty

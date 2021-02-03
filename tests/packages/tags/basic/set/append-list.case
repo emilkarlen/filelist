@@ -37,14 +37,14 @@ file -rel-tmp stdout-fixed-3-4.txt = -stdout-from $ sed -n '3,4p' @[EXACTLY_RESU
 [assert]
 
 
-contents -rel-tmp stdout-fixed-1-2.txt
+contents -rel-tmp stdout-fixed-1-2.txt :
          equals
 <<-
 data/dir/existing-file-1.txt:tag1
 data/dir/existing-file-2.txt:tag1
 -
 
-contents -rel-tmp stdout-fixed-3-4.txt
+contents -rel-tmp stdout-fixed-3-4.txt :
          equals
 <<-
 data/dir/existing-file-1.txt:

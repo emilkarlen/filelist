@@ -10,4 +10,4 @@ M4_RUN_WITH_NEGATED_OPERATOR(`equals')
 
 exit-code == 0
 
-stdout equals -file output/unequals.txt
+stdout equals -contents-of output/unequals.txt

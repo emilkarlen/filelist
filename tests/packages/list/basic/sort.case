@@ -29,4 +29,4 @@ filelist.py @[REL_FILE_ARG_OPT]@ data/sort.list
 
 exit-code == 0
 
-stdout equals -file output/sort.txt
+stdout equals -contents-of output/sort.txt

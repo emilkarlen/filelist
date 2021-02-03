@@ -15,4 +15,4 @@ filelist.py --preprocessor @[COMMON_SCRIPTS_DIR]@/not-a-program data/single-file
 
 exit-code == @[EXIT_PRE_PROCESSING]@
 
-stdout empty
+stdout is-empty

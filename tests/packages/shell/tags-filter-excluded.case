@@ -24,4 +24,4 @@ filelist.py --filter-tags undefined-tag data/tags.list
 
 exit-code == 0
 
-stdout empty
+stdout is-empty

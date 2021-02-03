@@ -10,4 +10,4 @@ M4_RUN_WITH_OPERATOR(`contains-none-of')
 
 exit-code == 0
 
-stdout equals -file output/contains-none-of.txt
+stdout equals -contents-of output/contains-none-of.txt

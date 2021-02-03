@@ -12,6 +12,6 @@ M4_SORT_STDOUT_TO_TMP_FILE(stdout-sorted.txt)
 
 exit-code == 0
 
-contents -rel-tmp stdout-sorted.txt
+contents -rel-tmp stdout-sorted.txt :
          equals
-         -file output/name--include--shell-pattern.txt
+         -contents-of output/name--include--shell-pattern.txt

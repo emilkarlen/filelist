@@ -11,4 +11,4 @@ filelist.py comments-blanklines-single-print.list
 exit-code == 0
 
 stdout equals
-       -file output/comments-blanklines-single-print.txt
+       -contents-of output/comments-blanklines-single-print.txt

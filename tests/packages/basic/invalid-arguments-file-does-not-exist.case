@@ -6,4 +6,4 @@ filelist.py non-existing-file.list
 
 exit-code == @[EXIT_INVALID_ARGUMENTS]@
 
-stdout empty
+stdout is-empty

@@ -9,4 +9,4 @@ filelist.py data/existing-in-subdir.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/existing-in-subdir.txt
+stdout equals -contents-of output/existing-in-subdir.txt

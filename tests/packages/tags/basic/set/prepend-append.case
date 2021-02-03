@@ -14,4 +14,4 @@ filelist.py --prepend-tags --append-tags data/set-tags-and-files.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/set-and-prepend-append.txt
+stdout equals -contents-of output/set-and-prepend-append.txt

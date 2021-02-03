@@ -6,4 +6,4 @@ filelist.py -- - -
 
 exit-code == @[EXIT_USAGE]@
 
-stdout empty
+stdout is-empty

@@ -16,4 +16,4 @@ filelist.py --missing-file-handling only data/list.list
 
 exit-code == 0
 
-stdout equals -file output/only.txt
+stdout equals -contents-of output/only.txt

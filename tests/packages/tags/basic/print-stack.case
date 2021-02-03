@@ -15,4 +15,4 @@ filelist.py print-stack.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/print-stack.txt
+stdout equals -contents-of output/print-stack.txt

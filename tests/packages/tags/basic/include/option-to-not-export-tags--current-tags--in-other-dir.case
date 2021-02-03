@@ -15,4 +15,4 @@ filelist.py --append-tags data/include-option-to-not-export-tags--current-tags--
 [assert]
 
 exit-code == 0
-stdout equals -file output/include-option-to-not-export-tags--current-tags--in-other-dir.txt
+stdout equals -contents-of output/include-option-to-not-export-tags--current-tags--in-other-dir.txt

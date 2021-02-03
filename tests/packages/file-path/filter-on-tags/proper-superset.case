@@ -10,4 +10,4 @@ M4_RUN_WITH_OPERATOR(`proper-superset')
 
 exit-code == 0
 
-stdout equals -file output/proper-superset.txt
+stdout equals -contents-of output/proper-superset.txt

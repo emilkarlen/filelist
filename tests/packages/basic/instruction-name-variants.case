@@ -15,4 +15,4 @@ filelist.py instruction-name-variants.list
 exit-code == 0
 
 stdout equals
-       -file output/instruction-name-variants.txt
+       -contents-of output/instruction-name-variants.txt

@@ -10,4 +10,4 @@ filelist.py parse-invalid-instruction-name.list
 
 exit-code == @[EXIT_SYNTAX]@
 
-stdout empty
+stdout is-empty

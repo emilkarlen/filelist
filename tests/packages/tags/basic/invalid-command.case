@@ -14,4 +14,4 @@ filelist.py @[PREPEND_TAGS_OPT]@ invalid-command.list
 
 exit-code == @[EXIT_SYNTAX]@
 
-stdout   empty
+stdout   is-empty

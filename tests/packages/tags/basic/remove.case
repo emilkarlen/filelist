@@ -13,4 +13,4 @@ filelist.py @[PREPEND_TAGS_OPT]@ data/remove.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/remove.txt
+stdout equals -contents-of output/remove.txt

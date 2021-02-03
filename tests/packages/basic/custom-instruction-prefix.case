@@ -11,4 +11,4 @@ filelist.py --instruction-prefix PREFIX custom-instruction-prefix.list
 exit-code == 0
 
 stdout equals
-       -file output/custom-instruction-prefix.txt
+       -contents-of output/custom-instruction-prefix.txt

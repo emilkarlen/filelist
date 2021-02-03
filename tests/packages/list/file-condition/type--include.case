@@ -10,4 +10,4 @@ filelist.py @[REL_FILE_ARG_OPT]@ data/type--include.list
 
 exit-code == 0
 
-stdout equals -file output/type--include.txt
+stdout equals -contents-of output/type--include.txt

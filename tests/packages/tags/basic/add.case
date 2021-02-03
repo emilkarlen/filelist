@@ -13,4 +13,4 @@ filelist.py @[PREPEND_TAGS_OPT]@ data/add.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/add.txt
+stdout equals -contents-of output/add.txt

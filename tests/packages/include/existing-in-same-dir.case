@@ -10,4 +10,4 @@ filelist.py data/existing-in-same-dir.list
 
 exit-code == 0
 
-stdout equals -file output/existing-in-same-dir.txt
+stdout equals -contents-of output/existing-in-same-dir.txt

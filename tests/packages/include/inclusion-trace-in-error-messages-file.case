@@ -19,6 +19,6 @@ filelist.py data/includes-list-with-ref-to-non-existing-file.list
 
 exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
 
-stdout   empty
+stdout   is-empty
 
-stderr equals -file output/inclusion-trace-in-error-messages-file.txt
+stderr equals -contents-of output/inclusion-trace-in-error-messages-file.txt

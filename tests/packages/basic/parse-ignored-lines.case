@@ -10,4 +10,4 @@ filelist.py parse-ignored-lines.list
 
 exit-code == 0
 
-stdout empty
+stdout is-empty

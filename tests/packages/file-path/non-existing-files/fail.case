@@ -17,4 +17,4 @@ filelist.py --missing-file-handling fail data/list.list
 
 exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
 
-stdout equals -file output/fail.txt
+stdout equals -contents-of output/fail.txt

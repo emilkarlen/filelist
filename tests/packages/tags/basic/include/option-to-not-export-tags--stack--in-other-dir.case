@@ -16,4 +16,4 @@ filelist.py --append-tags data/include-option-to-not-export-tags--stack--in-othe
 
 exit-code == @[EXIT_TAGS_ERROR]@
 
-stdout   empty
+stdout   is-empty

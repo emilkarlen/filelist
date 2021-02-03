@@ -10,4 +10,4 @@ M4_RUN_WITH_OPERATOR(`contains-any-of')
 
 exit-code == 0
 
-stdout equals -file output/contains-any-of.txt
+stdout equals -contents-of output/contains-any-of.txt

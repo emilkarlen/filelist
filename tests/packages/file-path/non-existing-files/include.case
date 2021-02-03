@@ -17,4 +17,4 @@ filelist.py --missing-file-handling include data/list.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/include.txt
+stdout equals -contents-of output/include.txt

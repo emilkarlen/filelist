@@ -10,7 +10,7 @@
 
 copy data
 
-stdin = -file input/should-be-relative-cwd--other.list
+stdin = -contents-of input/should-be-relative-cwd--other.list
 
 [act]
 

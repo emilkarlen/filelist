@@ -9,4 +9,4 @@ filelist.py --relative-file-argument-location data/existing-in-subdir.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/existing--relative-file-argument.txt
+stdout equals -contents-of output/existing--relative-file-argument.txt

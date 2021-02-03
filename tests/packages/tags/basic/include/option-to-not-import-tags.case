@@ -15,4 +15,4 @@ filelist.py --append-tags data/include-option-to-not-import-tags.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/include-option-to-not-import-tags.txt
+stdout equals -contents-of output/include-option-to-not-import-tags.txt

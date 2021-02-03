@@ -16,4 +16,4 @@ filelist.py --filter-tags included1,included2 data/filter-include.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/filter.txt
+stdout equals -contents-of output/filter.txt

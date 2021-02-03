@@ -15,4 +15,4 @@ filelist.py data/preserve-current-directory.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/preserve-current-directory.txt
+stdout equals -contents-of output/preserve-current-directory.txt

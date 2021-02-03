@@ -10,4 +10,4 @@ M4_RUN_WITH_OPERATOR(`proper-subset')
 
 exit-code == 0
 
-stdout equals -file output/proper-subset.txt
+stdout equals -contents-of output/proper-subset.txt

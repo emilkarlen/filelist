@@ -10,4 +10,4 @@ filelist.py directory-argument-missing.list
 
 exit-code == @[EXIT_SYNTAX]@
 
-stdout   empty
+stdout   is-empty

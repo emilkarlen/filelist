@@ -13,4 +13,4 @@ filelist.py data/include-export-stack.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/include-export-stack.txt
+stdout equals -contents-of output/include-export-stack.txt

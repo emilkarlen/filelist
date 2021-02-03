@@ -13,4 +13,4 @@ filelist.py stack-push-pop.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/stack-push-pop.txt
+stdout equals -contents-of output/stack-push-pop.txt

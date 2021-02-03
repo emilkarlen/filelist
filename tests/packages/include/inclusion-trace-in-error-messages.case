@@ -14,6 +14,6 @@ filelist.py data/inclusion-trace-in-error-messages.list
 
 exit-code == @[EXIT_SYNTAX]@
 
-stdout empty
+stdout is-empty
 
-stderr equals -file output/inclusion-trace-in-error-messages.txt
+stderr equals -contents-of output/inclusion-trace-in-error-messages.txt

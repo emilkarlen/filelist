@@ -17,4 +17,4 @@ filelist.py @[REL_FILE_ARG_OPT]@ data/excludes-have-precedence.list
 
 exit-code == 0
 
-stdout equals -file output/excludes-have-precedence.txt
+stdout equals -contents-of output/excludes-have-precedence.txt

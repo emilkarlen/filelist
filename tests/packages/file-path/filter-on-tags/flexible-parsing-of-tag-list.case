@@ -10,4 +10,4 @@ filelist.py @[REL_FILE_ARG_OPT]@ --operator-for-filter-tags equals --filter-tags
 
 exit-code == 0
 
-stdout equals -file output/flexible-parsing-of-tag-list.txt
+stdout equals -contents-of output/flexible-parsing-of-tag-list.txt

@@ -16,4 +16,4 @@ filelist.py data/set-and-print-tags.list data/print-tags.list
 
 exit-code == 0
 
-stdout equals -file output/do-not-forward.txt
+stdout equals -contents-of output/do-not-forward.txt

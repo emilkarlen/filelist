@@ -16,4 +16,4 @@ filelist.py set-and-print.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/set-and-print.txt
+stdout equals -contents-of output/set-and-print.txt

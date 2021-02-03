@@ -10,7 +10,7 @@
 dir data-root-dir
 copy data data-root-dir
 
-stdin = -file input/should-be-relative-cwd--other.list
+stdin = -contents-of input/should-be-relative-cwd--other.list
 
 [act]
 
@@ -20,4 +20,4 @@ filelist.py --stdin-paths-are-relative data-root-dir  -- -
 
 exit-code == 0
 
-stdout equals -file output/paths-relative-custom-dir.txt
+stdout equals -contents-of output/paths-relative-custom-dir.txt

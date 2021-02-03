@@ -9,4 +9,4 @@ filelist.py --normalize-paths --relative-file-argument-location home/normalize-p
 [assert]
 
 exit-code == 0
-stdout equals -file output/normalize-paths-relative-file-argument.txt
+stdout equals -contents-of output/normalize-paths-relative-file-argument.txt

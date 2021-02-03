@@ -16,4 +16,4 @@ filelist.py --missing-file-handling ignore data/list.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/ignore.txt
+stdout equals -contents-of output/ignore.txt

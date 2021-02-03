@@ -16,4 +16,4 @@ filelist.py --suppress-non-path-output print-prefix-suffix.list
 [assert]
 
 exit-code == 0
-stdout   empty
+stdout   is-empty

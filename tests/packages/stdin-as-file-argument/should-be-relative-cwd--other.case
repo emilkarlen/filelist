@@ -8,7 +8,7 @@
 
 copy data
 
-stdin = -file input/should-be-relative-cwd--other.list
+stdin = -contents-of input/should-be-relative-cwd--other.list
 
 [act]
 
@@ -18,4 +18,4 @@ filelist.py -- -
 
 exit-code == 0
 
-stdout equals -file output/should-be-relative-cwd--other.txt
+stdout equals -contents-of output/should-be-relative-cwd--other.txt

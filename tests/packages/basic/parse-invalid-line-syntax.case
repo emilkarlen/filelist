@@ -10,4 +10,4 @@ filelist.py parse-invalid-line-syntax.list
 
 exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
 
-stdout empty
+stdout is-empty

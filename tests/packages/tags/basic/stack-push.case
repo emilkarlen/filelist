@@ -15,4 +15,4 @@ filelist.py data/stack-push.list
 [assert]
 
 exit-code == 0
-stdout equals -file output/stack-push.txt
+stdout equals -contents-of output/stack-push.txt

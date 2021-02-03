@@ -10,4 +10,4 @@ M4_RUN_WITH_OPERATOR(`subset')
 
 exit-code == 0
 
-stdout equals -file output/subset.txt
+stdout equals -contents-of output/subset.txt

@@ -15,4 +15,4 @@ filelist.py --print-inclusion-hierarchy data/in-same-directory.list
 
 exit-code == 0
 
-stdout equals -file output/in-same-directory.txt
+stdout equals -contents-of output/in-same-directory.txt

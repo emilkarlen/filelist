@@ -25,4 +25,4 @@ filelist.py data/the.list
 
 exit-code == @[EXIT_FILE_DOES_NOT_EXIST]@
 
-stdout   empty
+stdout   is-empty

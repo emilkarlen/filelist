@@ -11,4 +11,4 @@ filelist.py simple-print.list
 exit-code == 0
 
 stdout equals
-       -file output/simple-print.txt
+       -contents-of output/simple-print.txt
