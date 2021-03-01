@@ -3,3 +3,5 @@ tmp
 build
 TIMING
 venv
+.idea
+__pycache__

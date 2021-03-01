@@ -11,7 +11,7 @@
 
 [setup]
 
-env TEST_PACKAGE_HOME_DIR = @[EXACTLY_HOME]@
+env TEST_PACKAGE_HOME_DIR = "@[EXACTLY_HOME]@"
 
 copy data
 
